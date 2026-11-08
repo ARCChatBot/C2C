@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Operation SEMI - 2D Training Portal</title>
+    <title>Operation SEMI - 2D Computer-Based Training Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -28,7 +28,7 @@
             </div>
             <div>
                 <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Operation SEMI Portal</h2>
-                <p class="text-xs text-slate-500 mt-1">Enter your Student ID and Full Name to register and access training modules.</p>
+                <p class="text-xs text-slate-500 mt-1">Enter your Student ID and Full Name to register and access your CBT modules.</p>
             </div>
             <form onsubmit="handleDirectIntake(event)" class="space-y-3 text-left">
                 <div>
@@ -40,7 +40,7 @@
                     <input type="text" id="intakeFullName" placeholder="e.g. Nicolas Pollard" required class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-slate-50">
                 </div>
                 <button type="submit" class="w-full py-3.5 rounded-xl bg-brandBlue hover:bg-blue-700 text-white font-semibold text-sm shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-right-to-bracket"></i> Register & Enter Portal
+                    <i class="fa-solid fa-right-to-bracket"></i> Register & Enter CBT
                 </button>
             </form>
         </div>
@@ -54,7 +54,7 @@
                     <i class="fa-solid fa-microchip"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold text-slate-900">Operation SEMI <span class="text-xs uppercase px-2 py-0.5 bg-blue-50 text-brandBlue rounded-full font-semibold">2D Portal</span></h1>
+                    <h1 class="text-xl font-bold text-slate-900">Operation SEMI <span class="text-xs uppercase px-2 py-0.5 bg-blue-50 text-brandBlue rounded-full font-semibold">2D CBT Portal</span></h1>
                 </div>
             </div>
             <div class="flex items-center space-x-4">
@@ -66,42 +66,54 @@
     </header>
 
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-white rounded-3xl border border-slate-200 p-6 flex flex-col justify-between shadow-sm">
-                <div>
-                    <h4 class="text-xl font-bold text-slate-900 mb-1">Module 1: AI Literacy</h4>
-                    <p class="text-xs text-slate-600 mb-6">Learn AI fundamentals and automated agentic workflows in manufacturing.</p>
-                </div>
-                <button onclick="openModule(1)" class="w-full py-3 rounded-xl bg-brandBlue text-white font-semibold text-sm">Launch Module 1</button>
+        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex items-center justify-between">
+            <div>
+                <span class="text-xs font-bold text-brandOrange uppercase tracking-wider">Curriculum Roadmap</span>
+                <h2 class="text-xl font-extrabold text-slate-900">Knowledge-Based Foundations (Modules 1 - 10)</h2>
             </div>
-            <div class="bg-white rounded-3xl border border-slate-200 p-6 flex flex-col justify-between shadow-sm">
-                <div>
-                    <h4 class="text-xl font-bold text-slate-900 mb-1">Module 2: Microelectronics</h4>
-                    <p class="text-xs text-slate-600 mb-6">Explore semiconductor physics and ESD protection protocols.</p>
-                </div>
-                <button onclick="openModule(2)" class="w-full py-3 rounded-xl bg-brandBlue text-white font-semibold text-sm">Launch Module 2</button>
-            </div>
-            <div class="bg-white rounded-3xl border border-slate-200 p-6 flex flex-col justify-between shadow-sm">
-                <div>
-                    <h4 class="text-xl font-bold text-slate-900 mb-1">Module 3: Industry Standards</h4>
-                    <p class="text-xs text-slate-600 mb-6">Gain insights into cleanroom contamination control and supply chains.</p>
-                </div>
-                <button onclick="openModule(3)" class="w-full py-3 rounded-xl bg-brandBlue text-white font-semibold text-sm">Launch Module 3</button>
-            </div>
+            <span id="completionBadge" class="px-3 py-1.5 bg-slate-100 text-slate-700 font-bold rounded-full text-xs">Completed: 0 / 10</span>
+        </div>
+
+        <!-- Modules Grid (10 Modules Minimum) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="modulesGrid">
+            <!-- Populated via JS -->
         </div>
     </main>
 
-    <!-- Modal -->
+    <!-- Module Modal -->
     <div id="moduleModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 space-y-4 shadow-2xl">
-            <h3 id="modalTitle" class="text-lg font-bold"></h3>
-            <div id="modalBodyContent"></div>
-            <button onclick="nextStep()" id="nextBtn" class="px-5 py-2 bg-brandBlue text-white rounded-xl text-sm font-semibold">Continue</button>
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-8 space-y-6 shadow-2xl">
+            <div class="flex items-center justify-between border-b pb-4">
+                <h3 id="modalTitle" class="text-lg font-extrabold text-slate-900"></h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div id="modalBodyContent" class="space-y-4"></div>
+            <button onclick="nextStep()" id="nextBtn" class="w-full py-3 bg-brandBlue text-white rounded-xl text-sm font-semibold shadow">Continue</button>
+        </div>
+    </div>
+
+    <!-- Overall Completion Celebration Modal -->
+    <div id="celebrationModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-8 shadow-2xl border border-slate-100 text-center space-y-6">
+            <div class="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl mx-auto shadow-inner border border-emerald-100">
+                <i class="fa-solid fa-award"></i>
+            </div>
+            <div>
+                <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Computer-Based Training Complete!</h2>
+                <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+                    Congratulations! You have successfully mastered all knowledge-based foundations. Please return back to the main menu for continuous training and hands-on equipment scheduling.
+                </p>
+            </div>
+            <a href="/" class="block w-full py-3.5 rounded-xl bg-brandBlue hover:bg-blue-700 text-white font-semibold text-sm shadow-lg transition-colors">
+                <i class="fa-solid fa-arrow-left"></i> Return to Main Menu
+            </a>
         </div>
     </div>
 
     <script>
         let userId = '', userName = '';
+        let completedModules = new Set();
+
         async function handleDirectIntake(event) {
             event.preventDefault();
             const studentIdInput = document.getElementById('intakeStudentId').value.trim();
@@ -115,49 +127,132 @@
                 userId = studentIdInput; userName = fullNameInput;
                 document.getElementById('userNameDisplay').textContent = userName;
                 document.getElementById('intakeAuthModal').classList.add('hidden');
+                loadExistingProgress();
             }
         }
+
+        async function loadExistingProgress() {
+            try {
+                const res = await fetch('/api/training-logs');
+                if (res.ok) {
+                    const logs = await res.json();
+                    logs.forEach(log => {
+                        if (log.student_id === userId && (log.track || '').includes('2D CBT - Module')) {
+                            const match = log.track.match(/Module (\d+)/);
+                            if (match) completedModules.add(parseInt(match[1]));
+                        }
+                    });
+                }
+                renderModulesGrid();
+            } catch (err) {
+                renderModulesGrid();
+            }
+        }
+
+        const modulesConfig = [
+            { id: 1, title: "Module 1: AI Literacy in Microelectronics", desc: "Foundational concepts of AI-driven semiconductor scheduling and autonomous fab workflows.", steps: [{ type: "content", text: "Autonomous agentic frameworks analyze lot flow and optimize tool utilization across semiconductor fabrication bays." }, { type: "quiz", question: "What is the primary role of AI agents in modern semiconductor manufacturing?", options: ["Automating tool routing and yield prediction", "Replacing all chemical cleaning processes", "Managing administrative payroll"], correct: 0 }] },
+            { id: 2, title: "Module 2: Cleanroom Protocols & Contamination Control", desc: "Understanding particle control, cleanroom classification, and gowning procedures.", steps: [{ type: "content", text: "Cleanrooms maintain extremely low concentrations of airborne particulates by controlling airflow and gowning discipline." }, { type: "quiz", question: "Why is particle control critical in a semiconductor cleanroom?", options: ["To keep the room temperature comfortable", "To prevent microscopic dust from bridging sub-micron circuit features", "To reduce electricity consumption"], correct: 1 }] },
+            { id: 3, title: "Module 3: Electrostatic Discharge (ESD) Safety", desc: "Mitigating electrostatic hazards to protect sensitive semiconductor devices.", steps: [{ type: "content", text: "Electrostatic discharge can instantly rupture gate oxides in microchips. Grounding straps and ESD flooring are mandatory." }, { type: "quiz", question: "What is the primary purpose of wearing an ESD wrist strap?", options: ["To prevent wrist strain during tool operation", "To safely drain static electricity from the technician to ground", "To track technician location in the bay"], correct: 1 }] },
+            { id: 4, title: "Module 4: Photolithography & Etching Fundamentals", desc: "Exploring exposure, photoresist application, and pattern transfer techniques.", steps: [{ type: "content", text: "Photolithography transfers circuit patterns from a photomask onto a silicon wafer using light-sensitive photoresist." }, { type: "quiz", question: "What substance is selectively removed during the wet or dry etching process?", options: ["The underlying substrate or unmasked material", "The vacuum pump oil", "The cleanroom ceiling tiles"], correct: 0 }] },
+            { id: 5, title: "Module 5: Chemical Handling & Safety Data Sheets", desc: "Safe handling of acids, solvents, and hazardous materials in microelectronics labs.", steps: [{ type: "content", text: "Strict adherence to Chemical Hygiene Plans and Safety Data Sheets (SDS) ensures accident prevention during wet etch operations." }, { type: "quiz", question: "Where should you immediately look if exposed to an unfamiliar chemical solvent?", options: ["The equipment user manual", "The chemical Safety Data Sheet (SDS) and emergency eyewash station", "Social media forums"], correct: 1 }] },
+            { id: 6, title: "Module 6: Vacuum Systems & Thin Film Deposition", desc: "Principles of physical and chemical vapor deposition (PVD/CVD) in vacuum chambers.", steps: [{ type: "content", text: "Thin films of conductors, insulators, and semiconductors are deposited inside specialized high-vacuum chambers." }, { type: "quiz", question: "Why are high-vacuum environments required for thin film PVD processes?", options: ["To prevent background gas molecules from contaminating the deposited film", "To make the equipment run faster", "To cool the facility"], correct: 0 }] },
+            { id: 7, title: "Module 7: Metrology & Defect Inspection", desc: "Advanced optical and electronic measurement tools for quality control and yield enhancement.", steps: [{ type: "content", text: "Metrology tools measure critical dimensions (CD) and inspect sub-surface defects across silicon wafers at atomic scales." }, { type: "quiz", question: "What does CD metrology measure on a semiconductor wafer?", options: ["The diameter of the silicon ingot", "The critical width and dimensions of fabricated circuit lines", "The weight of the wafer carrier"], correct: 1 }] },
+            { id: 8, title: "Module 8: Packaging & Integrated Circuit Testing", desc: "Dicing wafers, wire bonding, and electrical characterization of finished microchips.", steps: [{ type: "content", text: "Once fabrication is complete, wafers are diced into individual die and packaged for thermal and electrical reliability." }, { type: "quiz", question: "What is the primary goal of electrical sort and die testing?", options: ["To burnish the exterior packaging", "To verify functional performance and bin chips by speed and power", "To engrave student names on the chip"], correct: 1 }] },
+            { id: 9, title: "Module 9: Digital Multimeters & Electrical Testing", desc: "Using multimeters for voltage, current, and resistance verification during hardware diagnostics.", steps: [{ type: "content", text: "Digital multimeters allow technicians to verify circuit continuity, power rail stability, and component resistance." }, { type: "quiz", question: "When measuring electrical resistance on a circuit board, what must you always do first?", options: ["Disconnect power from the circuit to prevent meter damage", "Increase room humidity", "Wear polarized sunglasses"], correct: 0 }] },
+            { id: 10, title: "Module 10: Mixed Reality & Digital Twin Integration", desc: "Leveraging HoloLens 2, VR headsets, and digital twins for immersive technician training.", steps: [{ type: "content", text: "Mixed reality and digital twins create spatial, zero-risk simulation environments for complex equipment maintenance." }, { type: "quiz", question: "What is a major advantage of mixed reality cleanroom training?", options: ["It eliminates the need for any physical equipment forever", "It allows trainees to practice hazardous or complex procedures safely in a virtual space", "It lowers electricity costs in the building"], correct: 1 }] }
+        ];
+
+        function renderModulesGrid() {
+            const grid = document.getElementById('modulesGrid');
+            grid.innerHTML = '';
+            modulesConfig.forEach(mod => {
+                const isDone = completedModules.has(mod.id);
+                const card = document.createElement('div');
+                card.className = `bg-white rounded-3xl border ${isDone ? 'border-emerald-200 bg-emerald-50/20' : 'border-slate-200'} p-6 flex flex-col justify-between shadow-sm`;
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-[10px] font-bold uppercase px-2.5 py-1 ${isDone ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-50 text-brandBlue'} rounded-full">Module ${mod.id} of 10</span>
+                            ${isDone ? '<span class="text-xs font-bold text-emerald-600 flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> Completed</span>' : '<span class="text-xs font-medium text-slate-400">Pending</span>'}
+                        </div>
+                        <h4 class="text-base font-extrabold text-slate-900 mb-2">${mod.title}</h4>
+                        <p class="text-xs text-slate-600 mb-6 leading-relaxed">${mod.desc}</p>
+                    </div>
+                    <button onclick="openModule(${mod.id})" class="w-full py-2.5 rounded-xl ${isDone ? 'bg-slate-800 hover:bg-slate-900' : 'bg-brandBlue hover:bg-blue-800'} text-white font-bold text-xs transition-colors shadow flex items-center justify-center gap-2">
+                        <i class="fa-solid ${isDone ? 'fa-rotate-right' : 'fa-play'}"></i> ${isDone ? 'Review Module' : 'Launch Module'}
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+            document.getElementById('completionBadge').textContent = `Completed: ${completedModules.size} / 10`;
+            if (completedModules.size >= 10) {
+                document.getElementById('celebrationModal').classList.remove('hidden');
+            }
+        }
+
         let currentActiveModule = null, currentStepIndex = 0;
-        const moduleData = {
-            1: { title: "AI Literacy", steps: [{ type: "content", text: "Autonomous agents manage fab schedules." }, { type: "quiz", question: "What do AI agents do?", options: ["Schedule routing", "Replace machinery"], correct: 0 }] },
-            2: { title: "Microelectronics", steps: [{ type: "content", text: "ESD protection is vital." }, { type: "quiz", question: "Why use ESD straps?", options: ["Comfort", "Prevent circuit damage"], correct: 1 }] },
-            3: { title: "Industry", steps: [{ type: "content", text: "Cleanrooms prevent particle dust." }, { type: "quiz", question: "Main cleanroom purpose?", options: ["Low particulates", "Lounge"], correct: 0 }] }
-        };
+
         function openModule(modId) {
             if (!userId) { alert('Please register your Student ID first.'); return; }
-            currentActiveModule = modId; currentStepIndex = 0;
-            renderModalStep(); document.getElementById('moduleModal').classList.remove('hidden');
+            currentActiveModule = modulesConfig.find(m => m.id === modId);
+            currentStepIndex = 0;
+            renderModalStep();
+            document.getElementById('moduleModal').classList.remove('hidden');
         }
+
+        function closeModal() {
+            document.getElementById('moduleModal').classList.add('hidden');
+        }
+
         function renderModalStep() {
-            const data = moduleData[currentActiveModule], step = data.steps[currentStepIndex];
-            document.getElementById('modalTitle').textContent = data.title;
-            let html = `<p class="text-sm text-slate-700">${step.text || step.question}</p>`;
+            const step = currentActiveModule.steps[currentStepIndex];
+            document.getElementById('modalTitle').textContent = currentActiveModule.title;
+            let html = `<p class="text-sm text-slate-700 leading-relaxed font-medium">${step.text || step.question}</p>`;
             if (step.options) {
+                html += `<div class="space-y-2.5 mt-4">`;
                 step.options.forEach((opt, idx) => {
-                    html += `<label class="block mt-2 text-xs"><input type="radio" name="quizOpt" value="${idx}"> ${opt}</label>`;
+                    html += `
+                        <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-blue-50/50 cursor-pointer text-xs font-semibold text-slate-700 transition-colors">
+                            <input type="radio" name="quizOpt" value="${idx}" class="text-brandBlue"> ${opt}
+                        </label>`;
                 });
+                html += `</div>`;
             }
             document.getElementById('modalBodyContent').innerHTML = html;
+            document.getElementById('nextBtn').textContent = currentStepIndex < currentActiveModule.steps.length - 1 ? 'Next Step' : 'Complete & Log Module';
         }
+
         async function nextStep() {
-            const data = moduleData[currentActiveModule];
-            const selected = document.querySelector('input[name="quizOpt"]:checked');
-            if (currentStepIndex === 1 && selected && parseInt(selected.value) !== data.steps[currentStepIndex].correct) {
-                alert('Incorrect answer. Try again.');
-                return;
+            const step = currentActiveModule.steps[currentStepIndex];
+            if (step.options) {
+                const selected = document.querySelector('input[name="quizOpt"]:checked');
+                if (!selected) { alert('Please select an answer to proceed.'); return; }
+                if (parseInt(selected.value) !== step.correct) { alert('Incorrect answer. Review the concept and try again.'); return; }
             }
-            if (currentStepIndex < data.steps.length - 1) {
-                currentStepIndex++; renderModalStep();
+
+            if (currentStepIndex < currentActiveModule.steps.length - 1) {
+                currentStepIndex++;
+                renderModalStep();
             } else {
                 await fetch('/api/complete-training', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ student_id: userId, score: 100.0, track: `2D CBT - Module ${currentActiveModule}` })
+                    body: JSON.stringify({ student_id: userId, score: 100.0, track: `2D CBT - Module ${currentActiveModule.id}` })
                 });
-                alert('Module completed and logged to admin database!');
-                document.getElementById('moduleModal').classList.add('hidden');
+                completedModules.add(currentActiveModule.id);
+                closeModal();
+                renderModulesGrid();
+                if (completedModules.size >= 10) {
+                    document.getElementById('celebrationModal').classList.remove('hidden');
+                } else {
+                    alert(`Module ${currentActiveModule.id} completed successfully and logged to admin database!`);
+                }
             }
         }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderModulesGrid();
+        });
     </script>
 </body>
 </html>
