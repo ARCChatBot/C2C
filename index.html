@@ -34,10 +34,13 @@
                 </div>
             </div>
             <div class="flex items-center space-x-3">
+                <button onclick="openStudentSignupModal()" class="px-4 py-2 bg-vsuOrange hover:bg-orange-600 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-2 shadow">
+                    <i class="fa-solid fa-user-plus"></i> Student Sign-Up
+                </button>
                 <a href="/cbt" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
                     <i class="fa-solid fa-desktop"></i> CBT Portal
                 </a>
-                <a href="/admin" class="px-4 py-2 bg-vsuOrange hover:bg-orange-600 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center gap-2">
+                <a href="/admin" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
                     <i class="fa-solid fa-gauge-high"></i> Admin Portal
                 </a>
             </div>
@@ -46,27 +49,30 @@
 
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-8 pb-24">
         <!-- Grant Section -->
-        <section class="bg-white rounded-3xl p-8 border-2 border-vsuBlue/20 shadow-xl relative overflow-hidden">
+        <section class="bg-white rounded-3xl p-8 border-2 border-vsuBlue/20 shadow-xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
             <div class="absolute top-0 right-0 w-32 h-32 bg-vsuOrange/10 rounded-bl-full pointer-events-none"></div>
-            <div class="flex items-center gap-3 mb-4">
-                <div class="w-10 h-10 rounded-xl bg-blue-50 text-vsuBlue flex items-center justify-center text-lg font-bold border border-blue-200">
-                    <i class="fa-solid fa-book-bookmark"></i>
+            <div class="space-y-4 max-w-2xl">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-vsuBlue flex items-center justify-center text-lg font-bold border border-blue-200">
+                        <i class="fa-solid fa-book-bookmark"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold text-vsuOrange uppercase tracking-wider">National Science Foundation Grant</span>
+                        <h2 class="text-xl font-extrabold text-vsuDark">About the Grant &bull; Award Abstract # 2606117</h2>
+                    </div>
                 </div>
-                <div>
-                    <span class="text-xs font-bold text-vsuOrange uppercase tracking-wider">National Science Foundation Grant</span>
-                    <h2 class="text-xl font-extrabold text-vsuDark">About the Grant &bull; Award Abstract # 2606117</h2>
+                <div class="bg-vsuLight p-5 rounded-2xl border border-slate-200">
+                    <p class="text-slate-700 text-sm leading-relaxed font-medium">
+                        <strong>Targeted Infusion Project:</strong> Enhancing Undergraduate Education and Research in AI-Driven Microelectronics at Virginia State University through the <strong>Classroom to Cleanroom (C2C) Pathway</strong>.
+                    </p>
                 </div>
             </div>
-            <div class="bg-vsuLight p-6 rounded-2xl border border-slate-200">
-                <p class="text-slate-700 text-sm md:text-base leading-relaxed font-medium mb-4">
-                    <strong>Targeted Infusion Project:</strong> Enhancing Undergraduate Education and Research in AI-Driven Microelectronics at Virginia State University through the <strong>Classroom to Cleanroom (C2C) Pathway</strong>.
-                </p>
-                <div class="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-slate-200">
-                    <span class="text-xs text-slate-500 font-semibold"><i class="fa-solid fa-university text-vsuBlue"></i> Host Institution: Virginia State University (VSU)</span>
-                    <a href="https://www.nsf.gov/awardsearch/show-award/?AWD_ID=2606117" target="_blank" class="px-4 py-2 bg-vsuBlue hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow-md transition-colors flex items-center gap-2">
-                        <i class="fa-solid fa-arrow-up-right-from-square"></i> View Official NSF Award Record
-                    </a>
-                </div>
+            <div class="w-full md:w-auto shrink-0 bg-gradient-to-br from-blue-50 to-orange-50 p-6 rounded-2xl border border-blue-100 text-center space-y-3">
+                <h3 class="text-sm font-extrabold text-vsuDark">Interested in Participating?</h3>
+                <p class="text-xs text-slate-600 max-w-xs">Join the C2C training program to express interest so our team can reach out to you.</p>
+                <button onclick="openStudentSignupModal()" class="w-full py-3 px-6 bg-vsuOrange hover:bg-orange-600 text-white font-extrabold text-xs rounded-xl shadow-md transition-colors flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-user-plus"></i> Sign-Up for Training
+                </button>
             </div>
         </section>
 
@@ -78,127 +84,174 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Layer 1 -->
             <div class="bg-white rounded-3xl p-6 border-t-4 border-vsuBlue border-x border-b border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
                 <div>
-                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-vsuBlue flex items-center justify-center text-xl font-bold mb-4 border border-blue-100">
-                        <i class="fa-solid fa-desktop"></i>
-                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-vsuBlue flex items-center justify-center text-xl font-bold mb-4 border border-blue-100"><i class="fa-solid fa-desktop"></i></div>
                     <span class="text-[10px] font-bold uppercase tracking-wider text-vsuBlue bg-blue-50 px-2.5 py-1 rounded-full">Layer 01</span>
                     <h4 class="text-lg font-bold text-vsuDark mt-3 mb-2">Computer-Based Training Node</h4>
                     <p class="text-xs text-slate-600 leading-relaxed mb-4">Interactive digital modules delivering foundational knowledge and AI literacy.</p>
                 </div>
-                <a href="/cbt" class="w-full py-2.5 bg-vsuBlue hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-play"></i> Launch CBT Portal
-                </a>
+                <a href="/cbt" class="w-full py-2.5 bg-vsuBlue hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-play"></i> Launch CBT Portal</a>
             </div>
 
-            <!-- Layer 2 -->
             <div class="bg-white rounded-3xl p-6 border-t-4 border-vsuOrange border-x border-b border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
                 <div>
-                    <div class="w-12 h-12 rounded-2xl bg-orange-50 text-vsuOrange flex items-center justify-center text-xl font-bold mb-4 border border-orange-100">
-                        <i class="fa-solid fa-cubes"></i>
-                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-orange-50 text-vsuOrange flex items-center justify-center text-xl font-bold mb-4 border border-orange-100"><i class="fa-solid fa-cubes"></i></div>
                     <span class="text-[10px] font-bold uppercase tracking-wider text-vsuOrange bg-orange-50 px-2.5 py-1 rounded-full">Layer 02</span>
                     <h4 class="text-lg font-bold text-vsuDark mt-3 mb-2">3D Simulation Training Node</h4>
                     <p class="text-xs text-slate-600 leading-relaxed mb-4">Immersive 3D environments simulating semiconductor fabrication processes.</p>
                 </div>
-                <button onclick="alert('Launching 3D Microelectronics Simulation Sandbox...')" class="w-full py-2.5 bg-vsuOrange hover:bg-orange-600 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-cube"></i> Open 3D Simulator
-                </button>
+                <button onclick="alert('Launching 3D Microelectronics Simulation Sandbox...')" class="w-full py-2.5 bg-vsuOrange hover:bg-orange-600 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-cube"></i> Open 3D Simulator</button>
             </div>
 
-            <!-- Layer 3 -->
             <div class="bg-white rounded-3xl p-6 border-t-4 border-vsuBlue border-x border-b border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
                 <div>
-                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-vsuBlue flex items-center justify-center text-xl font-bold mb-4 border border-blue-100">
-                        <i class="fa-solid fa-vr-cardboard"></i>
-                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-vsuBlue flex items-center justify-center text-xl font-bold mb-4 border border-blue-100"><i class="fa-solid fa-vr-cardboard"></i></div>
                     <span class="text-[10px] font-bold uppercase tracking-wider text-vsuBlue bg-blue-50 px-2.5 py-1 rounded-full">Layer 03</span>
                     <h4 class="text-lg font-bold text-vsuDark mt-3 mb-2">VR Cleanroom Training Node</h4>
                     <p class="text-xs text-slate-600 leading-relaxed mb-4">Virtual Reality integration guiding students through cleanroom protocols.</p>
                 </div>
-                <button onclick="alert('Initializing VR Cleanroom Headset Bridge & Stream...')" class="w-full py-2.5 bg-vsuBlue hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-headset"></i> Launch VR Portal
-                </button>
+                <button onclick="alert('Initializing VR Cleanroom Headset Bridge & Stream...')" class="w-full py-2.5 bg-vsuBlue hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-headset"></i> Launch VR Portal</button>
             </div>
 
-            <!-- Layer 4 -->
             <div class="bg-white rounded-3xl p-6 border-t-4 border-vsuOrange border-x border-b border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
                 <div>
-                    <div class="w-12 h-12 rounded-2xl bg-orange-50 text-vsuOrange flex items-center justify-center text-xl font-bold mb-4 border border-orange-100">
-                        <i class="fa-solid fa-folder-open"></i>
-                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-orange-50 text-vsuOrange flex items-center justify-center text-xl font-bold mb-4 border border-orange-100"><i class="fa-solid fa-folder-open"></i></div>
                     <span class="text-[10px] font-bold uppercase tracking-wider text-vsuOrange bg-orange-50 px-2.5 py-1 rounded-full">Layer 04</span>
                     <h4 class="text-lg font-bold text-vsuDark mt-3 mb-2">SOP & Documentation Repository</h4>
                     <p class="text-xs text-slate-600 leading-relaxed mb-4">Centralized repository for Standard Operating Procedures and safety guidelines.</p>
                 </div>
-                <button onclick="alert('Opening secure SOP & Document Archive...')" class="w-full py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-file-lines"></i> View Repository
-                </button>
+                <button onclick="alert('Opening secure SOP & Document Archive...')" class="w-full py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-file-lines"></i> View Repository</button>
             </div>
 
-            <!-- Layer 5 -->
             <div class="bg-white rounded-3xl p-6 border-t-4 border-vsuBlue border-x border-b border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between lg:col-span-2">
                 <div>
-                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-vsuBlue flex items-center justify-center text-xl font-bold mb-4 border border-blue-100">
-                        <i class="fa-solid fa-screwdriver-wrench"></i>
-                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-vsuBlue flex items-center justify-center text-xl font-bold mb-4 border border-blue-100"><i class="fa-solid fa-screwdriver-wrench"></i></div>
                     <span class="text-[10px] font-bold uppercase tracking-wider text-vsuBlue bg-blue-50 px-2.5 py-1 rounded-full">Layer 05</span>
                     <h4 class="text-lg font-bold text-vsuDark mt-3 mb-3">Physical Equipment Training &amp; Scheduling</h4>
                     <div class="space-y-2 text-xs text-slate-700 bg-vsuLight p-4 rounded-2xl border border-slate-200 mb-4">
-                        <div class="flex items-start gap-2">
-                            <span class="w-4 h-4 rounded-full bg-vsuBlue text-white font-bold flex items-center justify-center shrink-0 text-[9px]">1</span>
-                            <span><strong>Training Times:</strong> Tuesdays &amp; Thursdays from 3:30 PM – 4:50 PM EST.</span>
-                        </div>
-                        <div class="flex items-start gap-2">
-                            <span class="w-4 h-4 rounded-full bg-vsuBlue text-white font-bold flex items-center justify-center shrink-0 text-[9px]">2</span>
-                            <span><strong>Equipment:</strong> Digital Multimeter, HoloLens 2, VR Oculus 2, Enderbot 3D Printer, NVIDIA Jetson Nano.</span>
-                        </div>
-                        <div class="flex items-start gap-2">
-                            <span class="w-4 h-4 rounded-full bg-vsuBlue text-white font-bold flex items-center justify-center shrink-0 text-[9px]">3</span>
-                            <span><strong>Mentor:</strong> Select your assigned student mentor to guide your hands-on session.</span>
-                        </div>
+                        <div class="flex items-start gap-2"><span class="w-4 h-4 rounded-full bg-vsuBlue text-white font-bold flex items-center justify-center shrink-0 text-[9px]">1</span><span><strong>Training Times:</strong> Tuesdays &amp; Thursdays from 3:30 PM – 4:50 PM EST.</span></div>
+                        <div class="flex items-start gap-2"><span class="w-4 h-4 rounded-full bg-vsuBlue text-white font-bold flex items-center justify-center shrink-0 text-[9px]">2</span><span><strong>Equipment:</strong> Digital Multimeter, HoloLens 2, VR Oculus 2, Enderbot 3D Printer, NVIDIA Jetson Nano.</span></div>
+                        <div class="flex items-start gap-2"><span class="w-4 h-4 rounded-full bg-vsuBlue text-white font-bold flex items-center justify-center shrink-0 text-[9px]">3</span><span><strong>Trainer Sign-Off:</strong> Assigned student mentor must sign off on the session during hands-on training.</span></div>
                     </div>
                 </div>
-                <button onclick="openEquipmentModal()" class="w-full py-2.5 bg-vsuBlue hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-calendar-check"></i> Schedule Equipment Training
-                </button>
+                <button onclick="openEquipmentModal()" class="w-full py-2.5 bg-vsuBlue hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-calendar-check"></i> Schedule Equipment Training</button>
             </div>
         </div>
 
-        <!-- Live Student Directory Section -->
+        <!-- Advisors & Teams Section -->
+        <section class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
+            <div class="flex items-center gap-3 pb-4 border-b border-slate-100">
+                <div class="w-10 h-10 rounded-xl bg-orange-50 text-vsuOrange flex items-center justify-center text-lg font-bold border border-orange-200"><i class="fa-solid fa-users-gear"></i></div>
+                <div>
+                    <span class="text-xs font-bold text-vsuOrange uppercase tracking-wider">Leadership & Cohorts</span>
+                    <h3 class="text-xl font-extrabold text-vsuDark">Faculty Advisors &amp; Senior Project Teams</h3>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-vsuLight p-5 rounded-2xl border border-slate-200 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-blue-100 text-vsuBlue flex items-center justify-center text-lg font-bold"><i class="fa-solid fa-chalkboard-user"></i></div>
+                    <div>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Faculty Advisor / PI</span>
+                        <h4 class="text-base font-extrabold text-vsuDark">Dr. Peng Cheng</h4>
+                    </div>
+                </div>
+                <div class="bg-vsuLight p-5 rounded-2xl border border-slate-200 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-blue-100 text-vsuBlue flex items-center justify-center text-lg font-bold"><i class="fa-solid fa-chalkboard-user"></i></div>
+                    <div>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Faculty Advisor / Co-PI</span>
+                        <h4 class="text-base font-extrabold text-vsuDark">Dr. Tao Sun</h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
+                <div class="bg-vsuLight rounded-2xl p-6 border-t-4 border-vsuOrange border-x border-b border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3"><h4 class="text-base font-extrabold text-vsuDark">Operation SEMI (VSU)</h4><span class="text-[10px] bg-orange-100 text-vsuOrange font-bold px-2 py-0.5 rounded-full">Lead Team</span></div>
+                        <ul class="space-y-2 text-xs text-slate-700 mt-3">
+                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-bold text-vsuBlue">Nicolas Pollard <span class="text-[10px] text-vsuOrange font-bold block">Team Lead</span></li>
+                            <li class="p-2 rounded-lg bg-white border border-slate-100">Tory'elle Coleman</li>
+                            <li class="p-2 rounded-lg bg-white border border-slate-100">Larry Caldwell</li>
+                            <li class="p-2 rounded-lg bg-white border border-slate-100">Sabien Hill</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="bg-vsuLight rounded-2xl p-6 border-t-4 border-vsuBlue border-x border-b border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3"><h4 class="text-base font-extrabold text-vsuDark">Virginia Tech Team</h4><span class="text-[10px] bg-blue-100 text-vsuBlue font-bold px-2 py-0.5 rounded-full">Collaborator</span></div>
+                        <ul class="space-y-2 text-xs text-slate-700 mt-3">
+                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-medium">VT Team Member 1</li>
+                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-medium">VT Team Member 2</li>
+                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-medium">VT Team Member 3</li>
+                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-medium">VT Team Member 4</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="bg-vsuLight rounded-2xl p-6 border-t-4 border-vsuOrange border-x border-b border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3"><h4 class="text-base font-extrabold text-vsuDark">Virginia State Team</h4><span class="text-[10px] bg-orange-100 text-vsuOrange font-bold px-2 py-0.5 rounded-full">Collaborator</span></div>
+                        <ul class="space-y-2 text-xs text-slate-700 mt-3">
+                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-medium">VSU Team Member 1</li>
+                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-medium">VSU Team Member 2</li>
+                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-medium">VSU Team Member 3</li>
+                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-medium">VSU Team Member 4</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Registered Student Directory Section (Shows student engagement) -->
         <section class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-4">
             <div class="flex items-center justify-between pb-4 border-b border-slate-100">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-vsuBlue flex items-center justify-center text-lg font-bold border border-blue-200">
-                        <i class="fa-solid fa-users-line"></i>
-                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-vsuBlue flex items-center justify-center text-lg font-bold border border-blue-200"><i class="fa-solid fa-users-line"></i></div>
                     <div>
                         <span class="text-xs font-bold text-vsuOrange uppercase tracking-wider">Live Database Feed</span>
                         <h3 class="text-xl font-extrabold text-vsuDark">Registered Student Directory</h3>
                     </div>
                 </div>
-                <button onclick="loadRegisteredStudents()" class="px-4 py-2 bg-vsuBlue hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center gap-2">
-                    <i class="fa-solid fa-rotate"></i> Refresh Directory
-                </button>
+                <button onclick="loadRegisteredStudents()" class="px-4 py-2 bg-vsuBlue hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center gap-2"><i class="fa-solid fa-rotate"></i> Refresh Directory</button>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="border-b border-slate-200 text-xs font-bold text-slate-400 uppercase">
-                            <th class="py-3 px-4">Student ID</th>
-                            <th class="py-3 px-4">Full Name</th>
-                            <th class="py-3 px-4">Registration Timestamp</th>
+                            <th class="py-3 px-4">Full Name (Interested Student)</th>
+                            <th class="py-3 px-4">Sign-Up Timestamp</th>
                         </tr>
                     </thead>
                     <tbody id="mainStudentTableBody" class="divide-y divide-slate-100 text-sm text-slate-700">
-                        <tr><td colspan="3" class="py-6 text-center text-slate-400 italic">Loading student records...</td></tr>
+                        <tr><td colspan="2" class="py-6 text-center text-slate-400 italic">Loading student records...</td></tr>
                     </tbody>
                 </table>
             </div>
         </section>
     </main>
+
+    <!-- Student Sign-Up Modal -->
+    <div id="studentSignupModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100 space-y-6">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-orange-50 text-vsuOrange flex items-center justify-center text-lg font-bold border border-orange-200"><i class="fa-solid fa-user-plus"></i></div>
+                    <h3 class="text-lg font-extrabold text-vsuDark">Student Training Sign-Up</h3>
+                </div>
+                <button onclick="closeStudentSignupModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form onsubmit="submitStudentSignup(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
+                    <input type="text" id="signupFullName" placeholder="e.g. Nicolas Pollard" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50">
+                </div>
+                <button type="submit" class="w-full py-3 rounded-xl bg-vsuOrange hover:bg-orange-600 text-white font-bold text-sm shadow-md transition-colors"><i class="fa-solid fa-check"></i> Submit Interest &amp; Join Directory</button>
+            </form>
+        </div>
+    </div>
 
     <!-- Equipment Modal -->
     <div id="equipmentModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
@@ -209,10 +262,6 @@
             </div>
             <form onsubmit="submitEquipmentBooking(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Student ID</label>
-                    <input type="text" id="eqStudentId" placeholder="e.g. VSU-100294" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50">
-                </div>
-                <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
                     <input type="text" id="eqFullName" placeholder="e.g. Nicolas Pollard" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50">
                 </div>
@@ -221,7 +270,7 @@
                     <input type="date" id="eqDate" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Select Training Time Slot (Tues / Thurs 3:30 PM - 4:50 PM EST)</label>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Select Training Time Slot</label>
                     <select id="eqTimeSlot" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50">
                         <option value="">-- Choose Slot --</option>
                         <option value="3:30 PM - 4:50 PM EST">3:30 PM - 4:50 PM EST</option>
@@ -239,18 +288,16 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Assigned Student Mentor</label>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Assigned Student Mentor (Trainer)</label>
                     <select id="eqMentor" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50">
                         <option value="">-- Select Mentor --</option>
                         <option value="Nicolas Pollard">Nicolas Pollard (Operation SEMI Lead)</option>
                         <option value="Tory'elle Coleman">Tory'elle Coleman</option>
                         <option value="Larry Caldwell">Larry Caldwell</option>
                         <option value="Sabien Hill">Sabien Hill</option>
-                        <option value="Kayin Buckley">Kayin Buckley (VT Lead)</option>
-                        <option value="Keasara Etienne">Keasara Etienne (VSU Lead)</option>
                     </select>
                 </div>
-                <button type="submit" class="w-full py-3 rounded-xl bg-vsuBlue hover:bg-blue-800 text-white font-bold text-sm shadow-md">Confirm &amp; Log Booking</button>
+                <button type="submit" class="w-full py-3 rounded-xl bg-vsuBlue hover:bg-blue-800 text-white font-bold text-sm shadow-md">Confirm &amp; Schedule Booking</button>
             </form>
         </div>
     </div>
@@ -260,17 +307,20 @@
     </footer>
 
     <script>
+        function openStudentSignupModal() { document.getElementById('studentSignupModal').classList.remove('hidden'); }
+        function closeStudentSignupModal() { document.getElementById('studentSignupModal').classList.add('hidden'); }
+
         function openEquipmentModal() { document.getElementById('equipmentModal').classList.remove('hidden'); }
         function closeEquipmentModal() { document.getElementById('equipmentModal').classList.add('hidden'); }
 
         async function loadRegisteredStudents() {
             const tbody = document.getElementById('mainStudentTableBody');
-            tbody.innerHTML = `<tr><td colspan="3" class="py-6 text-center text-slate-400 italic">Syncing registered students...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="2" class="py-6 text-center text-slate-400 italic">Syncing student engagement...</td></tr>`;
             try {
-                const res = await fetch('/api/students');
+                const res = await fetch('/api/interested-students');
                 const students = res.ok ? await res.json() : [];
                 if (students.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="3" class="py-6 text-center text-slate-400 italic">No students registered yet.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="2" class="py-6 text-center text-slate-400 italic">No student sign-ups recorded yet.</td></tr>`;
                     return;
                 }
                 tbody.innerHTML = '';
@@ -278,20 +328,41 @@
                     const row = document.createElement('tr');
                     row.className = "hover:bg-slate-50 transition-colors";
                     row.innerHTML = `
-                        <td class="py-3 px-4 font-semibold text-vsuBlue">${s.student_id}</td>
-                        <td class="py-3 px-4 font-medium text-slate-900">${s.full_name}</td>
+                        <td class="py-3 px-4 font-bold text-slate-900">${s.full_name}</td>
                         <td class="py-3 px-4 text-xs text-slate-500">${s.timestamp || 'N/A'}</td>
                     `;
                     tbody.appendChild(row);
                 });
             } catch (err) {
-                tbody.innerHTML = `<tr><td colspan="3" class="py-6 text-center text-rose-500 font-medium">Could not connect to database.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="2" class="py-6 text-center text-rose-500 font-medium">Could not connect to database.</td></tr>`;
+            }
+        }
+
+        async function submitStudentSignup(event) {
+            event.preventDefault();
+            const fullName = document.getElementById('signupFullName').value.trim();
+
+            try {
+                const response = await fetch('/api/register-interest', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ full_name: fullName })
+                });
+
+                if (response.ok) {
+                    alert('Thank you for signing up! Your interest has been logged so our team can reach out to you.');
+                    closeStudentSignupModal();
+                    loadRegisteredStudents();
+                } else {
+                    alert('Failed to register sign-up.');
+                }
+            } catch (err) {
+                alert('Could not connect to backend.');
             }
         }
 
         async function submitEquipmentBooking(event) {
             event.preventDefault();
-            const studentId = document.getElementById('eqStudentId').value.trim();
             const fullName = document.getElementById('eqFullName').value.trim();
             const date = document.getElementById('eqDate').value;
             const timeSlot = document.getElementById('eqTimeSlot').value;
@@ -299,28 +370,19 @@
             const mentor = document.getElementById('eqMentor').value;
 
             try {
-                // 1. Register student in student directory table
-                await fetch('/api/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ student_id: studentId, full_name: fullName })
-                });
-
-                // 2. Log scheduled training in training logs table
                 const response = await fetch('/api/complete-training', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        student_id: studentId, 
+                        full_name: fullName, 
                         score: 100.0, 
-                        track: `Physical Equipment: ${equipment} on ${date} (${timeSlot}) w/ Mentor: ${mentor}` 
+                        track: `Physical Equipment: ${equipment} on ${date} (${timeSlot}) w/ Trainer: ${mentor}` 
                     })
                 });
 
                 if (response.ok) {
-                    alert('Equipment training session successfully scheduled and logged!');
+                    alert('Equipment training session scheduled! Trainer sign-off required during hands-on execution.');
                     closeEquipmentModal();
-                    loadRegisteredStudents();
                 } else {
                     alert('Failed to log equipment session.');
                 }
