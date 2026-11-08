@@ -344,9 +344,12 @@
             tbody.innerHTML = `<tr><td colspan="2" class="py-6 text-center text-slate-400 italic">Syncing registered students...</td></tr>`;
             try {
                 const res = await fetch('/api/students');
+                console.log("Fetch students status:", res.status);
                 if (!res.ok) throw new Error('Network response was not ok');
                 const students = await res.json();
-                if (students.length === 0) {
+                console.log("Fetched students data:", students);
+                
+                if (!students || students.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="2" class="py-6 text-center text-slate-400 italic">No registered students found yet.</td></tr>`;
                     return;
                 }
@@ -355,12 +358,13 @@
                     const row = document.createElement('tr');
                     row.className = "hover:bg-slate-50 transition-colors";
                     row.innerHTML = `
-                        <td class="py-3 px-4 font-bold text-slate-900">${s.full_name}</td>
+                        <td class="py-3 px-4 font-bold text-slate-900">${s.full_name || 'N/A'}</td>
                         <td class="py-3 px-4 text-xs text-slate-500">${s.timestamp || 'N/A'}</td>
                     `;
                     tbody.appendChild(row);
                 });
             } catch (err) {
+                console.error("Error loading students:", err);
                 tbody.innerHTML = `<tr><td colspan="2" class="py-6 text-center text-rose-500 font-medium">Could not connect to database.</td></tr>`;
             }
         }
@@ -385,6 +389,7 @@
                     alert('Failed to register student.');
                 }
             } catch (err) {
+                console.error("Signup error:", err);
                 alert('Could not connect to backend.');
             }
         }
@@ -416,6 +421,7 @@
                     alert('Failed to log equipment session.');
                 }
             } catch (err) {
+                console.error("Equipment booking error:", err);
                 alert('Could not connect to backend.');
             }
         }
