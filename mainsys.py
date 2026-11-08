@@ -2,7 +2,6 @@ import os
 import sqlite3
 import csv
 import io
-from datetime import datetime
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
@@ -22,15 +21,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/static", StaticFiles(directory=BASE_DIR), name="static")
-
 def init_db():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS interested_students (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            full_name TEXT NOT NULL,
+        CREATE TABLE IF NOT EXISTS students (
+            full_name TEXT PRIMARY KEY,
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
@@ -68,13 +64,13 @@ async def read_cbt():
 async def read_admin():
     return FileResponse(os.path.join(BASE_DIR, "admin.html"))
 
-@app.get("/api/interested-students")
-async def get_interested_students():
+@app.get("/api/students")
+async def get_students():
     try:
         conn = sqlite3.connect(DB_NAME)
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM interested_students ORDER BY timestamp DESC")
+        cursor.execute("SELECT * FROM students ORDER BY timestamp DESC")
         students = [dict(row) for row in cursor.fetchall()]
         conn.close()
         return students
@@ -100,12 +96,12 @@ async def register_interest(student: StudentInterest):
         conn = sqlite3.connect(DB_NAME)
         cursor = conn.cursor()
         cursor.execute(
-            "INSERT INTO interested_students (full_name) VALUES (?)", 
+            "INSERT OR IGNORE INTO students (full_name) VALUES (?)", 
             (student.full_name,)
         )
         conn.commit()
         conn.close()
-        return {"status": "success", "message": "Interest registered successfully"}
+        return {"status": "success", "message": "Student registered successfully"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -114,6 +110,10 @@ async def complete_training(data: TrainingCompletion):
     try:
         conn = sqlite3.connect(DB_NAME)
         cursor = conn.cursor()
+        cursor.execute(
+            "INSERT OR IGNORE INTO students (full_name) VALUES (?)", 
+            (data.full_name,)
+        )
         cursor.execute(
             "INSERT INTO training_logs (full_name, score, track) VALUES (?, ?, ?)", 
             (data.full_name, data.score, data.track)
@@ -128,13 +128,13 @@ async def complete_training(data: TrainingCompletion):
 async def export_csv():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
-    cursor.execute("SELECT id, full_name, timestamp FROM interested_students ORDER BY timestamp DESC")
+    cursor.execute("SELECT full_name, timestamp FROM students ORDER BY timestamp DESC")
     rows = cursor.fetchall()
     conn.close()
 
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow(["ID", "Full Name", "Signup Timestamp"])
+    writer.writerow(["Full Name", "Registration Timestamp"])
     for row in rows:
         writer.writerow(row)
     
@@ -142,5 +142,5 @@ async def export_csv():
     return StreamingResponse(
         iter([output.getvalue()]),
         media_type="text/csv",
-        headers={"Content-Disposition": "attachment; filename=interested_students.csv"}
+        headers={"Content-Disposition": "attachment; filename=registered_students.csv"}
     )
