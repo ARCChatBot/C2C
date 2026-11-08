@@ -3,244 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classroom to Cleanroom (C2C) - Operation SEMI Dashboard</title>
+    <title>Operation SEMI - 2D Training Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        vsuBlue: '#0047AB',
-                        vsuOrange: '#FF6700',
-                        vsuDark: '#1E293B',
-                        vsuLight: '#F8FAFC'
-                    },
+                    colors: { brandBlue: '#0047AB', brandOrange: '#FF6700', brandDark: '#1E293B', brandLight: '#F8FAFC' },
                     fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
             }
         }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="h-full bg-vsuLight text-vsuDark font-sans antialiased flex flex-col">
+<body class="h-full bg-brandLight text-brandDark font-sans antialiased flex flex-col">
 
-    <header class="bg-vsuBlue border-b-4 border-vsuOrange sticky top-0 z-40 shadow-md text-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-24 flex items-center justify-between">
-            <div class="flex items-center space-x-4">
-                <div class="w-14 h-14 rounded-2xl bg-white text-vsuBlue flex items-center justify-center text-3xl font-extrabold shadow-inner border-2 border-vsuOrange">
-                    <i class="fa-solid fa-graduation-cap"></i>
-                </div>
-                <div>
-                    <h1 class="text-2xl font-extrabold tracking-tight flex items-center gap-2">
-                        Classroom to Cleanroom <span class="text-[10px] uppercase px-2.5 py-1 bg-vsuOrange text-white rounded-full font-bold shadow-sm">C2C Pathway</span>
-                    </h1>
-                    <p class="text-xs text-blue-100 font-medium">Training system developed by <strong class="text-white underline">Operation SEMI (VSU)</strong></p>
-                </div>
+    <!-- Intake Modal -->
+    <div id="intakeAuthModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100 text-center space-y-6">
+            <div class="w-16 h-16 rounded-2xl bg-blue-50 text-brandBlue flex items-center justify-center text-3xl mx-auto shadow-inner border border-blue-100">
+                <i class="fa-solid fa-user-graduate"></i>
             </div>
-            
-            <div class="flex items-center space-x-4">
-                <a href="/admin" class="px-4 py-2 bg-vsuOrange hover:bg-orange-600 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center gap-2">
-                    <i class="fa-solid fa-gauge-high"></i> Admin Portal
-                </a>
+            <div>
+                <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Operation SEMI Portal</h2>
+                <p class="text-xs text-slate-500 mt-1">Enter your Student ID and Full Name to register and access training modules.</p>
             </div>
-        </div>
-    </header>
-
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-8 pb-24">
-        <!-- Grant Section -->
-        <section class="bg-white rounded-3xl p-8 border-2 border-vsuBlue/20 shadow-xl relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-vsuOrange/10 rounded-bl-full pointer-events-none"></div>
-            <div class="flex items-center gap-3 mb-4">
-                <div class="w-10 h-10 rounded-xl bg-blue-50 text-vsuBlue flex items-center justify-center text-lg font-bold border border-blue-200">
-                    <i class="fa-solid fa-book-bookmark"></i>
-                </div>
-                <div>
-                    <span class="text-xs font-bold text-vsuOrange uppercase tracking-wider">National Science Foundation Grant</span>
-                    <h2 class="text-xl font-extrabold text-vsuDark">About the Grant &bull; Award Abstract # 2606117</h2>
-                </div>
-            </div>
-            <div class="bg-vsuLight p-6 rounded-2xl border border-slate-200">
-                <p class="text-slate-700 text-sm md:text-base leading-relaxed font-medium mb-4">
-                    <strong>Targeted Infusion Project:</strong> Enhancing Undergraduate Education and Research in AI-Driven Microelectronics at Virginia State University through the <strong>Classroom to Cleanroom (C2C) Pathway</strong>.
-                </p>
-                <div class="flex flex-wrap items-center justify-between gap-4 pt-2 border-t border-slate-200">
-                    <span class="text-xs text-slate-500 font-semibold"><i class="fa-solid fa-university text-vsuBlue"></i> Host Institution: Virginia State University (VSU)</span>
-                    <a href="https://www.nsf.gov/awardsearch/show-award/?AWD_ID=2606117" target="_blank" class="px-4 py-2 bg-vsuBlue hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow-md transition-colors flex items-center gap-2">
-                        <i class="fa-solid fa-arrow-up-right-from-square"></i> View Official NSF Award Record
-                    </a>
-                </div>
-            </div>
-        </section>
-
-        <!-- Architecture Layers -->
-        <div class="space-y-4">
-            <h3 class="text-xl font-extrabold text-vsuDark flex items-center gap-2">
-                <i class="fa-solid fa-layer-group text-vsuOrange"></i> C2C Training Management System Architecture
-            </h3>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Layer 1 -->
-            <div class="bg-white rounded-3xl p-6 border-t-4 border-vsuBlue border-x border-b border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
-                <div>
-                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-vsuBlue flex items-center justify-center text-xl font-bold mb-4 border border-blue-100">
-                        <i class="fa-solid fa-desktop"></i>
-                    </div>
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-vsuBlue bg-blue-50 px-2.5 py-1 rounded-full">Layer 01</span>
-                    <h4 class="text-lg font-bold text-vsuDark mt-3 mb-2">Computer-Based Training Node</h4>
-                    <p class="text-xs text-slate-600 leading-relaxed mb-4">Interactive digital modules delivering foundational knowledge and AI literacy.</p>
-                </div>
-                <a href="/cbt" class="w-full py-2.5 bg-vsuBlue hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-play"></i> Launch CBT Portal
-                </a>
-            </div>
-
-            <!-- Layer 2 -->
-            <div class="bg-white rounded-3xl p-6 border-t-4 border-vsuOrange border-x border-b border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
-                <div>
-                    <div class="w-12 h-12 rounded-2xl bg-orange-50 text-vsuOrange flex items-center justify-center text-xl font-bold mb-4 border border-orange-100">
-                        <i class="fa-solid fa-cubes"></i>
-                    </div>
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-vsuOrange bg-orange-50 px-2.5 py-1 rounded-full">Layer 02</span>
-                    <h4 class="text-lg font-bold text-vsuDark mt-3 mb-2">3D Simulation Training Node</h4>
-                    <p class="text-xs text-slate-600 leading-relaxed mb-4">Immersive 3D environments simulating semiconductor fabrication processes.</p>
-                </div>
-                <button onclick="alert('Launching 3D Microelectronics Simulation Sandbox...')" class="w-full py-2.5 bg-vsuOrange hover:bg-orange-600 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-cube"></i> Open 3D Simulator
-                </button>
-            </div>
-
-            <!-- Layer 3 -->
-            <div class="bg-white rounded-3xl p-6 border-t-4 border-vsuBlue border-x border-b border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
-                <div>
-                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-vsuBlue flex items-center justify-center text-xl font-bold mb-4 border border-blue-100">
-                        <i class="fa-solid fa-vr-cardboard"></i>
-                    </div>
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-vsuBlue bg-blue-50 px-2.5 py-1 rounded-full">Layer 03</span>
-                    <h4 class="text-lg font-bold text-vsuDark mt-3 mb-2">VR Cleanroom Training Node</h4>
-                    <p class="text-xs text-slate-600 leading-relaxed mb-4">Virtual Reality integration guiding students through cleanroom protocols.</p>
-                </div>
-                <button onclick="alert('Initializing VR Cleanroom Headset Bridge & Stream...')" class="w-full py-2.5 bg-vsuBlue hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-headset"></i> Launch VR Portal
-                </button>
-            </div>
-
-            <!-- Layer 4 -->
-            <div class="bg-white rounded-3xl p-6 border-t-4 border-vsuOrange border-x border-b border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
-                <div>
-                    <div class="w-12 h-12 rounded-2xl bg-orange-50 text-vsuOrange flex items-center justify-center text-xl font-bold mb-4 border border-orange-100">
-                        <i class="fa-solid fa-folder-open"></i>
-                    </div>
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-vsuOrange bg-orange-50 px-2.5 py-1 rounded-full">Layer 04</span>
-                    <h4 class="text-lg font-bold text-vsuDark mt-3 mb-2">SOP & Documentation Repository</h4>
-                    <p class="text-xs text-slate-600 leading-relaxed mb-4">Centralized repository for Standard Operating Procedures and safety guidelines.</p>
-                </div>
-                <button onclick="alert('Opening secure SOP & Document Archive...')" class="w-full py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-file-lines"></i> View Repository
-                </button>
-            </div>
-
-            <!-- Layer 5 -->
-            <div class="bg-white rounded-3xl p-6 border-t-4 border-vsuBlue border-x border-b border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between lg:col-span-2">
-                <div>
-                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-vsuBlue flex items-center justify-center text-xl font-bold mb-4 border border-blue-100">
-                        <i class="fa-solid fa-screwdriver-wrench"></i>
-                    </div>
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-vsuBlue bg-blue-50 px-2.5 py-1 rounded-full">Layer 05</span>
-                    <h4 class="text-lg font-bold text-vsuDark mt-3 mb-3">Physical Equipment Training &amp; Scheduling</h4>
-                    <div class="space-y-2 text-xs text-slate-700 bg-vsuLight p-4 rounded-2xl border border-slate-200 mb-4">
-                        <div class="flex items-start gap-2">
-                            <span class="w-4 h-4 rounded-full bg-vsuBlue text-white font-bold flex items-center justify-center shrink-0 text-[9px]">1</span>
-                            <span><strong>Training Times:</strong> Tuesdays &amp; Thursdays from 3:30 PM – 4:50 PM EST.</span>
-                        </div>
-                        <div class="flex items-start gap-2">
-                            <span class="w-4 h-4 rounded-full bg-vsuBlue text-white font-bold flex items-center justify-center shrink-0 text-[9px]">2</span>
-                            <span><strong>Equipment:</strong> Digital Multimeter, HoloLens 2, VR Oculus 2, Enderbot 3D Printer, NVIDIA Jetson Nano.</span>
-                        </div>
-                        <div class="flex items-start gap-2">
-                            <span class="w-4 h-4 rounded-full bg-vsuBlue text-white font-bold flex items-center justify-center shrink-0 text-[9px]">3</span>
-                            <span><strong>Mentor:</strong> Select your assigned student mentor to guide your hands-on session.</span>
-                        </div>
-                    </div>
-                </div>
-                <button onclick="openEquipmentModal()" class="w-full py-2.5 bg-vsuBlue hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-calendar-check"></i> Schedule Equipment Training
-                </button>
-            </div>
-        </div>
-    </main>
-
-    <!-- Equipment Modal -->
-    <div id="equipmentModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-3xl max-w-lg w-full p-8 shadow-2xl border border-slate-100 space-y-6">
-            <div class="flex items-center justify-between pb-4 border-b border-slate-100">
-                <h3 class="text-lg font-extrabold text-vsuDark">Physical Equipment Booking</h3>
-                <button onclick="closeEquipmentModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            <form onsubmit="submitEquipmentBooking(event)" class="space-y-4">
+            <form onsubmit="handleDirectIntake(event)" class="space-y-3 text-left">
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Student ID</label>
-                    <input type="text" id="eqStudentId" placeholder="e.g. VSU-100294" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50">
+                    <input type="text" id="intakeStudentId" placeholder="e.g. VSU-100294" required class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-slate-50">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Select Training Time Slot</label>
-                    <select id="eqTimeSlot" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50">
-                        <option value="">-- Choose Slot --</option>
-                        <option value="Tuesday 3:30 PM - 4:50 PM EST">Tuesday | 3:30 PM - 4:50 PM EST</option>
-                        <option value="Thursday 3:30 PM - 4:50 PM EST">Thursday | 3:30 PM - 4:50 PM EST</option>
-                    </select>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
+                    <input type="text" id="intakeFullName" placeholder="e.g. Nicolas Pollard" required class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-slate-50">
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Target Equipment</label>
-                    <select id="eqTarget" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50">
-                        <option value="">-- Select Equipment --</option>
-                        <option value="Digital Multimeter">Digital Multimeter</option>
-                        <option value="HoloLens 2 equipment">HoloLens 2 equipment</option>
-                        <option value="VR Oculus 2">VR Oculus 2</option>
-                        <option value="Enderbot 3D printer">Enderbot 3D printer</option>
-                        <option value="Nvidia Jetson Nano">Nvidia Jetson Nano</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Assigned Student Mentor</label>
-                    <select id="eqMentor" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50">
-                        <option value="">-- Select Mentor --</option>
-                        <option value="Nicolas Pollard">Nicolas Pollard (Operation SEMI Lead)</option>
-                        <option value="Tory'elle Coleman">Tory'elle Coleman</option>
-                        <option value="Larry Caldwell">Larry Caldwell</option>
-                        <option value="Sabien Hill">Sabien Hill</option>
-                        <option value="Kayin Buckley">Kayin Buckley (VT Lead)</option>
-                        <option value="Keasara Etienne">Keasara Etienne (VSU Lead)</option>
-                    </select>
-                </div>
-                <button type="submit" class="w-full py-3 rounded-xl bg-vsuBlue hover:bg-blue-800 text-white font-bold text-sm shadow-md">Confirm &amp; Log Booking</button>
+                <button type="submit" class="w-full py-3.5 rounded-xl bg-brandBlue hover:bg-blue-700 text-white font-semibold text-sm shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-right-to-bracket"></i> Register & Enter Portal
+                </button>
             </form>
         </div>
     </div>
 
-    <footer class="bg-vsuBlue text-white border-t-2 border-vsuOrange py-6 text-center text-xs">
-        <p>Virginia State University &bull; Classroom to Cleanroom (C2C) &bull; Developed by Operation SEMI (VSU) &bull; NSF Award #2606117</p>
-    </footer>
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 rounded-xl bg-brandBlue flex items-center justify-center text-white text-2xl font-bold">
+                    <i class="fa-solid fa-microchip"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900">Operation SEMI <span class="text-xs uppercase px-2 py-0.5 bg-blue-50 text-brandBlue rounded-full font-semibold">2D Portal</span></h1>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="/" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold">Main Portal</a>
+                <span class="text-xs font-semibold text-slate-700" id="userNameDisplay">Trainee Candidate</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white rounded-3xl border border-slate-200 p-6 flex flex-col justify-between shadow-sm">
+                <div>
+                    <h4 class="text-xl font-bold text-slate-900 mb-1">Module 1: AI Literacy</h4>
+                    <p class="text-xs text-slate-600 mb-6">Learn AI fundamentals and automated agentic workflows in manufacturing.</p>
+                </div>
+                <button onclick="openModule(1)" class="w-full py-3 rounded-xl bg-brandBlue text-white font-semibold text-sm">Launch Module 1</button>
+            </div>
+            <div class="bg-white rounded-3xl border border-slate-200 p-6 flex flex-col justify-between shadow-sm">
+                <div>
+                    <h4 class="text-xl font-bold text-slate-900 mb-1">Module 2: Microelectronics</h4>
+                    <p class="text-xs text-slate-600 mb-6">Explore semiconductor physics and ESD protection protocols.</p>
+                </div>
+                <button onclick="openModule(2)" class="w-full py-3 rounded-xl bg-brandBlue text-white font-semibold text-sm">Launch Module 2</button>
+            </div>
+            <div class="bg-white rounded-3xl border border-slate-200 p-6 flex flex-col justify-between shadow-sm">
+                <div>
+                    <h4 class="text-xl font-bold text-slate-900 mb-1">Module 3: Industry Standards</h4>
+                    <p class="text-xs text-slate-600 mb-6">Gain insights into cleanroom contamination control and supply chains.</p>
+                </div>
+                <button onclick="openModule(3)" class="w-full py-3 rounded-xl bg-brandBlue text-white font-semibold text-sm">Launch Module 3</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal -->
+    <div id="moduleModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 space-y-4 shadow-2xl">
+            <h3 id="modalTitle" class="text-lg font-bold"></h3>
+            <div id="modalBodyContent"></div>
+            <button onclick="nextStep()" id="nextBtn" class="px-5 py-2 bg-brandBlue text-white rounded-xl text-sm font-semibold">Continue</button>
+        </div>
+    </div>
 
     <script>
-        function openEquipmentModal() { document.getElementById('equipmentModal').classList.remove('hidden'); }
-        function closeEquipmentModal() { document.getElementById('equipmentModal').classList.add('hidden'); }
-        async function submitEquipmentBooking(event) {
+        let userId = '', userName = '';
+        async function handleDirectIntake(event) {
             event.preventDefault();
-            const studentId = document.getElementById('eqStudentId').value.trim();
-            const timeSlot = document.getElementById('eqTimeSlot').value;
-            const equipment = document.getElementById('eqTarget').value;
-            const mentor = document.getElementById('eqMentor').value;
-            try {
-                const response = await fetch('/api/complete-training', {
+            const studentIdInput = document.getElementById('intakeStudentId').value.trim();
+            const fullNameInput = document.getElementById('intakeFullName').value.trim();
+            const res = await fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ student_id: studentIdInput, full_name: fullNameInput })
+            });
+            if (res.ok) {
+                userId = studentIdInput; userName = fullNameInput;
+                document.getElementById('userNameDisplay').textContent = userName;
+                document.getElementById('intakeAuthModal').classList.add('hidden');
+            }
+        }
+        let currentActiveModule = null, currentStepIndex = 0;
+        const moduleData = {
+            1: { title: "AI Literacy", steps: [{ type: "content", text: "Autonomous agents manage fab schedules." }, { type: "quiz", question: "What do AI agents do?", options: ["Schedule routing", "Replace machinery"], correct: 0 }] },
+            2: { title: "Microelectronics", steps: [{ type: "content", text: "ESD protection is vital." }, { type: "quiz", question: "Why use ESD straps?", options: ["Comfort", "Prevent circuit damage"], correct: 1 }] },
+            3: { title: "Industry", steps: [{ type: "content", text: "Cleanrooms prevent particle dust." }, { type: "quiz", question: "Main cleanroom purpose?", options: ["Low particulates", "Lounge"], correct: 0 }] }
+        };
+        function openModule(modId) {
+            if (!userId) { alert('Please register your Student ID first.'); return; }
+            currentActiveModule = modId; currentStepIndex = 0;
+            renderModalStep(); document.getElementById('moduleModal').classList.remove('hidden');
+        }
+        function renderModalStep() {
+            const data = moduleData[currentActiveModule], step = data.steps[currentStepIndex];
+            document.getElementById('modalTitle').textContent = data.title;
+            let html = `<p class="text-sm text-slate-700">${step.text || step.question}</p>`;
+            if (step.options) {
+                step.options.forEach((opt, idx) => {
+                    html += `<label class="block mt-2 text-xs"><input type="radio" name="quizOpt" value="${idx}"> ${opt}</label>`;
+                });
+            }
+            document.getElementById('modalBodyContent').innerHTML = html;
+        }
+        async function nextStep() {
+            const data = moduleData[currentActiveModule];
+            if (currentStepIndex < data.steps.length - 1) {
+                currentStepIndex++; renderModalStep();
+            } else {
+                await fetch('/api/complete-training', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ student_id: studentId, score: 100.0, track: `Physical Equipment - ${equipment} w/ ${mentor} (${timeSlot})` })
+                    body: JSON.stringify({ student_id: userId, score: 100.0, track: `2D CBT - Module ${currentActiveModule}` })
                 });
-                if (response.ok) { alert('Equipment training session booked and logged!'); closeEquipmentModal(); }
-                else { alert('Failed to log equipment session.'); }
-            } catch (err) { alert('Could not connect to backend.'); }
+                alert('Module completed and logged!');
+                document.getElementById('moduleModal').classList.add('hidden');
+            }
         }
     </script>
 </body>
