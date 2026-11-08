@@ -59,6 +59,7 @@
             </div>
             <div class="flex items-center space-x-4">
                 <a href="/" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold">Main Portal</a>
+                <a href="/admin" class="px-3 py-1.5 bg-orange-100 hover:bg-orange-200 text-brandOrange rounded-xl text-xs font-bold">Admin View</a>
                 <span class="text-xs font-semibold text-slate-700" id="userNameDisplay">Trainee Candidate</span>
             </div>
         </div>
@@ -140,6 +141,11 @@
         }
         async function nextStep() {
             const data = moduleData[currentActiveModule];
+            const selected = document.querySelector('input[name="quizOpt"]:checked');
+            if (currentStepIndex === 1 && selected && parseInt(selected.value) !== data.steps[currentStepIndex].correct) {
+                alert('Incorrect answer. Try again.');
+                return;
+            }
             if (currentStepIndex < data.steps.length - 1) {
                 currentStepIndex++; renderModalStep();
             } else {
@@ -148,7 +154,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ student_id: userId, score: 100.0, track: `2D CBT - Module ${currentActiveModule}` })
                 });
-                alert('Module completed and logged!');
+                alert('Module completed and logged to admin database!');
                 document.getElementById('moduleModal').classList.add('hidden');
             }
         }
