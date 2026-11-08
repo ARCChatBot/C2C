@@ -1,9 +1,11 @@
 import os
 import sqlite3
+import csv
+import io
 from datetime import datetime
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -87,7 +89,9 @@ async def get_training_logs():
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         cursor.execute('''
-            SELECT t.id, t.student_id, s.full_name, t.score, t.track, t.timestamp 
+            SELECT t.id, t.student_id, 
+                   COALESCE(s.full_name, 'Trainee') AS full_name, 
+                   t.score, t.track, t.timestamp 
             FROM training_logs t
             LEFT JOIN students s ON t.student_id = s.student_id
             ORDER BY t.timestamp DESC
@@ -127,3 +131,29 @@ async def complete_training(data: TrainingCompletion):
         return {"status": "success", "message": "Training progress logged"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@app.get("/api/export-csv")
+async def export_csv():
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT t.id, t.student_id, COALESCE(s.full_name, 'Trainee') AS full_name, t.score, t.track, t.timestamp 
+        FROM training_logs t
+        LEFT JOIN students s ON t.student_id = s.student_id
+        ORDER BY t.timestamp DESC
+    ''')
+    rows = cursor.fetchall()
+    conn.close()
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["Log ID", "Student ID", "Full Name", "Score", "Track / Scheduling Details", "Timestamp"])
+    for row in rows:
+        writer.writerow(row)
+    
+    output.seek(0)
+    return StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=operation_semi_telemetry.csv"}
+    )
