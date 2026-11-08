@@ -28,7 +28,7 @@ app.mount("/static", StaticFiles(directory=BASE_DIR), name="static")
 def init_db():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
-    # Ensure your tables exist to prevent 500 errors on startup
+    # Ensure tables exist to prevent 500 errors on startup
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS students (
             student_id TEXT PRIMARY KEY,
