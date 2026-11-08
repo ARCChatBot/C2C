@@ -167,7 +167,7 @@
             </div>
         </div>
 
-        <!-- Live Student Registration Directory Section -->
+        <!-- Live Student Directory Section -->
         <section class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-4">
             <div class="flex items-center justify-between pb-4 border-b border-slate-100">
                 <div class="flex items-center gap-3">
@@ -213,11 +213,18 @@
                     <input type="text" id="eqStudentId" placeholder="e.g. VSU-100294" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Select Training Time Slot</label>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
+                    <input type="text" id="eqFullName" placeholder="e.g. Nicolas Pollard" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Training Date</label>
+                    <input type="date" id="eqDate" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Select Training Time Slot (Tues / Thurs 3:30 PM - 4:50 PM EST)</label>
                     <select id="eqTimeSlot" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50">
                         <option value="">-- Choose Slot --</option>
-                        <option value="Tuesday 3:30 PM - 4:50 PM EST">Tuesday | 3:30 PM - 4:50 PM EST</option>
-                        <option value="Thursday 3:30 PM - 4:50 PM EST">Thursday | 3:30 PM - 4:50 PM EST</option>
+                        <option value="3:30 PM - 4:50 PM EST">3:30 PM - 4:50 PM EST</option>
                     </select>
                 </div>
                 <div>
@@ -285,18 +292,41 @@
         async function submitEquipmentBooking(event) {
             event.preventDefault();
             const studentId = document.getElementById('eqStudentId').value.trim();
+            const fullName = document.getElementById('eqFullName').value.trim();
+            const date = document.getElementById('eqDate').value;
             const timeSlot = document.getElementById('eqTimeSlot').value;
             const equipment = document.getElementById('eqTarget').value;
             const mentor = document.getElementById('eqMentor').value;
+
             try {
+                // 1. Register student in student directory table
+                await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ student_id: studentId, full_name: fullName })
+                });
+
+                // 2. Log scheduled training in training logs table
                 const response = await fetch('/api/complete-training', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ student_id: studentId, score: 100.0, track: `Physical Equipment - ${equipment} w/ ${mentor} (${timeSlot})` })
+                    body: JSON.stringify({ 
+                        student_id: studentId, 
+                        score: 100.0, 
+                        track: `Physical Equipment: ${equipment} on ${date} (${timeSlot}) w/ Mentor: ${mentor}` 
+                    })
                 });
-                if (response.ok) { alert('Equipment training session booked and logged!'); closeEquipmentModal(); }
-                else { alert('Failed to log equipment session.'); }
-            } catch (err) { alert('Could not connect to backend.'); }
+
+                if (response.ok) {
+                    alert('Equipment training session successfully scheduled and logged!');
+                    closeEquipmentModal();
+                    loadRegisteredStudents();
+                } else {
+                    alert('Failed to log equipment session.');
+                }
+            } catch (err) {
+                alert('Could not connect to backend.');
+            }
         }
 
         window.addEventListener('DOMContentLoaded', loadRegisteredStudents);
