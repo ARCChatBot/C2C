@@ -28,8 +28,8 @@ def init_db():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS students (
-            student_id TEXT PRIMARY KEY,
+        CREATE TABLE IF NOT EXISTS interested_students (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             full_name TEXT NOT NULL,
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
         )
@@ -37,7 +37,7 @@ def init_db():
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS training_logs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            student_id TEXT,
+            full_name TEXT,
             score REAL,
             track TEXT,
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -48,12 +48,11 @@ def init_db():
 
 init_db()
 
-class StudentRegister(BaseModel):
-    student_id: str
+class StudentInterest(BaseModel):
     full_name: str
 
 class TrainingCompletion(BaseModel):
-    student_id: str
+    full_name: str
     score: float
     track: str
 
@@ -69,13 +68,13 @@ async def read_cbt():
 async def read_admin():
     return FileResponse(os.path.join(BASE_DIR, "admin.html"))
 
-@app.get("/api/students")
-async def get_students():
+@app.get("/api/interested-students")
+async def get_interested_students():
     try:
         conn = sqlite3.connect(DB_NAME)
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM students ORDER BY timestamp DESC")
+        cursor.execute("SELECT * FROM interested_students ORDER BY timestamp DESC")
         students = [dict(row) for row in cursor.fetchall()]
         conn.close()
         return students
@@ -88,32 +87,25 @@ async def get_training_logs():
         conn = sqlite3.connect(DB_NAME)
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
-        cursor.execute('''
-            SELECT t.id, t.student_id, 
-                   COALESCE(s.full_name, 'Trainee') AS full_name, 
-                   t.score, t.track, t.timestamp 
-            FROM training_logs t
-            LEFT JOIN students s ON t.student_id = s.student_id
-            ORDER BY t.timestamp DESC
-        ''')
+        cursor.execute("SELECT * FROM training_logs ORDER BY timestamp DESC")
         logs = [dict(row) for row in cursor.fetchall()]
         conn.close()
         return logs
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/api/register")
-async def register_student(student: StudentRegister):
+@app.post("/api/register-interest")
+async def register_interest(student: StudentInterest):
     try:
         conn = sqlite3.connect(DB_NAME)
         cursor = conn.cursor()
         cursor.execute(
-            "INSERT OR REPLACE INTO students (student_id, full_name) VALUES (?, ?)", 
-            (student.student_id, student.full_name)
+            "INSERT INTO interested_students (full_name) VALUES (?)", 
+            (student.full_name,)
         )
         conn.commit()
         conn.close()
-        return {"status": "success", "message": "Student registered successfully"}
+        return {"status": "success", "message": "Interest registered successfully"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -122,16 +114,9 @@ async def complete_training(data: TrainingCompletion):
     try:
         conn = sqlite3.connect(DB_NAME)
         cursor = conn.cursor()
-        
-        # Ensure student exists in student directory even if direct registration wasn't called first
         cursor.execute(
-            "INSERT OR IGNORE INTO students (student_id, full_name) VALUES (?, ?)", 
-            (data.student_id, f"Trainee ({data.student_id})")
-        )
-
-        cursor.execute(
-            "INSERT INTO training_logs (student_id, score, track) VALUES (?, ?, ?)", 
-            (data.student_id, data.score, data.track)
+            "INSERT INTO training_logs (full_name, score, track) VALUES (?, ?, ?)", 
+            (data.full_name, data.score, data.track)
         )
         conn.commit()
         conn.close()
@@ -143,18 +128,13 @@ async def complete_training(data: TrainingCompletion):
 async def export_csv():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
-    cursor.execute('''
-        SELECT t.id, t.student_id, COALESCE(s.full_name, 'Trainee') AS full_name, t.score, t.track, t.timestamp 
-        FROM training_logs t
-        LEFT JOIN students s ON t.student_id = s.student_id
-        ORDER BY t.timestamp DESC
-    ''')
+    cursor.execute("SELECT id, full_name, timestamp FROM interested_students ORDER BY timestamp DESC")
     rows = cursor.fetchall()
     conn.close()
 
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow(["Log ID", "Student ID", "Full Name", "Score", "Track / Scheduling Details", "Timestamp"])
+    writer.writerow(["ID", "Full Name", "Signup Timestamp"])
     for row in rows:
         writer.writerow(row)
     
@@ -162,5 +142,5 @@ async def export_csv():
     return StreamingResponse(
         iter([output.getvalue()]),
         media_type="text/csv",
-        headers={"Content-Disposition": "attachment; filename=operation_semi_telemetry.csv"}
+        headers={"Content-Disposition": "attachment; filename=interested_students.csv"}
     )
