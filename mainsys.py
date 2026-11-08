@@ -67,11 +67,12 @@ async def read_admin():
 async def get_students():
     try:
         conn = sqlite3.connect(DB_NAME)
-        conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM students ORDER BY timestamp DESC")
-        students = [dict(row) for row in cursor.fetchall()]
+        cursor.execute("SELECT full_name, timestamp FROM students ORDER BY timestamp DESC")
+        rows = cursor.fetchall()
         conn.close()
+        # Explicit dictionary construction to prevent serialization issues
+        students = [{"full_name": r[0], "timestamp": r[1]} for r in rows]
         return students
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -80,11 +81,11 @@ async def get_students():
 async def get_training_logs():
     try:
         conn = sqlite3.connect(DB_NAME)
-        conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM training_logs ORDER BY timestamp DESC")
-        logs = [dict(row) for row in cursor.fetchall()]
+        cursor.execute("SELECT id, full_name, score, track, timestamp FROM training_logs ORDER BY timestamp DESC")
+        rows = cursor.fetchall()
         conn.close()
+        logs = [{"id": r[0], "full_name": r[1], "score": r[2], "track": r[3], "timestamp": r[4]} for r in rows]
         return logs
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -96,7 +97,7 @@ async def register_interest(student: StudentInterest):
         cursor = conn.cursor()
         cursor.execute(
             "INSERT OR IGNORE INTO students (full_name) VALUES (?)", 
-            (student.full_name,)
+            (student.full_name.strip(),)
         )
         conn.commit()
         conn.close()
@@ -111,11 +112,11 @@ async def complete_training(data: TrainingCompletion):
         cursor = conn.cursor()
         cursor.execute(
             "INSERT OR IGNORE INTO students (full_name) VALUES (?)", 
-            (data.full_name,)
+            (data.full_name.strip(),)
         )
         cursor.execute(
             "INSERT INTO training_logs (full_name, score, track) VALUES (?, ?, ?)", 
-            (data.full_name, data.score, data.track)
+            (data.full_name.strip(), data.score, data.track)
         )
         conn.commit()
         conn.close()
