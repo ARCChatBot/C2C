@@ -4,6 +4,10 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import sqlite3
 from datetime import datetime
+import os 
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_NAME = os.path.join(BASE_DIR, "operation_semi.db")
 
 app = FastAPI(title="Operation SEMI Training System API", version="1.0")
 
