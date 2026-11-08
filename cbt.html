@@ -4,21 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Operation SEMI - 2D Training Portal</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        brandBlue: '#0047AB',
-                        brandOrange: '#FF6700',
-                        brandDark: '#1E293B',
-                        brandLight: '#F8FAFC'
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif']
-                    }
+                    colors: { brandBlue: '#0047AB', brandOrange: '#FF6700', brandDark: '#1E293B', brandLight: '#F8FAFC' },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
             }
         }
@@ -28,7 +20,7 @@
 </head>
 <body class="h-full bg-brandLight text-brandDark font-sans antialiased flex flex-col">
 
-    <!-- Direct Database Intake & Sign-In Modal -->
+    <!-- Intake Modal -->
     <div id="intakeAuthModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100 text-center space-y-6">
             <div class="w-16 h-16 rounded-2xl bg-blue-50 text-brandBlue flex items-center justify-center text-3xl mx-auto shadow-inner border border-blue-100">
@@ -36,441 +28,136 @@
             </div>
             <div>
                 <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Operation SEMI Portal</h2>
-                <p class="text-xs text-slate-500 mt-1">Enter your Student ID and Full Name to register and access your workforce training modules.</p>
+                <p class="text-xs text-slate-500 mt-1">Enter your Student ID and Full Name to register and access training modules.</p>
             </div>
-            <form id="directIntakeForm" class="space-y-3 pt-2 text-left" onsubmit="handleDirectIntake(event)">
+            <form onsubmit="handleDirectIntake(event)" class="space-y-3 text-left">
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Student ID</label>
-                    <input type="text" id="intakeStudentId" placeholder="e.g. VSU-100294" required class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-brandBlue bg-slate-50">
+                    <input type="text" id="intakeStudentId" placeholder="e.g. VSU-100294" required class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-slate-50">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
-                    <input type="text" id="intakeFullName" placeholder="e.g. Nicolas Pollard" required class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-brandBlue bg-slate-50">
+                    <input type="text" id="intakeFullName" placeholder="e.g. Nicolas Pollard" required class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-slate-50">
                 </div>
-                <button type="submit" class="w-full py-3.5 px-4 rounded-xl bg-brandBlue hover:bg-blue-700 text-white font-semibold text-sm transition-colors shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 mt-2">
+                <button type="submit" class="w-full py-3.5 rounded-xl bg-brandBlue hover:bg-blue-700 text-white font-semibold text-sm shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
                     <i class="fa-solid fa-right-to-bracket"></i> Register & Enter Portal
                 </button>
             </form>
-            <p class="text-[11px] text-slate-400">AMR-MTS Architecture &bull; NSF Award #2606117</p>
         </div>
     </div>
 
-    <!-- Top Navigation Header -->
+    <!-- Header -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-brandBlue to-blue-600 flex items-center justify-center text-white text-2xl font-bold shadow-md shadow-blue-500/20">
+                <div class="w-12 h-12 rounded-xl bg-brandBlue flex items-center justify-center text-white text-2xl font-bold">
                     <i class="fa-solid fa-microchip"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-                        Operation SEMI <span class="text-xs uppercase px-2 py-0.5 bg-blue-50 text-brandBlue border border-blue-200 rounded-full font-semibold">2D Portal</span>
-                    </h1>
-                    <p class="text-xs text-slate-500">Agentic Mixed Reality Modular Training System (AMR-MTS)</p>
+                    <h1 class="text-xl font-bold text-slate-900">Operation SEMI <span class="text-xs uppercase px-2 py-0.5 bg-blue-50 text-brandBlue rounded-full font-semibold">2D Portal</span></h1>
                 </div>
             </div>
-            
             <div class="flex items-center space-x-4">
-                <div class="hidden md:flex flex-col text-right">
-                    <span class="text-xs font-semibold text-slate-700" id="userNameDisplay">Trainee Candidate</span>
-                    <span class="text-[10px] text-slate-400">ID: <span id="userIdDisplay">PENDING</span></span>
-                </div>
-                <div class="w-10 h-10 rounded-full bg-orange-100 text-brandOrange border-2 border-brandOrange flex items-center justify-center font-bold text-sm shadow-inner">
-                    <i class="fa-solid fa-user-graduate"></i>
-                </div>
+                <a href="/" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold">Main Portal</a>
+                <span class="text-xs font-semibold text-slate-700" id="userNameDisplay">Trainee Candidate</span>
             </div>
         </div>
     </header>
 
-    <!-- Main Application Wrapper -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col pb-28 gap-8">
-
-        <!-- Notification Banner -->
-        <div id="toastMessage" class="hidden mb-2 p-4 rounded-xl bg-blue-50 border border-blue-200 text-brandBlue flex items-center justify-between shadow-sm transition-all duration-300">
-            <div class="flex items-center space-x-3">
-                <i class="fa-solid fa-circle-info text-xl text-brandBlue"></i>
-                <span id="toastText" class="text-sm font-medium">Notification message goes here.</span>
-            </div>
-            <button onclick="hideToast()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-8">
+        <div id="toastMessage" class="hidden p-4 rounded-xl bg-blue-50 border border-blue-200 text-brandBlue flex items-center justify-between shadow-sm">
+            <span id="toastText" class="text-sm font-medium"></span>
         </div>
-
-        <!-- Dashboard View Header -->
-        <div>
-            <div class="bg-gradient-to-r from-brandBlue to-blue-700 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
-                <div class="absolute right-40 top-0 w-32 h-32 bg-brandOrange/20 rounded-full blur-xl pointer-events-none"></div>
-                <div class="z-10 max-w-2xl">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-xs font-semibold mb-3 backdrop-blur-md border border-white/20">
-                        <i class="fa-solid fa-shield-halved text-brandOrange"></i> Workforce Onboarding Active
-                    </div>
-                    <h2 class="text-3xl font-extrabold tracking-tight mb-2">Welcome to Semiconductor Training</h2>
-                    <p class="text-blue-100 text-sm leading-relaxed">
-                        Complete your foundational 2D computer-based training modules below before unlocking the 3D VR Cleanroom simulation and hardware training tracks.
-                    </p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Module 1 -->
+            <div class="bg-white rounded-3xl border border-slate-200 p-6 flex flex-col justify-between shadow-sm">
+                <div>
+                    <h4 class="text-xl font-bold text-slate-900 mb-1">Module 1: AI Literacy</h4>
+                    <p class="text-xs text-slate-600 mb-6">Learn AI fundamentals and automated agentic workflows in manufacturing.</p>
                 </div>
-                
-                <!-- Overall Progress Card -->
-                <div class="z-10 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5 min-w-[260px] shadow-inner">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-xs font-semibold uppercase tracking-wider text-blue-200">Overall Progress</span>
-                        <span class="text-lg font-bold text-brandOrange" id="overallProgressText">0%</span>
-                    </div>
-                    <div class="w-full bg-white/20 rounded-full h-3 mb-3 overflow-hidden">
-                        <div id="overallProgressBar" class="bg-gradient-to-r from-brandOrange to-amber-500 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
-                    </div>
-                    <div class="flex justify-between text-[11px] text-blue-100">
-                        <span><strong id="completedModulesCount">0</strong> of 3 Modules Completed</span>
-                        <span id="certificationStatus" class="font-semibold text-amber-300">In Progress</span>
-                    </div>
-                </div>
+                <button onclick="openModule(1)" class="w-full py-3 rounded-xl bg-brandBlue text-white font-semibold text-sm">Launch Module 1</button>
             </div>
-        </div>
-
-        <!-- Topic Modules Grid -->
-        <div>
-            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2 mb-4">
-                <i class="fa-solid fa-book-open text-brandOrange"></i> Core Training Modules
-            </h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Module 1 -->
-                <div class="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col overflow-hidden group">
-                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 border-b border-slate-100 relative">
-                        <div class="absolute top-4 right-4 w-10 h-10 rounded-xl bg-brandBlue text-white flex items-center justify-center font-bold shadow-sm">
-                            <i class="fa-solid fa-brain"></i>
-                        </div>
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-brandBlue bg-blue-100/80 px-2.5 py-1 rounded-full">Module 01</span>
-                        <h4 class="text-xl font-bold text-slate-900 mt-3 mb-1">AI Literacy & Ethics</h4>
-                        <p class="text-xs text-slate-500 font-medium flex items-center gap-1.5 mt-2">
-                            <i class="fa-solid fa-building-columns text-brandOrange"></i> VSU Center for Responsible AI
-                        </p>
-                    </div>
-                    <div class="p-6 flex-1 flex flex-col justify-between">
-                        <p class="text-sm text-slate-600 mb-6 leading-relaxed">
-                            Understand machine learning fundamentals, automated agentic workflows, and data governance in high-tech manufacturing.
-                        </p>
-                        <div>
-                            <div class="flex justify-between text-xs text-slate-500 mb-1.5 font-medium">
-                                <span>Status</span>
-                                <span id="mod1StatusText" class="text-amber-600 font-semibold">Not Started</span>
-                            </div>
-                            <div class="w-full bg-slate-100 rounded-full h-2 mb-5">
-                                <div id="mod1Bar" class="bg-brandOrange h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
-                            </div>
-                            <button onclick="openModule(1)" class="w-full py-3 px-4 rounded-xl bg-brandBlue hover:bg-blue-700 text-white font-semibold text-sm transition-colors flex items-center justify-center gap-2 shadow-sm shadow-blue-500/20">
-                                <i class="fa-solid fa-play text-xs"></i> Launch AI Module
-                            </button>
-                        </div>
-                    </div>
+            <!-- Module 2 -->
+            <div class="bg-white rounded-3xl border border-slate-200 p-6 flex flex-col justify-between shadow-sm">
+                <div>
+                    <h4 class="text-xl font-bold text-slate-900 mb-1">Module 2: Microelectronics</h4>
+                    <p class="text-xs text-slate-600 mb-6">Explore semiconductor physics and ESD protection protocols.</p>
                 </div>
-
-                <!-- Module 2 -->
-                <div class="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col overflow-hidden group">
-                    <div class="bg-gradient-to-br from-orange-50 to-amber-50 p-6 border-b border-slate-100 relative">
-                        <div class="absolute top-4 right-4 w-10 h-10 rounded-xl bg-brandOrange text-white flex items-center justify-center font-bold shadow-sm">
-                            <i class="fa-solid fa-bolt"></i>
-                        </div>
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-brandOrange bg-orange-100/80 px-2.5 py-1 rounded-full">Module 02</span>
-                        <h4 class="text-xl font-bold text-slate-900 mt-3 mb-1">Microelectronics Fundamentals</h4>
-                        <p class="text-xs text-slate-500 font-medium flex items-center gap-1.5 mt-2">
-                            <i class="fa-solid fa-graduation-cap text-brandBlue"></i> VMEC
-                        </p>
-                    </div>
-                    <div class="p-6 flex-1 flex flex-col justify-between">
-                        <p class="text-sm text-slate-600 mb-6 leading-relaxed">
-                            Explore semiconductor physics, wafer fabrication steps, CMOS device operation, and electrical safety standards.
-                        </p>
-                        <div>
-                            <div class="flex justify-between text-xs text-slate-500 mb-1.5 font-medium">
-                                <span>Status</span>
-                                <span id="mod2StatusText" class="text-amber-600 font-semibold">Not Started</span>
-                            </div>
-                            <div class="w-full bg-slate-100 rounded-full h-2 mb-5">
-                                <div id="mod2Bar" class="bg-brandOrange h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
-                            </div>
-                            <button onclick="openModule(2)" class="w-full py-3 px-4 rounded-xl bg-brandBlue hover:bg-blue-700 text-white font-semibold text-sm transition-colors flex items-center justify-center gap-2 shadow-sm shadow-blue-500/20">
-                                <i class="fa-solid fa-play text-xs"></i> Launch Microelectronics
-                            </button>
-                        </div>
-                    </div>
+                <button onclick="openModule(2)" class="w-full py-3 rounded-xl bg-brandBlue text-white font-semibold text-sm">Launch Module 2</button>
+            </div>
+            <!-- Module 3 -->
+            <div class="bg-white rounded-3xl border border-slate-200 p-6 flex flex-col justify-between shadow-sm">
+                <div>
+                    <h4 class="text-xl font-bold text-slate-900 mb-1">Module 3: Industry Standards</h4>
+                    <p class="text-xs text-slate-600 mb-6">Gain insights into cleanroom contamination control and supply chains.</p>
                 </div>
-
-                <!-- Module 3 -->
-                <div class="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col overflow-hidden group">
-                    <div class="bg-gradient-to-br from-blue-50 to-slate-100 p-6 border-b border-slate-100 relative">
-                        <div class="absolute top-4 right-4 w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold shadow-sm">
-                            <i class="fa-solid fa-industry"></i>
-                        </div>
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-700 bg-slate-200/80 px-2.5 py-1 rounded-full">Module 03</span>
-                        <h4 class="text-xl font-bold text-slate-900 mt-3 mb-1">Semiconductors Industry</h4>
-                        <p class="text-xs text-slate-500 font-medium flex items-center gap-1.5 mt-2">
-                            <i class="fa-solid fa-star text-brandOrange"></i> Micron Technology
-                        </p>
-                    </div>
-                    <div class="p-6 flex-1 flex flex-col justify-between">
-                        <p class="text-sm text-slate-600 mb-6 leading-relaxed">
-                            Gain insights into global supply chains, cleanroom protocols, contamination control, and career pathways.
-                        </p>
-                        <div>
-                            <div class="flex justify-between text-xs text-slate-500 mb-1.5 font-medium">
-                                <span>Status</span>
-                                <span id="mod3StatusText" class="text-amber-600 font-semibold">Not Started</span>
-                            </div>
-                            <div class="w-full bg-slate-100 rounded-full h-2 mb-5">
-                                <div id="mod3Bar" class="bg-brandOrange h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
-                            </div>
-                            <button onclick="openModule(3)" class="w-full py-3 px-4 rounded-xl bg-brandBlue hover:bg-blue-700 text-white font-semibold text-sm transition-colors flex items-center justify-center gap-2 shadow-sm shadow-blue-500/20">
-                                <i class="fa-solid fa-play text-xs"></i> Launch Industry Module
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <button onclick="openModule(3)" class="w-full py-3 rounded-xl bg-brandBlue text-white font-semibold text-sm">Launch Module 3</button>
             </div>
         </div>
     </main>
 
-    <!-- Interactive Module Modal -->
+    <!-- Modal -->
     <div id="moduleModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-slate-100">
-            <div id="modalHeaderBg" class="p-6 border-b border-slate-200 flex items-center justify-between bg-brandBlue text-white">
-                <div class="flex items-center space-x-3">
-                    <div id="modalIconBox" class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white text-lg font-bold">
-                        <i class="fa-solid fa-book"></i>
-                    </div>
-                    <div>
-                        <h3 id="modalTitle" class="text-lg font-bold">Module Title</h3>
-                        <p id="modalSponsor" class="text-xs text-blue-100 font-medium">Sponsor</p>
-                    </div>
-                </div>
-                <button onclick="closeModule()" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-            <div class="p-6 overflow-y-auto flex-1 space-y-6" id="modalBodyContent"></div>
-            <div class="p-4 border-t border-slate-200 bg-slate-50 flex justify-between items-center">
-                <span class="text-xs text-slate-500 font-medium" id="modalProgressIndicator">Step 1 of 3</span>
-                <div class="flex space-x-3">
-                    <button id="prevBtn" onclick="prevStep()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-semibold text-sm hover:bg-slate-100 disabled:opacity-40" disabled>Previous</button>
-                    <button id="nextBtn" onclick="nextStep()" class="px-5 py-2 rounded-xl bg-brandBlue hover:bg-blue-700 text-white font-semibold text-sm shadow-sm">Continue</button>
-                </div>
-            </div>
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 space-y-4 shadow-2xl">
+            <h3 id="modalTitle" class="text-lg font-bold"></h3>
+            <div id="modalBodyContent"></div>
+            <button onclick="nextStep()" id="nextBtn" class="px-5 py-2 bg-brandBlue text-white rounded-xl text-sm font-semibold">Continue</button>
         </div>
     </div>
 
-    <!-- JavaScript Application Logic -->
     <script>
-        let userId = '';
-        let userName = '';
-
-        // Handle Direct Intake and Save to Render SQLite Database
+        let userId = '', userName = '';
         async function handleDirectIntake(event) {
             event.preventDefault();
             const studentIdInput = document.getElementById('intakeStudentId').value.trim();
             const fullNameInput = document.getElementById('intakeFullName').value.trim();
-
-            if (!studentIdInput || !fullNameInput) {
-                alert('Please provide both Student ID and Full Name.');
-                return;
-            }
-
-            try {
-                const response = await fetch('https://c2c-5y77.onrender.com/api/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        student_id: studentIdInput, 
-                        full_name: fullNameInput 
-                    })
-                });
-
-                const data = await response.json();
-                if (response.ok) {
-                    userId = studentIdInput;
-                    userName = fullNameInput;
-
-                    // Update UI Display Headers
-                    document.getElementById('userIdDisplay').textContent = userId;
-                    document.getElementById('userNameDisplay').textContent = userName;
-
-                    // Hide Intake Modal
-                    document.getElementById('intakeAuthModal').classList.add('hidden');
-                    showToast('Welcome, ' + userName + '! Registered successfully in the C2C database.');
-                } else {
-                    alert('Registration error: ' + (data.detail || 'Unknown error'));
-                }
-            } catch (error) {
-                console.error('Connection error:', error);
-                alert('Could not connect to the Render backend server.');
+            const res = await fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ student_id: studentIdInput, full_name: fullNameInput })
+            });
+            if (res.ok) {
+                userId = studentIdInput; userName = fullNameInput;
+                document.getElementById('userNameDisplay').textContent = userName;
+                document.getElementById('intakeAuthModal').classList.add('hidden');
             }
         }
-
-        // Training Module Data & Progress Logic
-        const moduleProgress = {
-            1: { completed: false, score: 0 },
-            2: { completed: false, score: 0 },
-            3: { completed: false, score: 0 }
-        };
-
-        let currentActiveModule = null;
-        let currentStepIndex = 0;
-
+        let currentActiveModule = null, currentStepIndex = 0;
         const moduleData = {
-            1: {
-                title: "AI Literacy & Responsible Systems",
-                sponsor: "VSU Center for Responsible AI",
-                color: "bg-brandBlue",
-                icon: "fa-brain",
-                steps: [
-                    { type: "content", title: "Introduction to Agentic AI", text: "Modern semiconductor fabrication facilities utilize autonomous AI agents to manage equipment schedules, monitor telemetry, and optimize yields." },
-                    { type: "quiz", question: "What is a primary responsibility of Agentic AI in AMR-MTS?", options: ["Automating student session scheduling and routing", "Replacing physical machinery", "Eliminating safety gear"], correct: 0, explanation: "Correct! The AI agents automate scheduling and coordination." }
-                ]
-            },
-            2: {
-                title: "Microelectronics Fundamentals",
-                sponsor: "VMEC",
-                color: "bg-brandOrange",
-                icon: "fa-bolt",
-                steps: [
-                    { type: "content", title: "Semiconductor Physics & ESD", text: "Electrostatic Discharge (ESD) can destroy microscopic circuits instantly. Proper grounding wristbands and cleanroom protocols are mandatory." },
-                    { type: "quiz", question: "Why are ESD protocols strictly enforced?", options: ["For room comfort", "To prevent static discharge from damaging microcircuits", "To make printers faster"], correct: 1, explanation: "Correct! ESD protection prevents damage to microcomponents." }
-                ]
-            },
-            3: {
-                title: "Semiconductors Industry",
-                sponsor: "Micron Technology",
-                color: "bg-slate-900",
-                icon: "fa-industry",
-                steps: [
-                    { type: "content", title: "Global Supply Chains & Cleanrooms", text: "Cleanrooms maintain extremely low particulate concentrations to protect sensitive semiconductor wafers during fabrication." },
-                    { type: "quiz", question: "What is the main purpose of a semiconductor cleanroom?", options: ["Recreational lounge", "Maintain extremely low airborne particulates", "Test audio speakers"], correct: 1, explanation: "Correct! Cleanrooms protect wafers from dust and particulate contamination." }
-                ]
-            }
+            1: { title: "AI Literacy", steps: [{ type: "content", text: "Autonomous agents manage fab schedules." }, { type: "quiz", question: "What do AI agents do?", options: ["Schedule routing", "Replace machinery"], correct: 0 }] },
+            2: { title: "Microelectronics", steps: [{ type: "content", text: "ESD protection is vital." }, { type: "quiz", question: "Why use ESD straps?", options: ["Comfort", "Prevent circuit damage"], correct: 1 }] },
+            3: { title: "Industry", steps: [{ type: "content", text: "Cleanrooms prevent particle dust." }, { type: "quiz", question: "Main cleanroom purpose?", options: ["Low particulates", "Lounge"], correct: 0 }] }
         };
-
         function openModule(modId) {
-            if (!userId) {
-                alert('Please complete the Student Intake registration modal first.');
-                return;
-            }
-            currentActiveModule = modId;
-            currentStepIndex = 0;
-            const data = moduleData[modId];
-
-            document.getElementById('modalTitle').textContent = data.title;
-            document.getElementById('modalSponsor').textContent = data.sponsor;
-            document.getElementById('modalIconBox').innerHTML = `<i class="fa-solid ${data.icon}"></i>`;
-            
-            renderModalStep();
-            document.getElementById('moduleModal').classList.remove('hidden');
+            if (!userId) { alert('Please register your Student ID first.'); return; }
+            currentActiveModule = modId; currentStepIndex = 0;
+            renderModalStep(); document.getElementById('moduleModal').classList.remove('hidden');
         }
-
-        function closeModule() {
-            document.getElementById('moduleModal').classList.add('hidden');
-            currentActiveModule = null;
-            updateDashboard();
-        }
-
         function renderModalStep() {
-            const data = moduleData[currentActiveModule];
-            const step = data.steps[currentStepIndex];
-            const body = document.getElementById('modalBodyContent');
-            
-            document.getElementById('modalProgressIndicator').textContent = `Step ${currentStepIndex + 1} of ${data.steps.length}`;
-
-            let html = '';
-            if (step.type === 'content') {
-                html = `<div class="space-y-4"><h4 class="text-xl font-bold text-slate-900">${step.title}</h4><p class="text-slate-600 leading-relaxed text-base">${step.text}</p></div>`;
-            } else if (step.type === 'quiz') {
-                html = `<div class="space-y-4"><span class="px-3 py-1 bg-orange-100 text-brandOrange text-xs font-bold rounded-full">Knowledge Check</span><h4 class="text-lg font-bold text-slate-900">${step.question}</h4><div class="space-y-3 pt-2">`;
+            const data = moduleData[currentActiveModule], step = data.steps[currentStepIndex];
+            document.getElementById('modalTitle').textContent = data.title;
+            let html = `<p class="text-sm text-slate-700">${step.text || step.question}</p>`;
+            if (step.options) {
                 step.options.forEach((opt, idx) => {
-                    html += `<label class="flex items-center gap-3 p-4 rounded-2xl border border-slate-200 hover:border-brandBlue hover:bg-blue-50/50 cursor-pointer transition-all"><input type="radio" name="quizOption" value="${idx}" class="w-4 h-4 text-brandBlue"><span class="text-sm font-medium text-slate-700">${opt}</span></label>`;
+                    html += `<label class="block mt-2 text-xs"><input type="radio" name="quizOpt" value="${idx}"> ${opt}</label>`;
                 });
-                html += `</div><div id="quizFeedback" class="hidden mt-4 p-4 rounded-xl text-sm font-medium"></div></div>`;
             }
-            body.innerHTML = html;
-
-            document.getElementById('prevBtn').disabled = currentStepIndex === 0;
-            document.getElementById('nextBtn').textContent = (currentStepIndex === data.steps.length - 1) ? 'Complete Module' : 'Continue';
+            document.getElementById('modalBodyContent').innerHTML = html;
         }
-
-        function prevStep() {
-            if (currentStepIndex > 0) { currentStepIndex--; renderModalStep(); }
-        }
-
         async function nextStep() {
             const data = moduleData[currentActiveModule];
-            const step = data.steps[currentStepIndex];
-            
-            if (step.type === 'quiz') {
-                const selected = document.querySelector('input[name="quizOption"]:checked');
-                const feedback = document.getElementById('quizFeedback');
-                if (!selected) { showToast('Please select an answer.'); return; }
-                if (parseInt(selected.value) === step.correct) {
-                    feedback.className = "mt-4 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-medium flex items-center gap-2";
-                    feedback.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600"></i> ${step.explanation}`;
-                } else {
-                    feedback.className = "mt-4 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm font-medium flex items-center gap-2";
-                    feedback.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600"></i> Incorrect. Try again.`;
-                    return;
-                }
-            }
-
             if (currentStepIndex < data.steps.length - 1) {
-                currentStepIndex++;
-                renderModalStep();
+                currentStepIndex++; renderModalStep();
             } else {
-                moduleProgress[currentActiveModule].completed = true;
-                moduleProgress[currentActiveModule].score = 100;
-                
-                // Automatically log training completion to database backend
-                try {
-                    await fetch('https://c2c-5y77.onrender.com/api/complete-training', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            student_id: userId,
-                            score: 100.0,
-                            track: `2D CBT - Module ${currentActiveModule}`
-                        })
-                    });
-                } catch (e) {
-                    console.error('Failed to log completion', e);
-                }
-
-                showToast(`Module ${currentActiveModule} completed and logged successfully!`);
-                closeModule();
+                await fetch('/api/complete-training', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ student_id: userId, score: 100.0, track: `2D CBT - Module ${currentActiveModule}` })
+                });
+                alert('Module completed and logged!');
+                document.getElementById('moduleModal').classList.add('hidden');
             }
-        }
-
-        function updateDashboard() {
-            let completedCount = 0;
-            for (let i = 1; i <= 3; i++) {
-                const mod = moduleProgress[i];
-                const statusText = document.getElementById(`mod${i}StatusText`);
-                const bar = document.getElementById(`mod${i}Bar`);
-                if (mod.completed) {
-                    completedCount++;
-                    statusText.textContent = "Completed (100%)";
-                    statusText.className = "text-emerald-600 font-semibold";
-                    bar.style.width = "100%";
-                    bar.className = "bg-emerald-500 h-2 rounded-full transition-all duration-300";
-                }
-            }
-            const overallPct = Math.round((completedCount / 3) * 100);
-            document.getElementById('overallProgressText').textContent = overallPct + '%';
-            document.getElementById('overallProgressBar').style.width = overallPct + '%';
-            document.getElementById('completedModulesCount').textContent = completedCount;
-
-            if (completedCount === 3) {
-                document.getElementById('certificationStatus').textContent = "Ready for VR Hub";
-                document.getElementById('certificationStatus').className = "font-semibold text-emerald-300";
-            }
-        }
-
-        function showToast(msg) {
-            const toast = document.getElementById('toastMessage');
-            document.getElementById('toastText').textContent = msg;
-            toast.classList.remove('hidden');
-            setTimeout(() => { toast.classList.add('hidden'); }, 5000);
         }
     </script>
 </body>
