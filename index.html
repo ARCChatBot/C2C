@@ -119,9 +119,9 @@
                     <div class="w-12 h-12 rounded-2xl bg-orange-50 text-vsuOrange flex items-center justify-center text-xl font-bold mb-4 border border-orange-100"><i class="fa-solid fa-folder-open"></i></div>
                     <span class="text-[10px] font-bold uppercase tracking-wider text-vsuOrange bg-orange-50 px-2.5 py-1 rounded-full">Layer 04</span>
                     <h4 class="text-lg font-bold text-vsuDark mt-3 mb-2">SOP & Documentation Repository</h4>
-                    <p class="text-xs text-slate-600 leading-relaxed mb-4">Centralized repository for Standard Operating Procedures and safety guidelines.</p>
+                    <p class="text-xs text-slate-600 leading-relaxed mb-4">Centralized repository for Standard Operating Procedures and safety guidelines with viewable PDF viewer.</p>
                 </div>
-                <button onclick="alert('Opening secure SOP & Document Archive...')" class="w-full py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-file-lines"></i> View Repository</button>
+                <button onclick="openSopModal()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-file-pdf"></i> View SOP &amp; Documents PDF</button>
             </div>
 
             <div class="bg-white rounded-3xl p-6 border-t-4 border-vsuBlue border-x border-b border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between lg:col-span-2">
@@ -139,79 +139,13 @@
             </div>
         </div>
 
-        <!-- Advisors & Teams Section -->
-        <section class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
-            <div class="flex items-center gap-3 pb-4 border-b border-slate-100">
-                <div class="w-10 h-10 rounded-xl bg-orange-50 text-vsuOrange flex items-center justify-center text-lg font-bold border border-orange-200"><i class="fa-solid fa-users-gear"></i></div>
-                <div>
-                    <span class="text-xs font-bold text-vsuOrange uppercase tracking-wider">Leadership & Cohorts</span>
-                    <h3 class="text-xl font-extrabold text-vsuDark">Faculty Advisors &amp; Senior Project Teams</h3>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-vsuLight p-5 rounded-2xl border border-slate-200 flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-blue-100 text-vsuBlue flex items-center justify-center text-lg font-bold"><i class="fa-solid fa-chalkboard-user"></i></div>
-                    <div>
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Faculty Advisor / PI</span>
-                        <h4 class="text-base font-extrabold text-vsuDark">Dr. Peng Cheng</h4>
-                    </div>
-                </div>
-                <div class="bg-vsuLight p-5 rounded-2xl border border-slate-200 flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-blue-100 text-vsuBlue flex items-center justify-center text-lg font-bold"><i class="fa-solid fa-chalkboard-user"></i></div>
-                    <div>
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Faculty Advisor / Co-PI</span>
-                        <h4 class="text-base font-extrabold text-vsuDark">Dr. Tao Sun</h4>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
-                <div class="bg-vsuLight rounded-2xl p-6 border-t-4 border-vsuOrange border-x border-b border-slate-200 shadow-sm flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between mb-3"><h4 class="text-base font-extrabold text-vsuDark">Operation SEMI (VSU)</h4><span class="text-[10px] bg-orange-100 text-vsuOrange font-bold px-2 py-0.5 rounded-full">Lead Team</span></div>
-                        <ul class="space-y-2 text-xs text-slate-700 mt-3">
-                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-bold text-vsuBlue">Nicolas Pollard <span class="text-[10px] text-vsuOrange font-bold block">Team Lead</span></li>
-                            <li class="p-2 rounded-lg bg-white border border-slate-100">Tory'elle Coleman</li>
-                            <li class="p-2 rounded-lg bg-white border border-slate-100">Larry Caldwell</li>
-                            <li class="p-2 rounded-lg bg-white border border-slate-100">Sabien Hill</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="bg-vsuLight rounded-2xl p-6 border-t-4 border-vsuBlue border-x border-b border-slate-200 shadow-sm flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between mb-3"><h4 class="text-base font-extrabold text-vsuDark">Virginia Tech Team</h4><span class="text-[10px] bg-blue-100 text-vsuBlue font-bold px-2 py-0.5 rounded-full">Collaborator</span></div>
-                        <ul class="space-y-2 text-xs text-slate-700 mt-3">
-                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-medium">VT Team Member 1</li>
-                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-medium">VT Team Member 2</li>
-                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-medium">VT Team Member 3</li>
-                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-medium">VT Team Member 4</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="bg-vsuLight rounded-2xl p-6 border-t-4 border-vsuOrange border-x border-b border-slate-200 shadow-sm flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between mb-3"><h4 class="text-base font-extrabold text-vsuDark">Virginia State Team</h4><span class="text-[10px] bg-orange-100 text-vsuOrange font-bold px-2 py-0.5 rounded-full">Collaborator</span></div>
-                        <ul class="space-y-2 text-xs text-slate-700 mt-3">
-                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-medium">VSU Team Member 1</li>
-                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-medium">VSU Team Member 2</li>
-                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-medium">VSU Team Member 3</li>
-                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-medium">VSU Team Member 4</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <!-- Registered Student Directory Section -->
         <section class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-4">
             <div class="flex items-center justify-between pb-4 border-b border-slate-100">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-blue-50 text-vsuBlue flex items-center justify-center text-lg font-bold border border-blue-200"><i class="fa-solid fa-users-line"></i></div>
                     <div>
-                        <span class="text-xs font-bold text-vsuOrange uppercase tracking-wider">Live Database Feed</span>
+                        <span class="text-xs font-bold text-vsuOrange uppercase tracking-wider">Live Student Engagement Feed</span>
                         <h3 class="text-xl font-extrabold text-vsuDark">Registered Student Directory</h3>
                     </div>
                 </div>
@@ -221,17 +155,39 @@
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="border-b border-slate-200 text-xs font-bold text-slate-400 uppercase">
-                            <th class="py-3 px-4">Full Name (Interested Student)</th>
+                            <th class="py-3 px-4">Full Name</th>
                             <th class="py-3 px-4">Sign-Up Timestamp</th>
                         </tr>
                     </thead>
                     <tbody id="mainStudentTableBody" class="divide-y divide-slate-100 text-sm text-slate-700">
-                        <tr><td colspan="2" class="py-6 text-center text-slate-400 italic">Loading student records...</td></tr>
+                        <tr><td colspan="2" class="py-6 text-center text-slate-400 italic">Loading registered students...</td></tr>
                     </tbody>
                 </table>
             </div>
         </section>
     </main>
+
+    <!-- SOP PDF Viewer Modal -->
+    <div id="sopModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-4xl w-full h-[85vh] p-6 shadow-2xl border border-slate-100 flex flex-col space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-vsuBlue flex items-center justify-center text-lg font-bold border border-blue-200"><i class="fa-solid fa-file-pdf"></i></div>
+                    <div>
+                        <h3 class="text-lg font-extrabold text-vsuDark">Standard Operating Procedures (SOP) &amp; Documentation</h3>
+                        <p class="text-xs text-slate-500">Classroom to Cleanroom (C2C) Safety &amp; Protocol Manual</p>
+                    </div>
+                </div>
+                <button onclick="closeSopModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="flex-1 w-full bg-slate-100 rounded-2xl overflow-hidden border border-slate-200">
+                <iframe src="https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" class="w-full h-full" frameborder="0"></iframe>
+            </div>
+            <div class="flex justify-end pt-2">
+                <button onclick="closeSopModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow">Close Viewer</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Student Sign-Up Modal -->
     <div id="studentSignupModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
@@ -313,14 +269,18 @@
         function openEquipmentModal() { document.getElementById('equipmentModal').classList.remove('hidden'); }
         function closeEquipmentModal() { document.getElementById('equipmentModal').classList.add('hidden'); }
 
+        function openSopModal() { document.getElementById('sopModal').classList.remove('hidden'); }
+        function closeSopModal() { document.getElementById('sopModal').classList.add('hidden'); }
+
         async function loadRegisteredStudents() {
             const tbody = document.getElementById('mainStudentTableBody');
-            tbody.innerHTML = `<tr><td colspan="2" class="py-6 text-center text-slate-400 italic">Syncing student engagement...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="2" class="py-6 text-center text-slate-400 italic">Syncing registered students...</td></tr>`;
             try {
-                const res = await fetch('/api/interested-students');
-                const students = res.ok ? await res.json() : [];
+                const res = await fetch('/api/students');
+                if (!res.ok) throw new Error('Network response was not ok');
+                const students = await res.json();
                 if (students.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="2" class="py-6 text-center text-slate-400 italic">No student sign-ups recorded yet.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="2" class="py-6 text-center text-slate-400 italic">No registered students found yet.</td></tr>`;
                     return;
                 }
                 tbody.innerHTML = '';
@@ -350,18 +310,18 @@
                 });
 
                 if (response.ok) {
-                    alert('Thank you for signing up! Your interest has been logged so our team can reach out to you.');
+                    alert('Thank you for signing up! Your registration has been logged.');
                     closeStudentSignupModal();
                     loadRegisteredStudents();
                 } else {
-                    alert('Failed to register sign-up.');
+                    alert('Failed to register student.');
                 }
             } catch (err) {
                 alert('Could not connect to backend.');
             }
         }
 
-        async function submitEquipmentBooking(event) {
+    async function submitEquipmentBooking(event) {
             event.preventDefault();
             const fullName = document.getElementById('eqFullName').value.trim();
             const date = document.getElementById('eqDate').value;
@@ -381,8 +341,9 @@
                 });
 
                 if (response.ok) {
-                    alert('3D Printer & Equipment training session scheduled! Trainer sign-off required during hands-on execution.');
+                    alert('Equipment training session scheduled! Trainer sign-off required during hands-on execution.');
                     closeEquipmentModal();
+                    loadRegisteredStudents();
                 } else {
                     alert('Failed to log equipment session.');
                 }
