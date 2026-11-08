@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classroom to Cleanroom (C2C) - Operation SEMI Dashboard</title>
+    <title>Classroom to Cleanroom (C2C) - Operation SEMI Dashboard & Admin View</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -47,7 +47,7 @@
             
             <div class="flex items-center space-x-6">
                 <div class="hidden md:flex flex-col text-right">
-                    <span class="text-xs font-bold text-white" id="headerUserName">Virginia State University</span>
+                    <span class="text-xs font-bold text-white">Virginia State University</span>
                     <a href="https://www.nsf.gov/awardsearch/show-award/?AWD_ID=2606117" target="_blank" class="text-[11px] text-amber-300 hover:underline font-semibold flex items-center gap-1 justify-end">
                         <i class="fa-solid fa-award"></i> NSF Award #2606117 <i class="fa-solid fa-external-link text-[9px]"></i>
                     </a>
@@ -94,7 +94,7 @@
             </h3>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
             <!-- Layer 1: Computer-Based Training Node -->
             <div class="bg-white rounded-3xl p-6 border-t-4 border-vsuBlue border-x border-b border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
@@ -188,7 +188,118 @@
                 </div>
             </div>
 
+            <!-- Layer 5: Physical Equipment Training & Scheduling Node -->
+            <div class="bg-white rounded-3xl p-6 border-t-4 border-vsuBlue border-x border-b border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between lg:col-span-2">
+                <div>
+                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-vsuBlue flex items-center justify-center text-xl font-bold mb-4 border border-blue-100">
+                        <i class="fa-solid fa-screwdriver-wrench"></i>
+                    </div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-vsuBlue bg-blue-50 px-2.5 py-1 rounded-full">Layer 05</span>
+                    <h4 class="text-lg font-bold text-vsuDark mt-3 mb-3">Physical Equipment Training &amp; Scheduling</h4>
+                    
+                    <div class="space-y-3 text-xs text-slate-700 bg-vsuLight p-4 rounded-2xl border border-slate-200 mb-4">
+                        <div class="flex items-start gap-2.5">
+                            <span class="w-5 h-5 rounded-full bg-vsuBlue text-white font-bold flex items-center justify-center shrink-0 text-[10px]">1</span>
+                            <div>
+                                <strong class="text-slate-900 block">Review Available Training Times:</strong>
+                                <span class="text-slate-600">Sessions are held Tuesdays &amp; Thursdays from 3:30 PM – 4:50 PM EST.</span>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-2.5">
+                            <span class="w-5 h-5 rounded-full bg-vsuBlue text-white font-bold flex items-center justify-center shrink-0 text-[10px]">2</span>
+                            <div>
+                                <strong class="text-slate-900 block">Confirm Target Equipment:</strong>
+                                <span class="text-slate-600">Digital Multimeter, HoloLens 2, VR Oculus 2, Enderbot 3D Printer, or NVIDIA Jetson Nano.</span>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-2.5">
+                            <span class="w-5 h-5 rounded-full bg-vsuBlue text-white font-bold flex items-center justify-center shrink-0 text-[10px]">3</span>
+                            <div>
+                                <strong class="text-slate-900 block">Select a Student Mentor:</strong>
+                                <span class="text-slate-600">Choose your assigned peer mentor from Operation SEMI to guide your hands-on session.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <button onclick="openEquipmentModal()" class="w-full mb-3 py-2.5 bg-vsuBlue hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-calendar-check"></i> Schedule Equipment Training
+                    </button>
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                        <span class="text-slate-400 font-medium">Lab Availability</span>
+                        <span class="text-emerald-600 font-bold">Open for Booking</span>
+                    </div>
+                </div>
+            </div>
+
         </div>
+
+        <!-- Real-Time Admin Workforce Training Metrics -->
+        <section class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between pb-6 border-b border-slate-100 gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-vsuBlue flex items-center justify-center text-xl font-bold border border-blue-200">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold text-vsuOrange uppercase tracking-wider">Operation SEMI Admin Portal</span>
+                        <h3 class="text-2xl font-extrabold text-vsuDark">Real-Time Workforce Training Metrics</h3>
+                    </div>
+                </div>
+                <button onclick="loadAdminMetrics()" class="px-5 py-2.5 bg-vsuBlue hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-rotate"></i> Refresh Metrics
+                </button>
+            </div>
+
+            <!-- Summary Metrics Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Registered Students</span>
+                    <span class="text-3xl font-extrabold text-vsuDark" id="statTotalStudents">--</span>
+                </div>
+                <div class="bg-blue-50 p-5 rounded-2xl border border-blue-100">
+                    <span class="text-xs font-bold text-vsuBlue uppercase tracking-wider block mb-1">2D CBT Completed</span>
+                    <span class="text-3xl font-extrabold text-blue-700" id="stat2dCompleted">--</span>
+                </div>
+                <div class="bg-orange-50 p-5 rounded-2xl border border-orange-100">
+                    <span class="text-xs font-bold text-vsuOrange uppercase tracking-wider block mb-1">3D Simulation</span>
+                    <span class="text-3xl font-extrabold text-orange-700" id="stat3dCompleted">--</span>
+                </div>
+                <div class="bg-indigo-50 p-5 rounded-2xl border border-indigo-100">
+                    <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider block mb-1">VR Cleanroom</span>
+                    <span class="text-3xl font-extrabold text-indigo-700" id="statVrCompleted">--</span>
+                </div>
+                <div class="bg-emerald-50 p-5 rounded-2xl border border-emerald-100">
+                    <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider block mb-1">Physical Equipment</span>
+                    <span class="text-3xl font-extrabold text-emerald-700" id="statPhysicalCompleted">--</span>
+                </div>
+            </div>
+
+            <!-- Detailed Student Activity Table -->
+            <div class="pt-4">
+                <h4 class="text-base font-bold text-vsuDark mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-table-list text-vsuBlue"></i> Student Progress &amp; Completion Logs
+                </h4>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-200 text-xs font-bold text-slate-400 uppercase">
+                                <th class="py-3 px-4">Student ID</th>
+                                <th class="py-3 px-4">Full Name</th>
+                                <th class="py-3 px-4">Track / Module</th>
+                                <th class="py-3 px-4">Score</th>
+                                <th class="py-3 px-4">Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminLogsTableBody" class="divide-y divide-slate-100 text-sm text-slate-700">
+                            <tr>
+                                <td colspan="5" class="py-6 text-center text-slate-400 italic">Loading telemetry logs from database...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
 
         <!-- Project Gallery Section -->
         <section class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
@@ -226,7 +337,7 @@
                         <h4 class="text-sm font-extrabold text-vsuDark mt-1">AI-Driven Microelectronics Analytics</h4>
                     </div>
                 </div>
-                <!-- Gallery Item 4: Sponsorship Engagement (Micron & Operation SEMI Trip) -->
+                <!-- Gallery Item 4 -->
                 <div class="group relative bg-vsuLight rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition-all">
                     <img src="IMG_0185.jpg" alt="Micron Sponsorship Engagement and Operation SEMI Team Visit" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src='https://placehold.co/600x400/0047AB/FFFFFF?text=Micron+Sponsorship+Visit';">
                     <div class="p-4">
@@ -240,122 +351,4 @@
         <!-- About the Team Section -->
         <section class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
             <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
-                <div class="w-10 h-10 rounded-xl bg-orange-50 text-vsuOrange flex items-center justify-center text-lg font-bold border border-orange-200">
-                    <i class="fa-solid fa-users-gear"></i>
-                </div>
-                <div>
-                    <span class="text-xs font-bold text-vsuOrange uppercase tracking-wider">Collaboration & Leadership</span>
-                    <h2 class="text-xl font-extrabold text-vsuDark">About the Team &bull; C2C Pathway &amp; Operation SEMI</h2>
-                </div>
-            </div>
-
-            <!-- Advisors Slots -->
-            <div class="mb-8 bg-vsuLight p-6 rounded-2xl border border-slate-200">
-                <h3 class="text-sm font-extrabold uppercase tracking-wider text-vsuBlue mb-3 flex items-center gap-2">
-                    <i class="fa-solid fa-chalkboard-user"></i> Faculty Advisors
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-blue-100 text-vsuBlue flex items-center justify-center font-bold">
-                            <i class="fa-solid fa-user-tie"></i>
-                        </div>
-                        <div>
-                            <span class="text-xs font-bold text-slate-400 uppercase block">Co-Principal Investigator (Co-PI)</span>
-                            <span class="text-sm font-extrabold text-vsuDark">Dr. Peng Cheng</span>
-                        </div>
-                    </div>
-                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-blue-100 text-vsuBlue flex items-center justify-center font-bold">
-                            <i class="fa-solid fa-user-tie"></i>
-                        </div>
-                        <div>
-                            <span class="text-xs font-bold text-slate-400 uppercase block">Co-Principal Investigator (Co-PI)</span>
-                            <span class="text-sm font-extrabold text-vsuDark">Dr. Tao Sun</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- About Us - Student Section -->
-            <div class="mb-8 bg-gradient-to-r from-blue-50 to-orange-50 p-6 rounded-2xl border border-blue-100">
-                <div class="flex items-center gap-2 mb-2">
-                    <i class="fa-solid fa-user-graduate text-vsuBlue"></i>
-                    <h3 class="text-sm font-extrabold uppercase tracking-wider text-vsuBlue">About Us &bull; Student Engineering Cohort</h3>
-                </div>
-                <p class="text-xs md:text-sm text-slate-700 leading-relaxed font-medium">
-                    Our multidisciplinary student team brings together top undergraduate and research talent from Virginia State University and Virginia Tech, partnering with Operation SEMI. Together, we are designing, developing, and deploying next-generation AI-driven microelectronics training modules, interactive 3D simulations, and immersive virtual reality cleanroom environments to prepare the future semiconductor workforce.
-                </p>
-            </div>
-
-            <!-- Three Teams Grid (Operation SEMI (VSU) [Orange], Virginia Tech [Blue], VSU [Orange]) -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                
-                <!-- Operation SEMI (VSU) Team -->
-                <div class="bg-white rounded-2xl p-6 border-t-4 border-vsuOrange border-x border-b border-slate-200 shadow-sm flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between mb-3">
-                            <h4 class="text-base font-extrabold text-vsuDark">Operation SEMI (VSU)</h4>
-                            <span class="text-[10px] bg-orange-100 text-vsuOrange font-bold px-2.5 py-0.5 rounded-full">AI System Engineering</span>
-                        </div>
-                        <ul class="space-y-2 text-xs text-slate-700 mt-4">
-                            <li class="flex items-center justify-between p-2 rounded-lg bg-slate-50 font-semibold">
-                                <span>Nicolas Pollard</span>
-                                <span class="text-[10px] text-vsuOrange font-bold">Team Lead</span>
-                            </li>
-                            <li class="p-2 rounded-lg bg-white border border-slate-100">Tory'elle Coleman</li>
-                            <li class="p-2 rounded-lg bg-white border border-slate-100">Larry Caldwell</li>
-                            <li class="p-2 rounded-lg bg-white border border-slate-100">Sabien Hill</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- VT Team (Middle, Blue Theme) -->
-                <div class="bg-white rounded-2xl p-6 border-t-4 border-vsuBlue border-x border-b border-slate-200 shadow-sm flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between mb-3">
-                            <h4 class="text-base font-extrabold text-vsuDark">Virginia Tech (VT)</h4>
-                            <span class="text-[10px] bg-blue-100 text-vsuBlue font-bold px-2.5 py-0.5 rounded-full">VR Cleanroom Design</span>
-                        </div>
-                        <ul class="space-y-2 text-xs text-slate-700 mt-4">
-                            <li class="flex items-center justify-between p-2 rounded-lg bg-slate-50 font-semibold">
-                                <span>Kayin Buckley</span>
-                                <span class="text-[10px] text-vsuBlue font-bold">Team Lead</span>
-                            </li>
-                            <li class="p-2 rounded-lg bg-white border border-slate-100">Darwin Octchere</li>
-                            <li class="p-2 rounded-lg bg-white border border-slate-100">Fiorenza Viacava</li>
-                            <li class="p-2 rounded-lg bg-white border border-slate-100">Jacob Enslen</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- VSU Team (Orange Theme) -->
-                <div class="bg-white rounded-2xl p-6 border-t-4 border-vsuOrange border-x border-b border-slate-200 shadow-sm flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between mb-3">
-                            <h4 class="text-base font-extrabold text-vsuDark">Virginia State University (VSU)</h4>
-                            <span class="text-[10px] bg-orange-100 text-vsuOrange font-bold px-2.5 py-0.5 rounded-full">VR Training Modules</span>
-                        </div>
-                        <ul class="space-y-2 text-xs text-slate-700 mt-4">
-                            <li class="flex items-center justify-between p-2 rounded-lg bg-slate-50 font-semibold">
-                                <span>Keasara Etienne</span>
-                                <span class="text-[10px] text-vsuOrange font-bold">Team Lead</span>
-                            </li>
-                            <li class="p-2 rounded-lg bg-white border border-slate-100">Jalen Wooden</li>
-                            <li class="p-2 rounded-lg bg-white border border-slate-100">Trey [Last Name]</li>
-                            <li class="p-2 rounded-lg bg-white border border-slate-100">Geoff [Last Name]</li>
-                        </ul>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-vsuBlue text-white border-t-2 border-vsuOrange py-6 text-center text-xs">
-        <p>Virginia State University &bull; Classroom to Cleanroom (C2C) &bull; Developed by Operation SEMI (VSU) &bull; NSF Award #2606117</p>
-    </footer>
-
-</body>
-</html>
+                <div class="w-10 h-10
