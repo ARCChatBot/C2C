@@ -122,6 +122,13 @@ async def complete_training(data: TrainingCompletion):
     try:
         conn = sqlite3.connect(DB_NAME)
         cursor = conn.cursor()
+        
+        # Ensure student exists in student directory even if direct registration wasn't called first
+        cursor.execute(
+            "INSERT OR IGNORE INTO students (student_id, full_name) VALUES (?, ?)", 
+            (data.student_id, f"Trainee ({data.student_id})")
+        )
+
         cursor.execute(
             "INSERT INTO training_logs (student_id, score, track) VALUES (?, ?, ?)", 
             (data.student_id, data.score, data.track)
