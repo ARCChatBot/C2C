@@ -5,7 +5,6 @@ import io
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, StreamingResponse
-from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -144,3 +143,7 @@ async def export_csv():
         media_type="text/csv",
         headers={"Content-Disposition": "attachment; filename=registered_students.csv"}
     )
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("mainsys:app", host="127.0.0.1", port=8000, reload=True)
