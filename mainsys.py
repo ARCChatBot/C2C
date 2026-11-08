@@ -8,7 +8,7 @@ from datetime import datetime
 app = FastAPI(title="Operation SEMI Training System API", version="1.0")
 
 # Mount the static frontend folder
-app.mount("/static", StaticFiles(directory="../static"), name="static")
+app.mount("/static", StaticFiles(directory="."), name="static")
 
 @app.get("/")
 async def read_index():
