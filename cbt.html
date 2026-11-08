@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Operation SEMI - 2D Training Portal & Admin View</title>
+    <title>Operation SEMI - 2D Training Portal</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -226,74 +226,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Admin Real-Time Tracking View -->
-        <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6 mt-6">
-            <div class="flex flex-col md:flex-row items-start md:items-center justify-between pb-6 border-b border-slate-100 gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl font-bold border border-blue-200">
-                        <i class="fa-solid fa-chart-line"></i>
-                    </div>
-                    <div>
-                        <span class="text-xs font-bold text-orange-500 uppercase tracking-wider">Operation SEMI Admin Portal</span>
-                        <h3 class="text-2xl font-extrabold text-slate-900">Real-Time Workforce Training Metrics</h3>
-                    </div>
-                </div>
-                <button onclick="loadAdminMetrics()" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center gap-2">
-                    <i class="fa-solid fa-rotate"></i> Refresh Metrics
-                </button>
-            </div>
-
-            <!-- Summary Metrics Cards Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200">
-                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Registered Students</span>
-                    <span class="text-3xl font-extrabold text-slate-900" id="statTotalStudents">--</span>
-                </div>
-                <div class="bg-blue-50 p-5 rounded-2xl border border-blue-100">
-                    <span class="text-xs font-bold text-blue-600 uppercase tracking-wider block mb-1">2D CBT Completed</span>
-                    <span class="text-3xl font-extrabold text-blue-700" id="stat2dCompleted">--</span>
-                </div>
-                <div class="bg-orange-50 p-5 rounded-2xl border border-orange-100">
-                    <span class="text-xs font-bold text-orange-600 uppercase tracking-wider block mb-1">3D Simulation</span>
-                    <span class="text-3xl font-extrabold text-orange-700" id="stat3dCompleted">--</span>
-                </div>
-                <div class="bg-indigo-50 p-5 rounded-2xl border border-indigo-100">
-                    <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider block mb-1">VR Cleanroom</span>
-                    <span class="text-3xl font-extrabold text-indigo-700" id="statVrCompleted">--</span>
-                </div>
-                <div class="bg-emerald-50 p-5 rounded-2xl border border-emerald-100">
-                    <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider block mb-1">Physical Equipment</span>
-                    <span class="text-3xl font-extrabold text-emerald-700" id="statPhysicalCompleted">--</span>
-                </div>
-            </div>
-
-            <!-- Detailed Student Activity Table -->
-            <div class="pt-4">
-                <h4 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-table-list text-blue-600"></i> Student Progress &amp; Completion Logs
-                </h4>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="border-b border-slate-200 text-xs font-bold text-slate-400 uppercase">
-                                <th class="py-3 px-4">Student ID</th>
-                                <th class="py-3 px-4">Full Name</th>
-                                <th class="py-3 px-4">Track / Module</th>
-                                <th class="py-3 px-4">Score</th>
-                                <th class="py-3 px-4">Timestamp</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminLogsTableBody" class="divide-y divide-slate-100 text-sm text-slate-700">
-                            <tr>
-                                <td colspan="5" class="py-6 text-center text-slate-400 italic">Loading telemetry logs from database...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
     </main>
 
     <!-- Interactive Module Modal -->
@@ -362,9 +294,6 @@
                     // Hide Intake Modal
                     document.getElementById('intakeAuthModal').classList.add('hidden');
                     showToast('Welcome, ' + userName + '! Registered successfully in the C2C database.');
-                    
-                    // Refresh Admin Metrics upon successful sign-in
-                    loadAdminMetrics();
                 } else {
                     alert('Registration error: ' + (data.detail || 'Unknown error'));
                 }
@@ -509,7 +438,6 @@
 
                 showToast(`Module ${currentActiveModule} completed and logged successfully!`);
                 closeModule();
-                loadAdminMetrics(); // Refresh admin stats
             }
         }
 
@@ -538,79 +466,12 @@
             }
         }
 
-        // Admin Metrics Loading Logic
-        async function loadAdminMetrics() {
-            const tbody = document.getElementById('adminLogsTableBody');
-            tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400 italic">Syncing telemetry metrics...</td></tr>`;
-
-            try {
-                const [studentsRes, logsRes] = await Promise.all([
-                    fetch('https://c2c-5y77.onrender.com/api/students'),
-                    fetch('https://c2c-5y77.onrender.com/api/training-logs').catch(() => null)
-                ]);
-
-                const students = studentsRes.ok ? await studentsRes.json() : [];
-                document.getElementById('statTotalStudents').textContent = students.length;
-
-                let count2d = 0, count3d = 0, countVr = 0, countPhysical = 0;
-                let logs = [];
-
-                if (logsRes && logsRes.ok) {
-                    logs = await logsRes.json();
-                    logs.forEach(log => {
-                        const trackLower = (log.track || '').toLowerCase();
-                        if (trackLower.includes('2d') || trackLower.includes('module')) count2d++;
-                        else if (trackLower.includes('3d')) count3d++;
-                        else if (trackLower.includes('vr') || trackLower.includes('cleanroom')) countVr++;
-                        else if (trackLower.includes('physical') || trackLower.includes('equipment') || trackLower.includes('hardware')) countPhysical++;
-                    });
-                }
-
-                document.getElementById('stat2dCompleted').textContent = count2d;
-                document.getElementById('stat3dCompleted').textContent = count3d;
-                document.getElementById('statVrCompleted').textContent = countVr;
-                document.getElementById('statPhysicalCompleted').textContent = countPhysical;
-
-                if (logs.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400 italic">Registered students found (${students.length}), but no completion logs recorded yet.</td></tr>`;
-                    return;
-                }
-
-                tbody.innerHTML = '';
-                logs.forEach(log => {
-                    const row = document.createElement('tr');
-                    row.className = "hover:bg-slate-50 transition-colors";
-                    row.innerHTML = `
-                        <td class="py-3 px-4 font-semibold text-blue-600">${escapeHtml(log.student_id)}</td>
-                        <td class="py-3 px-4 font-medium text-slate-900">${escapeHtml(log.full_name || 'Trainee')}</td>
-                        <td class="py-3 px-4"><span class="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-bold">${escapeHtml(log.track)}</span></td>
-                        <td class="py-3 px-4 font-bold text-emerald-600">${escapeHtml(log.score)}%</td>
-                        <td class="py-3 px-4 text-xs text-slate-500">${escapeHtml(log.timestamp || 'N/A')}</td>
-                    `;
-                    tbody.appendChild(row);
-                });
-
-            } catch (error) {
-                console.error('Error loading admin metrics:', error);
-                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-rose-500 font-medium">Could not connect to Render backend telemetry database.</td></tr>`;
-            }
-        }
-
-        function escapeHtml(text) {
-            if (!text) return '';
-            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-            return text.toString().replace(/[&<>"']/g, function(m) { return map[m]; });
-        }
-
         function showToast(msg) {
             const toast = document.getElementById('toastMessage');
             document.getElementById('toastText').textContent = msg;
             toast.classList.remove('hidden');
             setTimeout(() => { toast.classList.add('hidden'); }, 5000);
         }
-
-        // Auto-load admin metrics when page loads
-        window.addEventListener('DOMContentLoaded', loadAdminMetrics);
     </script>
 </body>
 </html>
