@@ -13,7 +13,7 @@ DB_NAME = os.path.join(BASE_DIR, "operation_semi.db")
 
 app = FastAPI(title="Operation SEMI Training System API", version="1.0")
 
-# Enable CORS for cross-origin requests from your GitHub Pages frontend
+# Enable CORS for cross-origin requests
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -22,13 +22,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount static files correctly from the current directory
+# Mount static files correctly
 app.mount("/static", StaticFiles(directory=BASE_DIR), name="static")
 
 def init_db():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
-    # Ensure tables exist to prevent 500 errors on startup
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS students (
             student_id TEXT PRIMARY KEY,
@@ -48,7 +47,6 @@ def init_db():
     conn.commit()
     conn.close()
 
-# Initialize database on startup
 init_db()
 
 class StudentRegister(BaseModel):
@@ -66,7 +64,10 @@ async def read_index():
 
 @app.get("/cbt")
 async def read_cbt():
-    return FileResponse(os.path.join(BASE_DIR, "cbt.html"))
+    file_path = os.path.join(BASE_DIR, "cbt.html")
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="cbt.html not found in server root directory")
+    return FileResponse(file_path)
 
 @app.get("/api/students")
 async def get_students():
