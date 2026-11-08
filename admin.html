@@ -4,33 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Operation SEMI - Admin Workforce Metrics Portal</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        vsuBlue: '#0047AB',
-                        vsuOrange: '#FF6700',
-                        vsuDark: '#1E293B',
-                        vsuLight: '#F8FAFC'
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif']
-                    }
+                    colors: { vsuBlue: '#0047AB', vsuOrange: '#FF6700', vsuDark: '#1E293B', vsuLight: '#F8FAFC' },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
             }
         }
     </script>
-    <!-- Google Fonts Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="h-full bg-vsuLight text-vsuDark font-sans antialiased flex flex-col">
 
-    <!-- Top Navigation Header -->
     <header class="bg-vsuBlue border-b-4 border-vsuOrange sticky top-0 z-40 shadow-md text-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             <div class="flex items-center space-x-3">
@@ -44,19 +33,13 @@
                     <p class="text-xs text-blue-100">Classroom to Cleanroom (C2C) &bull; NSF Award #2606117</p>
                 </div>
             </div>
-            
-            <div class="flex items-center space-x-4">
-                <a href="/" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
-                    <i class="fa-solid fa-house"></i> Return to Main Portal
-                </a>
-            </div>
+            <a href="/" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
+                <i class="fa-solid fa-house"></i> Return to Main Portal
+            </a>
         </div>
     </header>
 
-    <!-- Main Content Wrapper -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-8 pb-20">
-
-        <!-- Admin Metrics Command Center Box -->
         <section class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
             <div class="flex flex-col md:flex-row items-start md:items-center justify-between pb-6 border-b border-slate-100 gap-4">
                 <div class="flex items-center gap-3">
@@ -68,12 +51,12 @@
                         <h2 class="text-2xl font-extrabold text-vsuDark">Workforce Development Metrics</h2>
                     </div>
                 </div>
-                <button onclick="loadAdminMetrics()" class="px-5 py-2.5 bg-vsuBlue hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center gap-2">
+                <button onclick="loadAdminMetrics()" class="px-5 py-2.5 bg-vsuBlue hover:bg-vsuBlue/90 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center gap-2">
                     <i class="fa-solid fa-rotate"></i> Refresh Telemetry Data
                 </button>
             </div>
 
-            <!-- Summary Metrics Cards Grid -->
+            <!-- Summary Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200">
                     <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Registered Students</span>
@@ -97,7 +80,7 @@
                 </div>
             </div>
 
-            <!-- Detailed Student Activity Table -->
+            <!-- Table -->
             <div class="pt-4">
                 <h3 class="text-base font-bold text-vsuDark mb-4 flex items-center gap-2">
                     <i class="fa-solid fa-table-list text-vsuBlue"></i> Student Progress &amp; Completion Logs
@@ -114,51 +97,42 @@
                             </tr>
                         </thead>
                         <tbody id="adminLogsTableBody" class="divide-y divide-slate-100 text-sm text-slate-700">
-                            <tr>
-                                <td colspan="5" class="py-6 text-center text-slate-400 italic">Loading telemetry logs from Render database...</td>
-                            </tr>
+                            <tr><td colspan="5" class="py-6 text-center text-slate-400 italic">Loading telemetry logs...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </section>
-
     </main>
 
-    <!-- Footer -->
     <footer class="bg-vsuBlue text-white border-t-2 border-vsuOrange py-6 text-center text-xs">
         <p>Virginia State University &bull; Classroom to Cleanroom (C2C) &bull; Admin Telemetry &bull; NSF Award #2606117</p>
     </footer>
 
-    <!-- Metrics Fetching Logic -->
     <script>
         async function loadAdminMetrics() {
             const tbody = document.getElementById('adminLogsTableBody');
-            tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400 italic">Syncing telemetry metrics from Render...</td></tr>`;
-
+            tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400 italic">Syncing telemetry metrics...</td></tr>`;
             try {
                 const [studentsRes, logsRes] = await Promise.all([
-                    fetch('https://c2c-5y77.onrender.com/api/students'),
-                    fetch('https://c2c-5y77.onrender.com/api/training-logs').catch(() => null)
+                    fetch('/api/students'),
+                    fetch('/api/training-logs').catch(() => null)
                 ]);
-
                 const students = studentsRes.ok ? await studentsRes.json() : [];
                 document.getElementById('statTotalStudents').textContent = students.length;
 
                 let count2d = 0, count3d = 0, countVr = 0, countPhysical = 0;
                 let logs = [];
-
                 if (logsRes && logsRes.ok) {
                     logs = await logsRes.json();
                     logs.forEach(log => {
-                        const trackLower = (log.track || '').toLowerCase();
-                        if (trackLower.includes('2d') || trackLower.includes('module')) count2d++;
-                        else if (trackLower.includes('3d')) count3d++;
-                        else if (trackLower.includes('vr') || trackLower.includes('cleanroom')) countVr++;
-                        else if (trackLower.includes('physical') || trackLower.includes('equipment') || trackLower.includes('hardware')) countPhysical++;
+                        const t = (log.track || '').toLowerCase();
+                        if (t.includes('2d') || t.includes('module')) count2d++;
+                        else if (t.includes('3d')) count3d++;
+                        else if (t.includes('vr') || t.includes('cleanroom')) countVr++;
+                        else if (t.includes('physical') || t.includes('equipment')) countPhysical++;
                     });
                 }
-
                 document.getElementById('stat2dCompleted').textContent = count2d;
                 document.getElementById('stat3dCompleted').textContent = count3d;
                 document.getElementById('statVrCompleted').textContent = countVr;
@@ -182,19 +156,15 @@
                     `;
                     tbody.appendChild(row);
                 });
-
             } catch (error) {
-                console.error('Error loading admin metrics:', error);
-                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-rose-500 font-medium">Could not connect to Render backend telemetry database.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-rose-500 font-medium">Could not connect to backend telemetry database.</td></tr>`;
             }
         }
-
         function escapeHtml(text) {
             if (!text) return '';
             const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
             return text.toString().replace(/[&<>"']/g, function(m) { return map[m]; });
         }
-
         window.addEventListener('DOMContentLoaded', loadAdminMetrics);
     </script>
 </body>
