@@ -82,6 +82,24 @@ async def get_students():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/api/training-logs")
+async def get_training_logs():
+    try:
+        conn = sqlite3.connect(DB_NAME)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT t.id, t.student_id, s.full_name, t.score, t.track, t.timestamp 
+            FROM training_logs t
+            LEFT JOIN students s ON t.student_id = s.student_id
+            ORDER BY t.timestamp DESC
+        ''')
+        logs = [dict(row) for row in cursor.fetchall()]
+        conn.close()
+        return logs
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.post("/api/register")
 async def register_student(student: StudentRegister):
     try:
