@@ -36,7 +36,7 @@
             </div>
             <div>
                 <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Operation SEMI Portal</h2>
-                <p class="text-xs text-slate-500 mt-1">Enter your Student ID and Full Name to register and access your CBT modules.</p>
+                <p class="text-xs text-slate-500 mt-1">Enter your Student ID and Full Name to register and access your training simulations.</p>
             </div>
             <form onsubmit="handleDirectIntake(event)" class="space-y-3 text-left">
                 <div>
@@ -77,47 +77,21 @@
             <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
                     <span class="text-xs font-bold text-brandOrange uppercase tracking-wider">Curriculum Roadmap</span>
-                    <h2 class="text-xl font-extrabold text-slate-900">Knowledge Modules &amp; Hands-On Activities</h2>
+                    <h2 class="text-xl font-extrabold text-slate-900">Hands-On Simulations</h2>
                 </div>
-                <span id="completionBadge" class="px-3 py-1.5 bg-slate-100 text-slate-700 font-bold rounded-full text-xs">Completed: 0 / 12</span>
+                <span id="completionBadge" class="px-3 py-1.5 bg-slate-100 text-slate-700 font-bold rounded-full text-xs">Completed: 0 / 10</span>
             </div>
-            <div class="h-2 rounded-full bg-slate-100 overflow-hidden" role="progressbar" aria-label="Overall progress" aria-valuemin="0" aria-valuemax="12" aria-valuenow="0" id="progressTrack">
+            <div class="h-2 rounded-full bg-slate-100 overflow-hidden" role="progressbar" aria-label="Overall progress" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0" id="progressTrack">
                 <div id="progressBar" class="h-full bg-emerald-500 rounded-full transition-all duration-500" style="width:0%"></div>
             </div>
         </div>
 
         <section>
-            <h3 class="text-sm font-extrabold text-slate-900 uppercase tracking-wider mb-4">Hands-On Activities</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="activitiesGrid"></div>
-        </section>
-
-        <section>
-            <h3 class="text-sm font-extrabold text-slate-900 uppercase tracking-wider mb-4">Knowledge-Based Foundations (Modules 1 – 10)</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="modulesGrid"></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="activitiesGrid"></div>
         </section>
     </main>
 
-    <!-- Module Modal -->
-    <div id="moduleModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-y-auto p-6 sm:p-8 space-y-5 shadow-2xl">
-            <div class="flex items-start justify-between gap-4 border-b pb-4">
-                <div>
-                    <h3 id="modalTitle" class="text-lg font-extrabold text-slate-900"></h3>
-                    <p id="modalStepLabel" class="text-xs font-semibold text-slate-500 mt-1"></p>
-                </div>
-                <button onclick="closeModal('moduleModal')" aria-label="Close" class="text-slate-400 hover:text-slate-600 p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            <div class="h-1.5 rounded-full bg-slate-100 overflow-hidden"><div id="modalProgress" class="h-full bg-brandBlue rounded-full transition-all duration-300"></div></div>
-            <div id="modalBodyContent" class="space-y-4"></div>
-            <div id="modalFeedback" role="status" class="hidden text-xs font-semibold rounded-xl px-4 py-3 border"></div>
-            <div class="flex gap-3">
-                <button onclick="prevStep()" id="backBtn" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold">Back</button>
-                <button onclick="nextStep()" id="nextBtn" class="flex-1 py-3 bg-brandBlue hover:bg-blue-800 disabled:bg-slate-300 disabled:cursor-not-allowed text-white rounded-xl text-sm font-semibold shadow">Continue</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Activity Modal (matching game + fab simulation) -->
+    <!-- Activity Modal (simulations + matching game) -->
     <div id="activityModal" role="dialog" aria-modal="true" aria-labelledby="activityTitle" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 hidden">
         <div class="bg-white rounded-3xl max-w-5xl w-full max-h-[94vh] overflow-y-auto p-5 sm:p-8 space-y-5 shadow-2xl">
             <div class="flex items-start justify-between gap-4 border-b pb-4">
@@ -140,13 +114,13 @@
             <div>
                 <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Computer-Based Training Complete!</h2>
                 <p class="text-sm text-slate-600 mt-2 leading-relaxed">
-                    Congratulations! You have completed all ten knowledge modules and both hands-on activities. Please return to the main menu for continuous training and hands-on equipment scheduling.
+                    Congratulations! You have completed every simulation and the matching game. Please return to the main menu for continuous training and hands-on equipment scheduling.
                 </p>
             </div>
             <a href="/" class="block w-full py-3.5 rounded-xl bg-brandBlue hover:bg-blue-700 text-white font-semibold text-sm shadow-lg transition-colors">
                 <i class="fa-solid fa-arrow-left"></i> Return to Main Menu
             </a>
-            <button onclick="closeModal('celebrationModal')" class="text-xs font-semibold text-slate-500 hover:text-slate-700">Stay here and review modules</button>
+            <button onclick="closeModal('celebrationModal')" class="text-xs font-semibold text-slate-500 hover:text-slate-700">Stay here and run simulations again</button>
         </div>
     </div>
 
@@ -157,11 +131,9 @@
         /* ============================== Helpers ============================== */
         const $ = id => document.getElementById(id);
         const shuffle = arr => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
-        const TOTAL_ITEMS = 12;
-        const ACTIVITY_TRACKS = { match: '2D CBT - Activity: Electronics Match', fab: '2D CBT - Activity: Chip Fab Simulation' };
+        const ACTIVITY_TRACKS = { match: '2D CBT - Activity: Electronics Match' };
 
         let userId = '', userName = '';
-        let completedModules = new Set();
         let completedActivities = new Set();
         let celebrated = false;
         let toastTimer = null;
@@ -177,7 +149,7 @@
         function openModal(id) { $(id).classList.remove('hidden'); }
         document.addEventListener('keydown', e => {
             if (e.key !== 'Escape') return;
-            ['moduleModal', 'activityModal', 'celebrationModal'].forEach(closeModal);
+            ['activityModal', 'celebrationModal'].forEach(closeModal);
         });
 
         /* ============================== API ============================== */
@@ -217,9 +189,8 @@
                     logs.forEach(log => {
                         if (log.student_id !== userId) return;
                         const track = log.track || '';
-                        const match = track.match(/2D CBT - Module (\d+)/);
-                        if (match) completedModules.add(parseInt(match[1]));
-                        Object.entries(ACTIVITY_TRACKS).forEach(([key, t]) => { if (track === t) completedActivities.add(key); });
+                        if (track === ACTIVITY_TRACKS.match) completedActivities.add('match');
+                        SIMS.forEach(s => { if (track === s.track) completedActivities.add(s.key); });
                     });
                 }
             } catch (err) { /* progress simply starts empty */ }
@@ -237,53 +208,8 @@
             } catch (e) { return false; }
         }
 
-        /* ============================== Module content ============================== */
-        const modulesConfig = [
-            { id: 1, title: "Module 1: Using AI Responsibly at Work", desc: "What to do before, during, and after you use an AI tool on the job — and how to stay safe, honest, and accountable.", steps: [
-                { type: "content", title: "AI is an assistant, not an authority",
-                  text: "AI tools such as chat assistants, code helpers, and prediction models produce output that sounds confident. That output can still be wrong, out of date, or made up.",
-                  points: ["Use AI to draft, summarize, explain, and brainstorm.", "Do not treat an AI answer as a verified fact or an approved procedure.", "You — not the tool — are responsible for what you do with the answer."] },
-                { type: "content", title: "Before you use AI: permission and data",
-                  text: "Ask two questions before you type anything into an AI tool.",
-                  points: ["Am I allowed? Follow your instructor's or employer's AI policy, and use only approved tools.", "What am I sharing? Never paste process recipes, tool parameters, customer designs, export-controlled data, or personal information into a public AI tool.", "If you are unsure, ask your supervisor first."] },
-                { type: "quiz", question: "You want help troubleshooting an etch problem and are about to paste the full proprietary recipe into a public chatbot. What should you do?",
-                  options: ["Describe the problem in general terms, or use a tool your organization has approved for that data", "Paste it — the chatbot needs the full recipe to help", "Paste it, then delete the chat afterwards"], correct: 0,
-                  why: "Proprietary data that leaves the organization cannot be taken back. Deleting a chat does not undo the disclosure." },
-                { type: "content", title: "While you use AI: verify everything that matters",
-                  text: "AI can invent numbers, citations, and steps. Check its output against a trusted source before you act on it.",
-                  points: ["Safety information: check the Safety Data Sheet (SDS) and the SOP.", "Equipment settings: check the tool manual and the approved recipe.", "If AI output conflicts with a procedure, the procedure wins. Report the conflict."] },
-                { type: "quiz", question: "An AI assistant tells you two chemicals are safe to mix. The Safety Data Sheet says they are incompatible. What do you do?",
-                  options: ["Trust the AI — it has read more documents than you have", "Follow the SDS, do not mix them, and report the AI error", "Mix a small amount to see who is right"], correct: 1,
-                  why: "Verified safety documents always override AI output. Reporting the error protects the next person." },
-                { type: "quiz", question: "A technician applies an AI-suggested tool setpoint without checking it, and the lot is scrapped. Who is accountable?",
-                  options: ["The AI tool", "The company that built the AI", "The technician who applied it without verifying"], correct: 2,
-                  why: "A person stays accountable for every action taken. AI suggestions need human review before they touch product or equipment." },
-                { type: "content", title: "After you use AI: be honest about it",
-                  text: "Responsible use continues after the answer is on the screen.",
-                  points: ["Disclose AI use when your course or employer requires it.", "Do your own work on assessments and certifications — they measure what you can do.", "Review AI output for errors and unfair bias before you share it.", "Report AI mistakes or misuse so the process can be fixed."] },
-                { type: "quiz", question: "Which of these is a responsible use of AI?",
-                  options: ["Having AI write your shift report from memory and submitting it unread", "Using AI to answer a certification exam for you", "Using an approved AI tool to summarize your own notes, then checking the summary and noting that AI helped"], correct: 2,
-                  why: "It uses an approved tool, keeps you in control of the content, and is transparent about AI involvement." },
-                { type: "content", title: "Your five-point AI checklist",
-                  text: "Run through this list every time you use AI at work or in class.",
-                  points: ["Permitted — is this tool and this use allowed?", "Protected — am I keeping confidential and personal data out?", "Verified — did I check the output against a trusted source?", "Disclosed — have I been open about using AI?", "Accountable — am I ready to own the result?"] }
-            ] },
-            { id: 2, title: "Module 2: Cleanroom Protocols & Contamination Control", desc: "Understanding particle control, cleanroom classification, and gowning procedures.", steps: [{ type: "content", text: "Cleanrooms maintain extremely low concentrations of airborne particulates by controlling airflow and gowning discipline." }, { type: "quiz", question: "Why is particle control critical in a semiconductor cleanroom?", options: ["To keep the room temperature comfortable", "To prevent microscopic dust from bridging sub-micron circuit features", "To reduce electricity consumption"], correct: 1, why: "A single particle can be larger than the circuit features and short or block them." }] },
-            { id: 3, title: "Module 3: Electrostatic Discharge (ESD) Safety", desc: "Mitigating electrostatic hazards to protect sensitive semiconductor devices.", steps: [{ type: "content", text: "Electrostatic discharge can instantly rupture gate oxides in microchips. Grounding straps and ESD flooring are mandatory." }, { type: "quiz", question: "What is the primary purpose of wearing an ESD wrist strap?", options: ["To prevent wrist strain during tool operation", "To safely drain static electricity from the technician to ground", "To track technician location in the bay"], correct: 1, why: "The strap gives static charge a controlled path to ground instead of through the device." }] },
-            { id: 4, title: "Module 4: Photolithography & Etching Fundamentals", desc: "Exploring exposure, photoresist application, and pattern transfer techniques.", steps: [{ type: "content", text: "Photolithography transfers circuit patterns from a photomask onto a silicon wafer using light-sensitive photoresist." }, { type: "quiz", question: "What substance is selectively removed during the wet or dry etching process?", options: ["The underlying substrate or unmasked material", "The vacuum pump oil", "The cleanroom ceiling tiles"], correct: 0, why: "Etching removes material wherever the photoresist does not protect it." }] },
-            { id: 5, title: "Module 5: Chemical Handling & Safety Data Sheets", desc: "Safe handling of acids, solvents, and hazardous materials in microelectronics labs.", steps: [{ type: "content", text: "Strict adherence to Chemical Hygiene Plans and Safety Data Sheets (SDS) ensures accident prevention during wet etch operations." }, { type: "quiz", question: "Where should you immediately look if exposed to an unfamiliar chemical solvent?", options: ["The equipment user manual", "The chemical Safety Data Sheet (SDS) and emergency eyewash station", "Social media forums"], correct: 1, why: "The SDS lists first-aid measures, and the eyewash station provides immediate treatment." }] },
-            { id: 6, title: "Module 6: Vacuum Systems & Thin Film Deposition", desc: "Principles of physical and chemical vapor deposition (PVD/CVD) in vacuum chambers.", steps: [{ type: "content", text: "Thin films of conductors, insulators, and semiconductors are deposited inside specialized high-vacuum chambers." }, { type: "quiz", question: "Why are high-vacuum environments required for thin film PVD processes?", options: ["To prevent background gas molecules from contaminating the deposited film", "To make the equipment run faster", "To cool the facility"], correct: 0, why: "Stray gas molecules react with or scatter the depositing material and degrade the film." }] },
-            { id: 7, title: "Module 7: Metrology & Defect Inspection", desc: "Advanced optical and electronic measurement tools for quality control and yield enhancement.", steps: [{ type: "content", text: "Metrology tools measure critical dimensions (CD) and inspect sub-surface defects across silicon wafers at atomic scales." }, { type: "quiz", question: "What does CD metrology measure on a semiconductor wafer?", options: ["The diameter of the silicon ingot", "The critical width and dimensions of fabricated circuit lines", "The weight of the wafer carrier"], correct: 1, why: "CD stands for critical dimension — the smallest feature widths that control device behavior." }] },
-            { id: 8, title: "Module 8: Packaging & Integrated Circuit Testing", desc: "Dicing wafers, wire bonding, and electrical characterization of finished microchips.", steps: [{ type: "content", text: "Once fabrication is complete, wafers are diced into individual die and packaged for thermal and electrical reliability." }, { type: "quiz", question: "What is the primary goal of electrical sort and die testing?", options: ["To burnish the exterior packaging", "To verify functional performance and bin chips by speed and power", "To engrave student names on the chip"], correct: 1, why: "Testing finds the working dies and sorts them by how well they perform." }] },
-            { id: 9, title: "Module 9: Digital Multimeters & Electrical Testing", desc: "Using multimeters for voltage, current, and resistance verification during hardware diagnostics.", steps: [{ type: "content", text: "Digital multimeters allow technicians to verify circuit continuity, power rail stability, and component resistance." }, { type: "quiz", question: "When measuring electrical resistance on a circuit board, what must you always do first?", options: ["Disconnect power from the circuit to prevent meter damage", "Increase room humidity", "Wear polarized sunglasses"], correct: 0, why: "Resistance mode drives its own small current; external power gives false readings and can damage the meter." }] },
-            { id: 10, title: "Module 10: Mixed Reality & Digital Twin Integration", desc: "Leveraging HoloLens 2, VR headsets, and digital twins for immersive technician training.", steps: [{ type: "content", text: "Mixed reality and digital twins create spatial, zero-risk simulation environments for complex equipment maintenance." }, { type: "quiz", question: "What is a major advantage of mixed reality cleanroom training?", options: ["It eliminates the need for any physical equipment forever", "It allows trainees to practice hazardous or complex procedures safely in a virtual space", "It lowers electricity costs in the building"], correct: 1, why: "Trainees can make mistakes and repeat procedures with no risk to people, product, or tools." }] }
-        ];
-
         /* ============================== Dashboard rendering ============================== */
-        const activitiesConfig = [
-            { key: 'match', icon: 'fa-puzzle-piece', title: 'Electronics Match', desc: 'Match each electronic component picture to its name. Learn what every part does as you pair them.', launch: () => startMatchGame() },
-            { key: 'fab', icon: 'fa-industry', title: 'Chip Fab Simulation', desc: 'Take one wafer through the whole process — from circuit design to a packaged, tested chip. Wrong calls cost yield.', launch: () => startFabSim() }
-        ];
+        const MATCH_CARD = { key: 'match', icon: 'fa-puzzle-piece', title: 'Electronics Match', tag: 'Game', desc: 'Match each electronic component picture to its name. Learn what every part does as you pair them.' };
 
         function requireUser() {
             if (userId) return true;
@@ -291,49 +217,39 @@
             return false;
         }
 
-        function cardHTML({ tag, isDone, title, desc, onclick, icon }) {
-            return `
-                <div>
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="text-[10px] font-bold uppercase px-2.5 py-1 ${isDone ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-50 text-brandBlue'} rounded-full">${tag}</span>
-                        ${isDone ? '<span class="text-xs font-bold text-emerald-600 flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> Completed</span>' : '<span class="text-xs font-medium text-slate-400">Pending</span>'}
-                    </div>
-                    <h4 class="text-base font-extrabold text-slate-900 mb-2">${icon ? `<i class="fa-solid ${icon} text-brandOrange mr-1.5"></i>` : ''}${title}</h4>
-                    <p class="text-xs text-slate-600 mb-6 leading-relaxed">${desc}</p>
-                </div>
-                <button onclick="${onclick}" class="w-full py-2.5 rounded-xl ${isDone ? 'bg-slate-800 hover:bg-slate-900' : 'bg-brandBlue hover:bg-blue-800'} text-white font-bold text-xs transition-colors shadow flex items-center justify-center gap-2">
-                    <i class="fa-solid ${isDone ? 'fa-rotate-right' : 'fa-play'}"></i> ${isDone ? 'Review' : 'Launch'}
-                </button>`;
+        function dashboardItems() {
+            return [...SIMS.map((s, i) => ({ key: s.key, icon: s.icon, title: s.title, desc: s.desc, tag: `Simulation ${i + 1} of ${SIMS.length}` })), MATCH_CARD];
         }
 
         function renderAll() {
-            const cardClass = isDone => `bg-white rounded-3xl border ${isDone ? 'border-emerald-200 bg-emerald-50/20' : 'border-slate-200'} p-6 flex flex-col justify-between shadow-sm`;
-
-            const grid = $('modulesGrid');
+            const items = dashboardItems();
+            const grid = $('activitiesGrid');
             grid.innerHTML = '';
-            modulesConfig.forEach(mod => {
-                const isDone = completedModules.has(mod.id);
+            items.forEach(it => {
+                const isDone = completedActivities.has(it.key);
                 const card = document.createElement('div');
-                card.className = cardClass(isDone);
-                card.innerHTML = cardHTML({ tag: `Module ${mod.id} of 10`, isDone, title: mod.title, desc: mod.desc, onclick: `openModule(${mod.id})` });
+                card.className = `bg-white rounded-3xl border ${isDone ? 'border-emerald-200 bg-emerald-50/20' : 'border-slate-200'} p-6 flex flex-col justify-between shadow-sm`;
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-[10px] font-bold uppercase px-2.5 py-1 ${isDone ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-50 text-brandBlue'} rounded-full">${it.tag}</span>
+                            ${isDone ? '<span class="text-xs font-bold text-emerald-600 flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> Completed</span>' : '<span class="text-xs font-medium text-slate-400">Pending</span>'}
+                        </div>
+                        <h4 class="text-base font-extrabold text-slate-900 mb-2"><i class="fa-solid ${it.icon} text-brandOrange mr-1.5"></i>${it.title}</h4>
+                        <p class="text-xs text-slate-600 mb-6 leading-relaxed">${it.desc}</p>
+                    </div>
+                    <button onclick="launchActivity('${it.key}')" class="w-full py-2.5 rounded-xl ${isDone ? 'bg-slate-800 hover:bg-slate-900' : 'bg-brandBlue hover:bg-blue-800'} text-white font-bold text-xs transition-colors shadow flex items-center justify-center gap-2">
+                        <i class="fa-solid ${isDone ? 'fa-rotate-right' : 'fa-play'}"></i> ${isDone ? 'Run Again' : 'Launch'}
+                    </button>`;
                 grid.appendChild(card);
             });
 
-            const aGrid = $('activitiesGrid');
-            aGrid.innerHTML = '';
-            activitiesConfig.forEach(act => {
-                const isDone = completedActivities.has(act.key);
-                const card = document.createElement('div');
-                card.className = cardClass(isDone);
-                card.innerHTML = cardHTML({ tag: 'Interactive', isDone, title: act.title, desc: act.desc, icon: act.icon, onclick: `launchActivity('${act.key}')` });
-                aGrid.appendChild(card);
-            });
-
-            const done = completedModules.size + completedActivities.size;
-            $('completionBadge').textContent = `Completed: ${done} / ${TOTAL_ITEMS}`;
-            $('progressBar').style.width = `${(done / TOTAL_ITEMS) * 100}%`;
+            const done = items.filter(it => completedActivities.has(it.key)).length;
+            $('completionBadge').textContent = `Completed: ${done} / ${items.length}`;
+            $('progressBar').style.width = `${(done / items.length) * 100}%`;
+            $('progressTrack').setAttribute('aria-valuemax', items.length);
             $('progressTrack').setAttribute('aria-valuenow', done);
-            if (done >= TOTAL_ITEMS && !celebrated) {
+            if (done >= items.length && !celebrated) {
                 celebrated = true;
                 openModal('celebrationModal');
             }
@@ -341,85 +257,10 @@
 
         function launchActivity(key) {
             if (!requireUser()) return;
-            activitiesConfig.find(a => a.key === key).launch();
+            if (key === 'match') startMatchGame(); else startSim(key);
         }
 
-        /* ============================== Knowledge modules ============================== */
-        let mod = null; // { cfg, index, steps: [{ order, solved, missed, tried:Set }] }
-
-        function openModule(modId) {
-            if (!requireUser()) return;
-            const cfg = modulesConfig.find(m => m.id === modId);
-            mod = { cfg, index: 0, saving: false, steps: cfg.steps.map(s => s.options ? { order: shuffle(s.options.map((_, i) => i)), solved: false, missed: false, tried: new Set() } : null) };
-            renderModalStep();
-            openModal('moduleModal');
-        }
-
-        function renderModalStep() {
-            const step = mod.cfg.steps[mod.index], st = mod.steps[mod.index], total = mod.cfg.steps.length;
-            $('modalTitle').textContent = mod.cfg.title;
-            $('modalStepLabel').textContent = `Step ${mod.index + 1} of ${total} · ${step.options ? 'Knowledge check' : 'Lesson'}`;
-            $('modalProgress').style.width = `${((mod.index + 1) / total) * 100}%`;
-
-            let html = '';
-            if (step.options) {
-                html += `<p class="text-sm text-slate-800 leading-relaxed font-semibold">${step.question}</p><div class="space-y-2.5">`;
-                st.order.forEach(idx => {
-                    const isCorrect = st.solved && idx === step.correct, isWrong = st.tried.has(idx);
-                    const cls = isCorrect ? 'border-emerald-400 bg-emerald-50 text-emerald-900'
-                              : isWrong ? 'border-red-200 bg-red-50 text-red-400 line-through'
-                              : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-blue-50/60 hover:border-blue-200';
-                    html += `<button type="button" onclick="answerQuiz(${idx})" ${st.solved || isWrong ? 'disabled' : ''} class="w-full text-left flex items-center gap-3 p-3 rounded-xl border ${cls} text-xs font-semibold transition-colors">
-                        <i class="fa-solid ${isCorrect ? 'fa-circle-check' : isWrong ? 'fa-circle-xmark' : 'fa-circle text-slate-300'}"></i><span>${step.options[idx]}</span></button>`;
-                });
-                html += `</div>`;
-            } else {
-                if (step.title) html += `<h4 class="text-base font-extrabold text-slate-900">${step.title}</h4>`;
-                html += `<p class="text-sm text-slate-700 leading-relaxed font-medium">${step.text}</p>`;
-                if (step.points) html += `<ul class="space-y-2">${step.points.map(p => `<li class="flex gap-2.5 text-sm text-slate-700 leading-relaxed"><i class="fa-solid fa-check text-brandBlue mt-1 text-xs"></i><span>${p}</span></li>`).join('')}</ul>`;
-            }
-            $('modalBodyContent').innerHTML = html;
-
-            const fb = $('modalFeedback');
-            if (step.options && st.solved) {
-                fb.className = 'text-xs font-semibold rounded-xl px-4 py-3 border border-emerald-200 bg-emerald-50 text-emerald-800';
-                fb.textContent = `Correct. ${step.why || ''}`;
-            } else if (step.options && st.tried.size) {
-                fb.className = 'text-xs font-semibold rounded-xl px-4 py-3 border border-red-200 bg-red-50 text-red-700';
-                fb.textContent = 'Not quite. Think it through and choose again.';
-            } else fb.className = 'hidden';
-
-            $('backBtn').classList.toggle('hidden', mod.index === 0);
-            const next = $('nextBtn');
-            next.disabled = !!(step.options && !st.solved) || mod.saving;
-            next.textContent = mod.saving ? 'Saving…' : mod.index < total - 1 ? 'Next Step' : 'Complete & Log Module';
-        }
-
-        function answerQuiz(idx) {
-            const step = mod.cfg.steps[mod.index], st = mod.steps[mod.index];
-            if (st.solved) return;
-            if (idx === step.correct) st.solved = true;
-            else { st.tried.add(idx); st.missed = true; }
-            renderModalStep();
-        }
-
-        function prevStep() { if (mod.index > 0) { mod.index--; renderModalStep(); } }
-
-        async function nextStep() {
-            if (mod.index < mod.cfg.steps.length - 1) { mod.index++; renderModalStep(); return; }
-            const quizzes = mod.steps.filter(Boolean);
-            const score = quizzes.length ? Math.round(100 * quizzes.filter(q => !q.missed).length / quizzes.length) : 100;
-            mod.saving = true; renderModalStep();
-            const ok = await logCompletion(`2D CBT - Module ${mod.cfg.id}`, score);
-            mod.saving = false;
-            if (!ok) { renderModalStep(); toast('Could not save your result. Check your connection and press Complete again.', false); return; }
-            completedModules.add(mod.cfg.id);
-            closeModal('moduleModal');
-            toast(`Module ${mod.cfg.id} complete — first-try score ${score}%. Logged to your record.`);
-            renderAll();
-        }
-
-        /* ============================== Electronics matching game ============================== */
+/* ============================== Electronics matching game ============================== */
         const svgWrap = inner => `<svg viewBox="0 0 80 60" class="w-full h-16" aria-hidden="true">${inner}</svg>`;
         const COMPONENTS = [
             { id: 'resistor', name: 'Resistor', fact: 'Limits how much current flows. The colored bands show its resistance value.',
@@ -605,18 +446,303 @@
                 { t: 'Seal the package and skip the final test', fb: 'Packaging can introduce failures, such as a broken bond wire. Always run the final test.' },
                 { t: 'Ship the bare dies in an envelope', fb: 'A bare die is fragile and has no way to connect to a circuit board.' } ] }
         ];
-        const YIELD_PENALTY = 8;
+        // Step builder: name, run-log line once done, question, right answer + feedback, two wrong answers + feedback
+        const S = (name, done, q, r, rf, w1, w1f, w2, w2f) => ({ name, done, q, opts: [{ t: r, ok: true, fb: rf }, { t: w1, fb: w1f }, { t: w2, fb: w2f }] });
+
+        const SIMS = [
+            { key: 'ai', track: '2D CBT - Simulation: AI on the Job', icon: 'fa-robot', title: 'AI on the Job', meter: 'Trust score', penalty: 10,
+              desc: 'Work a shift with an AI assistant. Decide what to share, what to verify, and how to stay accountable for the result.',
+              steps: [
+                S('Choose the tool', 'Confirmed the AI tool is approved for work use',
+                  'You want AI help writing your shift handover report. What do you do first?',
+                  'Check that the tool is approved under your site AI policy', 'Approved tools have been reviewed for how they store and use your data. Start there every time.',
+                  'Open a personal chatbot account on your phone', 'An unapproved tool may store company data outside the company’s control.',
+                  'Borrow a coworker’s login to an AI tool', 'Sharing accounts breaks policy and hides who entered what.'),
+                S('Protect the data', 'Kept recipe values and customer details out of the prompt',
+                  'Your notes include lot numbers, recipe setpoints, and a customer name. What goes into the AI tool?',
+                  'Only what the tool is approved to handle — remove or generalize the confidential details', 'Recipes, customer data, and personal information stay out unless the tool is approved for them.',
+                  'Everything — more detail gives a better answer', 'Confidential data that leaves the company cannot be taken back.',
+                  'Everything, with a line telling the AI to keep it secret', 'An instruction in the prompt does not control where the data is stored or who can see it.'),
+                S('Verify a number', 'Checked the AI’s setpoint against the approved recipe',
+                  'The AI suggests a temperature setpoint for a tool. What do you do with it?',
+                  'Check it against the approved recipe and tool manual before using it', 'AI can produce numbers that look right and are wrong. A trusted source decides.',
+                  'Enter it — the AI sounded confident', 'Confidence is not accuracy. An unverified setpoint can scrap a lot.',
+                  'Ask the AI “are you sure?” and go with its answer', 'An AI can repeat the same mistake with the same confidence. Check a real source.'),
+                S('Safety conflict', 'Followed the SDS and reported the AI error',
+                  'The AI says two cleaning chemicals are safe to mix. The Safety Data Sheet says they are incompatible. What now?',
+                  'Follow the SDS, do not mix them, and report the AI error', 'Verified safety documents always override AI output. Reporting protects the next person.',
+                  'Trust the AI — it has read more documents', 'AI output is never a safety authority.',
+                  'Mix a small amount to see which is right', 'Testing an incompatible mix puts you and others at risk.'),
+                S('Review the draft', 'Corrected the AI draft against your own notes',
+                  'The AI’s draft report says a tool “passed qualification”. Your notes say the check was not finished. What do you do?',
+                  'Correct the draft so it matches what actually happened', 'AI fills gaps with plausible text. You review every line before it carries your name.',
+                  'Submit it — the supervisor will catch any errors', 'You submitted it, so you own it. A false record can release bad product.',
+                  'Leave it in; it will probably pass anyway', 'Recording something that did not happen is falsification, with or without AI.'),
+                S('Be transparent', 'Disclosed that AI helped draft the report',
+                  'Your supervisor asks how the report was written. What do you say?',
+                  'That AI helped draft it and that you checked and corrected it', 'Being open about AI use lets others judge the work properly and builds trust.',
+                  'That you wrote all of it yourself', 'Hiding AI use is dishonest and breaks most AI policies.',
+                  'That the AI wrote it, so any errors are the AI’s', 'Accountability stays with the person. The tool cannot be responsible.'),
+                S('Your own work', 'Took the certification quiz without AI',
+                  'You have a certification quiz tonight. How do you use AI?',
+                  'Take the quiz yourself; afterwards, use AI to study the topics you missed if that is allowed', 'A certification measures what you can do. AI is for learning, not for standing in for you.',
+                  'Have the AI answer the questions for you', 'That is cheating, and it leaves you unprepared for the real job.',
+                  'Paste the quiz questions into a public chatbot to check your answers first', 'That shares assessment content and still replaces your own work.')
+              ] },
+            { key: 'gown', track: '2D CBT - Simulation: Cleanroom Gowning', icon: 'fa-user-shield', title: 'Cleanroom Gowning & Entry', meter: 'Cleanliness', penalty: 10,
+              desc: 'Gown up in the right order and enter the cleanroom without bringing contamination in with you.',
+              steps: [
+                S('Pre-entry', 'Personal items stowed, shoe covers on, tacky mat used',
+                  'You arrive at the gowning room door. What do you do before going in?',
+                  'Stow personal items, put on shoe covers, and step across the tacky mat', 'Phones, jewelry, and street dirt are major particle sources. They stay outside.',
+                  'Keep your phone in your pocket in case you need it', 'Personal items shed particles and cannot be cleaned.',
+                  'Go straight in and pick up a coverall', 'Street shoes carry dirt onto the gowning-room floor.'),
+                S('Head first', 'Hair cover and hood on',
+                  'You are in the gowning room. Which garment goes on first?',
+                  'Hair cover and hood', 'Gowning goes top-down, so particles shed while dressing fall onto areas that are covered next.',
+                  'Boots', 'Putting boots on first means particles from your head land on clean garments later.',
+                  'Final gloves', 'Gloves go on last. Put on now, they would touch every other garment and get dirty.'),
+                S('Coverall', 'Coverall on without touching the floor',
+                  'How do you put on the coverall?',
+                  'Gather it so it never touches the floor, step in, and zip it over the hood’s shoulder panel', 'The floor is the dirtiest surface in the room. Tucking the hood in seals the neck.',
+                  'Lay it on the floor and step into it', 'Anything that touches the floor is contaminated.',
+                  'Shake it out first to remove dust', 'Shaking releases particles into the gowning room air.'),
+                S('Boots & bench', 'Boots on over the coverall legs, crossed to the clean side',
+                  'You are at the crossover bench. What is the correct move?',
+                  'Sit, pull a boot over the coverall leg, and swing that foot to the clean side — one foot at a time', 'The bench separates dirty and clean floor. A booted foot only ever touches the clean side.',
+                  'Walk around the bench and put the boots on at the far side', 'That tracks the dirty-side floor onto the clean side.',
+                  'Put both boots on while standing on the dirty side, then step over', 'A booted foot that touches the dirty side carries that dirt into the cleanroom.'),
+                S('Mask, glasses, gloves', 'Mask and glasses on, gloves pulled over the cuffs',
+                  'What finishes the gowning sequence?',
+                  'Face mask and safety glasses, then gloves last, pulled over the coverall cuffs', 'Gloves go on last so they stay clean. Covering the cuffs seals the wrists.',
+                  'Gloves first, then adjust the mask with them', 'Touching your face contaminates the gloves.',
+                  'Gloves under the coverall cuffs', 'Skin particles escape through the open cuff.'),
+                S('Inside the bay', 'Dropped tool taken out of service',
+                  'Inside the cleanroom, your wafer tweezers fall on the floor. What do you do?',
+                  'Leave them out of use, get a clean pair, and send the dropped pair for cleaning', 'A dropped tool carries floor contamination straight to the wafer.',
+                  'Pick them up and carry on', 'The tweezers are now contaminated and will transfer particles to the wafer.',
+                  'Wipe them on your suit and carry on', 'That contaminates your suit as well as the tweezers.')
+              ] },
+            { key: 'esd', track: '2D CBT - Simulation: ESD-Safe Workstation', icon: 'fa-bolt', title: 'ESD-Safe Workstation', meter: 'Device safety', penalty: 10,
+              desc: 'Set up a static-safe bench and handle a sensitive board without damaging it.',
+              steps: [
+                S('Ground yourself', 'Wrist strap on bare skin and connected to ground',
+                  'You sit down at the ESD bench. What is your first action?',
+                  'Put the wrist strap on against bare skin and plug it into the ground point', 'The strap drains charge from your body through a controlled path to ground.',
+                  'Wear the wrist strap over your sleeve', 'Fabric insulates the strap from your skin, so it drains nothing.',
+                  'Skip the strap — the bench has an ESD mat', 'The mat grounds what sits on it. It does not ground you.'),
+                S('Test the strap', 'Wrist strap passed the tester',
+                  'The strap is on. How do you know it works?',
+                  'Check it on the wrist-strap tester before starting', 'A broken cord looks fine. Only the tester confirms a good connection.',
+                  'Assume it works — it is plugged in', 'Straps fail without any visible sign.',
+                  'Touch a metal table leg to see if you feel a spark', 'Most damaging discharges are far too small to feel.'),
+                S('Clear the bench', 'Ordinary plastics removed from the work area',
+                  'On the mat you find a foam cup, a plastic bag, and tape. What do you do?',
+                  'Remove them — ordinary plastics hold static charge', 'Insulators cannot be grounded. Keep them away from sensitive parts.',
+                  'Leave them; they are not touching the board', 'A charged insulator can damage a device from a distance through its electric field.',
+                  'Ground them with a clip lead', 'Insulators do not conduct, so a ground lead does nothing.'),
+                S('Open the bag', 'Shielding bag opened at the grounded bench only',
+                  'A circuit board arrives in a metallic shielding bag. Where do you open it?',
+                  'At the grounded workstation, with your strap on', 'The bag protects the board until you and the surface are at the same potential.',
+                  'At your desk, so it is ready when you get to the bench', 'Outside the protected area there is nothing draining your charge.',
+                  'In the hallway on the way to the bench', 'Walking builds charge. The board is exposed at the worst moment.'),
+                S('Handle the board', 'Board held by its edges',
+                  'How do you pick up the board?',
+                  'By its edges, without touching components or connector pins', 'Edges keep your fingers away from the sensitive circuits and keep skin oils off the contacts.',
+                  'By the largest chip — it is the sturdiest part', 'Chip pins lead straight to the most sensitive circuits.',
+                  'By the gold edge connector', 'Connector contacts lead into the circuits and pick up skin oils.'),
+                S('Move it on', 'Board resealed in a shielding bag for transport',
+                  'The board has to go to another station. How do you carry it?',
+                  'Put it back in a closed shielding bag first', 'Outside the protected area the board needs shielding around it.',
+                  'Carry it in your hand — the walk is short', 'Once you unplug the strap, you charge up within a few steps.',
+                  'Wrap it in bubble wrap', 'Ordinary bubble wrap generates static charge.')
+              ] },
+            { key: 'chem', track: '2D CBT - Simulation: Chemical Handling', icon: 'fa-flask-vial', title: 'Chemical Handling & Spill Response', meter: 'Safety score', penalty: 10,
+              desc: 'Prepare, use, and dispose of an acid at the wet bench — and respond correctly when something splashes.',
+              steps: [
+                S('Know the chemical', 'Label and Safety Data Sheet read',
+                  'You are assigned a wet-bench task with an acid you have not used before. What do you do first?',
+                  'Read the container label and the Safety Data Sheet (SDS)', 'The SDS lists the hazards, the protective equipment, and the first-aid steps.',
+                  'Smell it to confirm what it is', 'Never identify a chemical by smell. Vapors can injure you.',
+                  'Start — a coworker said it is like the last one', 'Similar-looking chemicals can have very different hazards.'),
+                S('Protective equipment', 'Apron, face shield over goggles, and acid gloves on',
+                  'Which protective equipment do you put on for pouring acid?',
+                  'Chemical apron, goggles with a face shield, and acid-resistant gloves over your cleanroom gloves', 'Each layer covers a splash route: body, eyes and face, and hands.',
+                  'Cleanroom gloves only — they are already on', 'Thin cleanroom gloves protect the wafer, not you. Acid gets through.',
+                  'Safety glasses and a lab coat', 'Glasses leave gaps around the eyes, and a lab coat soaks up acid.'),
+                S('Check the area', 'Exhaust running; eyewash and shower path clear',
+                  'Before opening the bottle, what do you confirm?',
+                  'The bench exhaust is running and the path to the eyewash and shower is clear', 'In an emergency you have seconds, and you may not be able to see.',
+                  'That nobody is watching, so you can work faster', 'Work with hazardous chemicals should never be done unobserved or rushed.',
+                  'That the music is not too loud', 'You must be able to hear alarms, but the exhaust and eyewash come first.'),
+                S('Dilute', 'Acid added slowly to water',
+                  'The procedure calls for diluting the acid. How do you mix it?',
+                  'Add the acid slowly to the water', 'The water absorbs the heat of mixing. Remember: add acid to water.',
+                  'Add the water to the acid', 'The first water to hit the acid can boil instantly and spray acid out.',
+                  'Pour both in together quickly', 'Fast mixing releases the heat all at once and causes splashing.'),
+                S('Splash!', 'Contaminated glove removed, skin rinsed, supervisor told',
+                  'A splash lands on your glove and runs onto your wrist. What do you do?',
+                  'Remove the contaminated glove, rinse with water as the SDS directs, and notify your supervisor', 'Fast, long rinsing limits the injury. Reporting gets you proper medical follow-up.',
+                  'Wipe it off with a cloth and keep working', 'Wiping spreads the acid and leaves it on your skin.',
+                  'Pour a base on it to neutralize the acid', 'Neutralizing on skin makes heat and a second chemical burn.'),
+                S('Waste', 'Waste poured into the labeled acid waste container',
+                  'The task is done. Where does the used acid go?',
+                  'Into the labeled, compatible acid waste container', 'Segregated, labeled waste prevents dangerous reactions and protects the waste handlers.',
+                  'Down the sink with plenty of water', 'Acid waste must be collected. Drains are not built or permitted for it.',
+                  'Into the solvent waste container — it has more room', 'Acids and solvents can react violently when mixed.')
+              ] },
+            { key: 'fab', track: '2D CBT - Activity: Chip Fab Simulation', icon: 'fa-industry', title: 'Chip Fab: Design to Packaged Chip', meter: 'Wafer yield', penalty: 8, visual: 'wafer',
+              desc: 'Take one wafer through the whole process — from circuit design to a packaged, tested chip. Wrong calls cost yield.',
+              steps: FAB_STAGES },
+            { key: 'vac', track: '2D CBT - Simulation: Vacuum Deposition Run', icon: 'fa-gauge-high', title: 'Vacuum Deposition Run', meter: 'Film quality', penalty: 10,
+              desc: 'Load a chamber, pump it down, deposit a thin film, and vent it without damaging the tool or the film.',
+              steps: [
+                S('Load', 'Substrate loaded with clean gloves; door seal checked',
+                  'You are loading a wafer into the deposition chamber. How do you do it?',
+                  'Wear clean gloves, load the wafer, check the door seal for debris, and close the chamber', 'Fingerprints release gas under vacuum, and debris on the seal causes leaks.',
+                  'Load it bare-handed — it is faster', 'Skin oils outgas for hours and contaminate the film.',
+                  'Load it and skip the seal check', 'A single hair across the seal can stop the chamber reaching vacuum.'),
+                S('Rough pump', 'Roughing pump brought the chamber to low vacuum',
+                  'The chamber is closed and at atmospheric pressure. Which pump do you start?',
+                  'The roughing pump, to bring the chamber down to low vacuum first', 'High-vacuum pumps only work once most of the air is already gone.',
+                  'Open the high-vacuum pump straight away', 'Exposing a high-vacuum pump to atmosphere can destroy it.',
+                  'Start both pumps together', 'The high-vacuum pump would still see atmospheric pressure.'),
+                S('High vacuum', 'Crossed over to the high-vacuum pump; base pressure reached',
+                  'The chamber is at crossover pressure and you have switched to the high-vacuum pump. The gauge is still above base pressure. What now?',
+                  'Wait until the chamber reaches base pressure', 'Gas left in the chamber ends up inside the film.',
+                  'Start depositing — it is close enough', 'Residual gas reacts with the film and ruins its properties.',
+                  'Vent a little nitrogen in to speed things up', 'Adding gas raises the pressure. It does not speed up pumping.'),
+                S('Pressure stalls', 'Leak found at the door seal and fixed',
+                  'On the next run the pressure stops falling well above base. What do you suspect?',
+                  'A leak or contamination — check the door seal and run a leak check', 'A stalled pump-down is a classic sign of a leak or of something outgassing.',
+                  'Nothing — keep waiting for the rest of the shift', 'A stall does not fix itself. You lose the shift and learn nothing.',
+                  'It is fine — start the deposition anyway', 'Depositing in poor vacuum wastes the wafer and the material.'),
+                S('Deposit', 'Rate stabilized behind the shutter, then film deposited to thickness',
+                  'Base pressure is reached. How do you start the deposition?',
+                  'Stabilize the rate with the shutter closed, then open it and watch the thickness monitor', 'The shutter keeps the unstable start off the wafer. The monitor tells you when to stop.',
+                  'Open the shutter and turn the power on together', 'The first material off the source is unstable and often contaminated.',
+                  'Run for a fixed time and skip the thickness monitor', 'Rates drift from run to run. Time alone gives the wrong thickness.'),
+                S('Vent & unload', 'Chamber cooled and vented slowly with nitrogen',
+                  'The film is at thickness. How do you get the wafer out?',
+                  'Let it cool, then vent the chamber slowly with nitrogen and open it', 'Cooling prevents oxidation, and slow venting avoids stirring up particles.',
+                  'Vent immediately with room air while it is hot', 'A hot film oxidizes in air, and room air brings moisture into the chamber.',
+                  'Vent as fast as possible to save time', 'A fast vent blows particles onto the fresh film.')
+              ] },
+            { key: 'met', track: '2D CBT - Simulation: Metrology & Inspection', icon: 'fa-magnifying-glass-chart', title: 'Metrology & Defect Inspection', meter: 'Yield protected', penalty: 10,
+              desc: 'Measure a lot, find a problem, and make the right call about what happens to the wafers.',
+              steps: [
+                S('Check the tool', 'Tool verified against the reference standard',
+                  'You are about to measure critical dimensions (CD) on a lot. What comes first?',
+                  'Verify the tool against its reference standard', 'A measurement is only as good as the tool’s calibration.',
+                  'Start measuring — it worked yesterday', 'Tools drift. Yesterday’s result does not prove today’s accuracy.',
+                  'Adjust the tool settings until the numbers look right', 'Tuning a tool to give expected numbers hides real problems.'),
+                S('Sampling', 'Measured every site in the sampling plan',
+                  'Which sites on the wafer do you measure?',
+                  'The sites in the sampling plan, including center and edge', 'Process results vary across the wafer. The plan is designed to catch that.',
+                  'The center only — it is quickest', 'Edge problems are common and would be missed completely.',
+                  'Whichever sites are easiest to find', 'Random convenience sampling cannot be compared from lot to lot.'),
+                S('Out of spec', 'Out-of-spec reading confirmed; lot placed on hold',
+                  'The edge sites read wider than the specification allows. What do you do?',
+                  'Re-measure to confirm, then put the lot on hold and notify the engineer', 'Confirm first, then stop the lot before more work is added to bad wafers.',
+                  'Record a value just inside the spec', 'That is falsifying data. It hides a real problem and can ship bad chips.',
+                  'Pass the lot — the center sites are fine', 'Edge dies are product too. Out of spec means stop.'),
+                S('Defect pattern', 'Repeating scratch reported as a tool problem',
+                  'Defect inspection shows a scratch in the same place on every wafer. What does that tell you?',
+                  'Something in a tool or handler is touching each wafer — report it for a tool check', 'A defect that repeats in position points to a systematic source, not chance.',
+                  'Random particles — nothing to report', 'Random particles land in different places on each wafer.',
+                  'The inspection tool must be wrong', 'A consistent pattern is strong evidence of a real defect.'),
+                S('Record', 'Actual measurements logged, including the failures',
+                  'What goes into the data system?',
+                  'The actual measurements, including the out-of-spec ones', 'Engineers can only fix what the data shows them.',
+                  'Only the in-spec measurements', 'Leaving out failures makes the process look healthy when it is not.',
+                  'Nothing until the problem is fixed', 'Missing data hides when the problem started.'),
+                S('Disposition', 'Lot held for the engineer’s decision',
+                  'The lot is on hold. Who decides what happens to it?',
+                  'The process engineer decides: rework, scrap, or release', 'Disposition needs authority and the full picture. Your job is accurate data and a clear report.',
+                  'You do — rework it yourself to save time', 'Unauthorized rework can make the problem worse and breaks traceability.',
+                  'Nobody — move it on quietly before the shift ends', 'That sends known-bad wafers downstream.')
+              ] },
+            { key: 'pkg', track: '2D CBT - Simulation: Packaging & Final Test', icon: 'fa-box-open', title: 'Packaging & Final Test', meter: 'Assembly yield', penalty: 10,
+              desc: 'Turn tested dies into finished chips: die attach, wire bonding, sealing, and the final electrical test.',
+              steps: [
+                S('Pick dies', 'Only known-good dies picked from the wafer map',
+                  'The diced wafer arrives with a wafer map of the probe results. Which dies do you pick?',
+                  'Only the dies the map marks as good', 'Packaging costs money. It is only spent on dies that passed probe.',
+                  'All of them — final test will sort them out', 'Packaging known-bad dies wastes materials and tester time.',
+                  'The dies nearest the center', 'Position does not tell you which dies work. The map does.'),
+                S('Die attach', 'Die attached and adhesive fully cured',
+                  'A good die is placed in the package. What secures it?',
+                  'Die-attach adhesive, cured for the full specified time', 'A full cure holds the die still and carries heat away from it.',
+                  'Adhesive with the cure skipped to save time', 'An uncured die shifts during wire bonding and the bonds miss the pads.',
+                  'Nothing — the bond wires will hold it', 'Bond wires are thinner than a hair. They cannot support the die.'),
+                S('Wire bond', 'Pads bonded to leads; sample pull test passed',
+                  'How do you connect the die to the package leads?',
+                  'Wire-bond each pad to its lead, then pull-test a sample', 'The pull test proves the bonds are strong, not just in place.',
+                  'Wire-bond and move on without checking', 'A weak bond can pass visually and fail in the field.',
+                  'Hand-solder a wire to each pad', 'Bond pads are far too small for hand soldering.'),
+                S('Inspect', 'Unit with a lifted wire rejected per procedure',
+                  'Inspection finds one unit with a lifted bond wire. What happens to it?',
+                  'Reject or rework it according to the procedure', 'A lifted wire is an open circuit now or a failure later.',
+                  'Press the wire back down with tweezers', 'A pressed-down wire is not bonded. It will fail.',
+                  'Let it continue — the molding will hold it in place', 'Molding does not make an electrical connection.'),
+                S('Seal', 'Package molded and marked',
+                  'The bonds are good. What protects the die and wires?',
+                  'Seal the package with molding compound or a lid, then mark it', 'The package keeps out moisture and physical damage. The mark keeps traceability.',
+                  'Leave it open so it can be inspected later', 'Exposed wires and die are damaged by handling and moisture.',
+                  'Cover it with tape', 'Tape is not a moisture barrier and leaves residue.'),
+                S('Final test', 'Every unit tested and binned',
+                  'The chips are sealed. What is the last step before shipping?',
+                  'Electrically test every unit and bin it by performance', 'Assembly can introduce failures, so every finished chip is tested.',
+                  'Skip it — the dies already passed wafer probe', 'Probe tested the die, not the bonds or the package.',
+                  'Test one unit from the batch', 'One good unit says nothing about a broken wire in the next one.')
+              ] },
+            { key: 'dmm', track: '2D CBT - Simulation: Multimeter Troubleshooting', icon: 'fa-screwdriver-wrench', title: 'Multimeter Troubleshooting', meter: 'Safety score', penalty: 10,
+              desc: 'A board will not power on. Use a digital multimeter correctly and safely to find the fault.',
+              steps: [
+                S('Check the meter', 'Leads inspected; meter confirmed on a known source',
+                  'A board will not power on, and you pick up a multimeter. What do you do first?',
+                  'Inspect the leads for damage and confirm the meter reads correctly on a known source', 'A faulty meter or cracked lead gives false readings and can shock you.',
+                  'Start probing the board', 'If the meter is faulty, every reading you take is wrong.',
+                  'Replace parts on the board until it works', 'Guessing wastes parts and can add new faults.'),
+                S('Measure voltage', 'Measured the 5 V rail: 0 V on the board',
+                  'You want to check the 5 V supply rail. How do you set up the meter?',
+                  'DC volts, black lead in COM, red lead in the V jack, probes across the rail and ground', 'Voltage is measured in parallel, across the two points.',
+                  'Current (A) setting, probes across the rail and ground', 'In current mode the meter is nearly a short circuit. That blows the fuse or worse.',
+                  'AC volts, probes across the rail and ground', 'The rail is DC. The AC setting gives a meaningless reading.'),
+                S('Check the fuse', 'Power removed; fuse tested for continuity: open',
+                  'The supply connector reads 5 V, but the board rail reads 0 V. You suspect the fuse. How do you test it?',
+                  'Disconnect power, then test the fuse for continuity', 'Continuity and resistance tests are only done on unpowered circuits.',
+                  'Test continuity with the power still on', 'Circuit voltage can damage the meter and gives a false reading.',
+                  'Touch the fuse to see if it is warm', 'Never touch live components, and temperature proves nothing here.'),
+                S('Replace the fuse', 'Fuse replaced with the same rating',
+                  'The fuse reads open (OL). What do you fit?',
+                  'A new fuse of the same type and rating', 'The rating is chosen to protect the circuit. Match it exactly.',
+                  'A higher-rated fuse so it does not blow again', 'A bigger fuse lets a fault burn the board instead.',
+                  'A piece of wire across the fuse holder', 'That removes the protection completely and is a fire hazard.'),
+                S('Measure current', 'Current measured in series: within the normal range',
+                  'You want to confirm the board draws normal current. How do you connect the meter?',
+                  'Move the red lead to the A jack, open the circuit, and put the meter in series', 'Current flows through the meter, so the meter must be part of the circuit.',
+                  'Leave the leads as they are and probe across the supply', 'Parallel connection measures voltage, not current.',
+                  'Red lead in the A jack, probes across the supply', 'That shorts the supply through the meter.'),
+                S('Finish', 'Red lead returned to the V jack; meter off',
+                  'The board works. How do you leave the meter?',
+                  'Move the red lead back to the V jack and switch the meter off', 'A lead left in the current jack turns the next voltage check into a short circuit.',
+                  'Leave it set up for current', 'The next person may probe a voltage and short the circuit.',
+                  'Leave it switched on at the bench', 'That drains the battery and leaves the meter in an unknown state.')
+              ] }
+        ];
         let sim = null;
 
-        function startFabSim() {
-            sim = { i: 0, yield: 100, mistakes: 0, solved: false, tried: new Set(), fb: null, order: shuffle([0, 1, 2]), finished: false, saved: null };
-            $('activityTitle').textContent = 'Chip Fab Simulation';
-            $('activitySub').textContent = 'Take one wafer from design to a packaged chip. Every wrong call costs yield.';
+        function startSim(key) {
+            const cfg = SIMS.find(s => s.key === key);
+            sim = { cfg, i: 0, score: 100, mistakes: 0, solved: false, tried: new Set(), fb: null, order: shuffle([0, 1, 2]), finished: false, saved: null };
+            $('activityTitle').textContent = cfg.title;
+            $('activitySub').textContent = `${cfg.desc} Every wrong call costs ${cfg.penalty}%.`;
             renderSim();
             openModal('activityModal');
         }
 
-        function waferSVG(view) {
+function waferSVG(view) {
             const legend = [];
             let g = '';
             const SI = '#94a3b8', OX = '#60a5fa', PR = '#f87171', DOPE = '#34d399', METAL = '#f59e0b';
@@ -674,38 +800,54 @@
                 <div class="flex flex-wrap gap-x-4 gap-y-1.5 mt-2">${legend.map(([c, l]) => `<span class="flex items-center gap-1.5 text-[11px] font-semibold text-slate-600"><span class="w-3 h-3 rounded-sm inline-block" style="background:${c}"></span>${l}</span>`).join('')}</div>`;
         }
 
-        function yieldColor(y) { return y >= 85 ? 'bg-emerald-500' : y >= 60 ? 'bg-amber-500' : 'bg-red-500'; }
+        function meterColor(y) { return y >= 85 ? 'bg-emerald-500' : y >= 60 ? 'bg-amber-500' : 'bg-red-500'; }
+
+        // Left-hand panel: wafer cross-section for the fab run, a growing run log for every other simulation
+        function sceneHTML() {
+            const { cfg } = sim, steps = cfg.steps;
+            if (cfg.visual === 'wafer') {
+                if (sim.finished) return waferSVG('package');
+                const s = steps[sim.i], prev = sim.i === 0 ? 'layout' : steps[sim.i - 1].after;
+                return waferSVG(sim.solved ? s.after : (s.before || prev));
+            }
+            const rows = steps.map((st, k) => {
+                const done = sim.finished || k < sim.i || (k === sim.i && sim.solved), cur = k === sim.i && !done;
+                if (done) return `<li class="flex gap-2.5 text-xs font-semibold text-emerald-900"><i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i><span>${st.done}</span></li>`;
+                if (cur) return `<li class="flex gap-2.5 text-xs font-bold text-brandBlue"><i class="fa-solid fa-circle-play mt-0.5"></i><span>${st.name} — your call</span></li>`;
+                return `<li class="flex gap-2.5 text-xs font-medium text-slate-400"><i class="fa-regular fa-circle mt-0.5"></i><span>Step ${k + 1}</span></li>`;
+            }).join('');
+            return `<div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 shrink-0 rounded-xl bg-blue-100 text-brandBlue flex items-center justify-center text-xl"><i class="fa-solid ${cfg.icon}"></i></div>
+                    <div><p class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Run log</p><p class="text-sm font-extrabold text-slate-900">${cfg.title}</p></div>
+                </div><ol class="space-y-2.5">${rows}</ol>`;
+        }
 
         function renderSim() {
-            const n = FAB_STAGES.length;
+            const { cfg } = sim, steps = cfg.steps, n = steps.length;
             if (sim.finished) {
-                const grade = sim.yield >= 85 ? 'Excellent run — a production-ready process.' : sim.yield >= 60 ? 'The chip works, but the wrong calls cost yield. Run it again to improve.' : 'Too many process errors. Review the steps and run it again.';
+                const grade = sim.score >= 85 ? 'Excellent run — you made the right calls.' : sim.score >= 60 ? 'You got there, but the wrong calls cost you. Run it again to improve.' : 'Too many wrong calls. Review the feedback and run it again.';
                 $('activityBody').innerHTML = `
-                    <div class="grid md:grid-cols-2 gap-6 items-center">
-                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">${waferSVG('package')}</div>
+                    <div class="grid md:grid-cols-2 gap-6 items-start">
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">${sceneHTML()}</div>
                         <div class="space-y-4">
                             <p class="text-xs font-bold text-brandOrange uppercase tracking-wider">Run complete</p>
-                            <p class="text-3xl font-extrabold text-slate-900">Final yield: ${sim.yield}%</p>
+                            <p class="text-3xl font-extrabold text-slate-900">${cfg.meter}: ${sim.score}%</p>
                             <p class="text-sm text-slate-700 font-medium">${grade}</p>
-                            <p class="text-xs text-slate-600">You completed all ${n} process steps with ${sim.mistakes} wrong ${sim.mistakes === 1 ? 'call' : 'calls'}.</p>
+                            <p class="text-xs text-slate-600">You completed all ${n} steps with ${sim.mistakes} wrong ${sim.mistakes === 1 ? 'call' : 'calls'}.</p>
                             <p class="text-xs font-semibold ${sim.saved === false ? 'text-red-700' : 'text-slate-600'}">${sim.saved === null ? 'Saving your result…' : sim.saved ? 'Result logged to your training record.' : 'Could not save your result. Check your connection.'}</p>
                             <div class="flex flex-wrap gap-3">
                                 ${sim.saved === false ? '<button onclick="saveSim()" class="px-5 py-2.5 rounded-xl bg-brandOrange text-white text-xs font-bold">Retry Save</button>' : ''}
-                                <button onclick="startFabSim()" class="px-5 py-2.5 rounded-xl bg-brandBlue hover:bg-blue-800 text-white text-xs font-bold"><i class="fa-solid fa-rotate-right"></i> Run Again</button>
+                                <button onclick="startSim('${cfg.key}')" class="px-5 py-2.5 rounded-xl bg-brandBlue hover:bg-blue-800 text-white text-xs font-bold"><i class="fa-solid fa-rotate-right"></i> Run Again</button>
                                 <button onclick="closeModal('activityModal')" class="px-5 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold">Close</button>
                             </div>
                         </div>
-                    </div>
-                    <ol class="mt-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">${FAB_STAGES.map((s, k) => `<li class="text-[11px] font-semibold text-slate-700 bg-emerald-50 border border-emerald-100 rounded-lg px-2.5 py-1.5"><span class="text-emerald-600">${k + 1}.</span> ${s.name}</li>`).join('')}</ol>`;
+                    </div>`;
                 return;
             }
-            const s = FAB_STAGES[sim.i];
-            const prevView = sim.i === 0 ? 'layout' : FAB_STAGES[sim.i - 1].after;
-            const view = sim.solved ? s.after : (s.before || prevView);
-
-            const stepper = FAB_STAGES.map((st, k) => {
+            const s = steps[sim.i];
+            const stepper = steps.map((st, k) => {
                 const done = k < sim.i || (k === sim.i && sim.solved), cur = k === sim.i;
-                return `<li title="${st.name}" class="flex-1 h-2 rounded-full ${done ? 'bg-emerald-500' : cur ? 'bg-brandBlue' : 'bg-slate-200'}"></li>`;
+                return `<li class="flex-1 h-2 rounded-full ${done ? 'bg-emerald-500' : cur ? 'bg-brandBlue' : 'bg-slate-200'}"></li>`;
             }).join('');
 
             const opts = sim.order.map(idx => {
@@ -718,43 +860,43 @@
                     <i class="fa-solid ${right ? 'fa-circle-check' : wrong ? 'fa-circle-xmark' : 'fa-circle-chevron-right text-slate-300'} mt-0.5"></i><span>${o.t}</span></button>`;
             }).join('');
 
-            const fb = sim.fb ? `<div role="status" class="text-xs font-semibold rounded-xl px-4 py-3 border pop ${sim.fb.ok ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-red-200 bg-red-50 text-red-700'}">${sim.fb.ok ? '' : `<span class="font-extrabold">Yield −${YIELD_PENALTY}%.</span> `}${sim.fb.text}</div>` : '';
+            const fb = sim.fb ? `<div role="status" class="text-xs font-semibold rounded-xl px-4 py-3 border pop ${sim.fb.ok ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-red-200 bg-red-50 text-red-700'}">${sim.fb.ok ? '' : `<span class="font-extrabold">${cfg.meter} −${cfg.penalty}%.</span> `}${sim.fb.text}</div>` : '';
 
             $('activityBody').innerHTML = `
-                <ol class="flex gap-1 mb-5" aria-label="Process progress">${stepper}</ol>
+                <ol class="flex gap-1 mb-5" aria-label="Simulation progress">${stepper}</ol>
                 <div class="grid md:grid-cols-2 gap-6">
                     <div class="space-y-4">
-                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">${waferSVG(view)}</div>
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">${sceneHTML()}</div>
                         <div>
-                            <div class="flex justify-between text-xs font-bold text-slate-700 mb-1.5"><span>Wafer yield</span><span>${sim.yield}%</span></div>
-                            <div class="h-2.5 rounded-full bg-slate-100 overflow-hidden"><div class="h-full rounded-full transition-all duration-500 ${yieldColor(sim.yield)}" style="width:${sim.yield}%"></div></div>
+                            <div class="flex justify-between text-xs font-bold text-slate-700 mb-1.5"><span>${cfg.meter}</span><span>${sim.score}%</span></div>
+                            <div class="h-2.5 rounded-full bg-slate-100 overflow-hidden"><div class="h-full rounded-full transition-all duration-500 ${meterColor(sim.score)}" style="width:${sim.score}%"></div></div>
                         </div>
                     </div>
                     <div class="space-y-4">
                         <div>
                             <p class="text-xs font-bold text-brandOrange uppercase tracking-wider">Step ${sim.i + 1} of ${n}</p>
                             <h4 class="text-lg font-extrabold text-slate-900">${s.name}</h4>
-                            <p class="text-[11px] font-semibold text-slate-500 mt-0.5"><i class="fa-solid fa-screwdriver-wrench mr-1"></i>${s.tool}</p>
+                            ${s.tool ? `<p class="text-[11px] font-semibold text-slate-500 mt-0.5"><i class="fa-solid fa-screwdriver-wrench mr-1"></i>${s.tool}</p>` : ''}
                         </div>
                         <p class="text-sm text-slate-800 font-semibold leading-relaxed">${s.q}</p>
                         <div class="space-y-2.5">${opts}</div>
                         ${fb}
-                        ${sim.solved ? `<button onclick="simNext()" class="w-full py-3 bg-brandBlue hover:bg-blue-800 text-white rounded-xl text-sm font-semibold shadow">${sim.i < n - 1 ? `Next: ${FAB_STAGES[sim.i + 1].name} <i class="fa-solid fa-arrow-right ml-1"></i>` : 'Finish Run'}</button>` : ''}
+                        ${sim.solved ? `<button onclick="simNext()" class="w-full py-3 bg-brandBlue hover:bg-blue-800 text-white rounded-xl text-sm font-semibold shadow">${sim.i < n - 1 ? 'Next Step <i class="fa-solid fa-arrow-right ml-1"></i>' : 'Finish Run'}</button>` : ''}
                     </div>
                 </div>`;
         }
 
         function simChoose(idx) {
             if (sim.solved || sim.tried.has(idx)) return;
-            const o = FAB_STAGES[sim.i].opts[idx];
+            const o = sim.cfg.steps[sim.i].opts[idx];
             if (o.ok) sim.solved = true;
-            else { sim.tried.add(idx); sim.mistakes++; sim.yield = Math.max(0, sim.yield - YIELD_PENALTY); }
+            else { sim.tried.add(idx); sim.mistakes++; sim.score = Math.max(0, sim.score - sim.cfg.penalty); }
             sim.fb = { ok: !!o.ok, text: o.fb };
             renderSim();
         }
 
         function simNext() {
-            if (sim.i < FAB_STAGES.length - 1) {
+            if (sim.i < sim.cfg.steps.length - 1) {
                 sim.i++; sim.solved = false; sim.tried = new Set(); sim.fb = null; sim.order = shuffle([0, 1, 2]);
                 renderSim();
             } else { sim.finished = true; saveSim(); }
@@ -763,12 +905,12 @@
         async function saveSim() {
             const s = sim;
             s.saved = null; if (sim === s) renderSim();
-            s.saved = await logCompletion(ACTIVITY_TRACKS.fab, s.yield);
-            if (s.saved) { completedActivities.add('fab'); renderAll(); }
+            s.saved = await logCompletion(s.cfg.track, s.score);
+            if (s.saved) { completedActivities.add(s.cfg.key); renderAll(); }
             if (sim === s && !$('activityModal').classList.contains('hidden')) renderSim();
         }
 
-        /* ============================== Init ============================== */
+/* ============================== Init ============================== */
         window.addEventListener('DOMContentLoaded', () => {
             renderAll();
             try {
