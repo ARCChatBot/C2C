@@ -15,10 +15,18 @@
             }
         }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes shake { 0%,100% { transform: translateX(0) } 25% { transform: translateX(-5px) } 75% { transform: translateX(5px) } }
+        .shake { animation: shake .3s ease-in-out; }
+        @keyframes pop { 0% { transform: scale(.96); opacity: .4 } 100% { transform: scale(1); opacity: 1 } }
+        .pop { animation: pop .25s ease-out; }
+        .lbl { font: 600 10px Inter, sans-serif; fill: #334155; }
+        @media (prefers-reduced-motion: reduce) { .shake, .pop { animation: none; } }
+    </style>
 </head>
-<body class="h-full bg-brandLight text-brandDark font-sans antialiased flex flex-col">
+<body class="min-h-full bg-brandLight text-brandDark font-sans antialiased flex flex-col">
 
     <!-- Intake Modal -->
     <div id="intakeAuthModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
@@ -32,15 +40,16 @@
             </div>
             <form onsubmit="handleDirectIntake(event)" class="space-y-3 text-left">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Student ID</label>
-                    <input type="text" id="intakeStudentId" placeholder="e.g. VSU-100294" required class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-slate-50">
+                    <label for="intakeStudentId" class="block text-xs font-semibold text-slate-700 mb-1">Student ID</label>
+                    <input type="text" id="intakeStudentId" placeholder="e.g. VSU-100294" required autocomplete="off" class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brandBlue/40">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
-                    <input type="text" id="intakeFullName" placeholder="e.g. Nicolas Pollard" required class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-slate-50">
+                    <label for="intakeFullName" class="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
+                    <input type="text" id="intakeFullName" placeholder="e.g. Nicolas Pollard" required autocomplete="name" class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brandBlue/40">
                 </div>
-                <button type="submit" class="w-full py-3.5 rounded-xl bg-brandBlue hover:bg-blue-700 text-white font-semibold text-sm shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-right-to-bracket"></i> Register & Enter CBT
+                <p id="intakeError" role="alert" class="hidden text-xs font-semibold text-red-700 bg-red-50 border border-red-200 rounded-xl px-3 py-2"></p>
+                <button type="submit" id="intakeSubmit" class="w-full py-3.5 rounded-xl bg-brandBlue hover:bg-blue-700 disabled:opacity-60 text-white font-semibold text-sm shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-right-to-bracket"></i> <span>Register &amp; Enter CBT</span>
                 </button>
             </form>
         </div>
@@ -48,52 +57,82 @@
 
     <!-- Header -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-12 h-12 rounded-xl bg-brandBlue flex items-center justify-center text-white text-2xl font-bold">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-3">
+            <div class="flex items-center space-x-3 min-w-0">
+                <div class="w-12 h-12 shrink-0 rounded-xl bg-brandBlue flex items-center justify-center text-white text-2xl font-bold">
                     <i class="fa-solid fa-microchip"></i>
                 </div>
-                <div>
-                    <h1 class="text-xl font-bold text-slate-900">Operation SEMI <span class="text-xs uppercase px-2 py-0.5 bg-blue-50 text-brandBlue rounded-full font-semibold">2D CBT Portal</span></h1>
-                </div>
+                <h1 class="text-lg sm:text-xl font-bold text-slate-900 truncate">Operation SEMI <span class="hidden sm:inline text-xs uppercase px-2 py-0.5 bg-blue-50 text-brandBlue rounded-full font-semibold">2D CBT Portal</span></h1>
             </div>
-            <div class="flex items-center space-x-4">
+            <div class="flex items-center gap-2 sm:gap-4 shrink-0">
                 <a href="/" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold">Main Portal</a>
                 <a href="/admin" class="px-3 py-1.5 bg-orange-100 hover:bg-orange-200 text-brandOrange rounded-xl text-xs font-bold">Admin View</a>
-                <span class="text-xs font-semibold text-slate-700" id="userNameDisplay">Trainee Candidate</span>
+                <span class="hidden md:inline text-xs font-semibold text-slate-700" id="userNameDisplay">Trainee Candidate</span>
             </div>
         </div>
     </header>
 
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-8">
-        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex items-center justify-between">
-            <div>
-                <span class="text-xs font-bold text-brandOrange uppercase tracking-wider">Curriculum Roadmap</span>
-                <h2 class="text-xl font-extrabold text-slate-900">Knowledge-Based Foundations (Modules 1 - 10)</h2>
+        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <span class="text-xs font-bold text-brandOrange uppercase tracking-wider">Curriculum Roadmap</span>
+                    <h2 class="text-xl font-extrabold text-slate-900">Knowledge Modules &amp; Hands-On Activities</h2>
+                </div>
+                <span id="completionBadge" class="px-3 py-1.5 bg-slate-100 text-slate-700 font-bold rounded-full text-xs">Completed: 0 / 12</span>
             </div>
-            <span id="completionBadge" class="px-3 py-1.5 bg-slate-100 text-slate-700 font-bold rounded-full text-xs">Completed: 0 / 10</span>
+            <div class="h-2 rounded-full bg-slate-100 overflow-hidden" role="progressbar" aria-label="Overall progress" aria-valuemin="0" aria-valuemax="12" aria-valuenow="0" id="progressTrack">
+                <div id="progressBar" class="h-full bg-emerald-500 rounded-full transition-all duration-500" style="width:0%"></div>
+            </div>
         </div>
 
-        <!-- Modules Grid (10 Modules Minimum) -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="modulesGrid">
-            <!-- Populated via JS -->
-        </div>
+        <section>
+            <h3 class="text-sm font-extrabold text-slate-900 uppercase tracking-wider mb-4">Hands-On Activities</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="activitiesGrid"></div>
+        </section>
+
+        <section>
+            <h3 class="text-sm font-extrabold text-slate-900 uppercase tracking-wider mb-4">Knowledge-Based Foundations (Modules 1 – 10)</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="modulesGrid"></div>
+        </section>
     </main>
 
     <!-- Module Modal -->
-    <div id="moduleModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-3xl max-w-2xl w-full p-8 space-y-6 shadow-2xl">
-            <div class="flex items-center justify-between border-b pb-4">
-                <h3 id="modalTitle" class="text-lg font-extrabold text-slate-900"></h3>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+    <div id="moduleModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-y-auto p-6 sm:p-8 space-y-5 shadow-2xl">
+            <div class="flex items-start justify-between gap-4 border-b pb-4">
+                <div>
+                    <h3 id="modalTitle" class="text-lg font-extrabold text-slate-900"></h3>
+                    <p id="modalStepLabel" class="text-xs font-semibold text-slate-500 mt-1"></p>
+                </div>
+                <button onclick="closeModal('moduleModal')" aria-label="Close" class="text-slate-400 hover:text-slate-600 p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
+            <div class="h-1.5 rounded-full bg-slate-100 overflow-hidden"><div id="modalProgress" class="h-full bg-brandBlue rounded-full transition-all duration-300"></div></div>
             <div id="modalBodyContent" class="space-y-4"></div>
-            <button onclick="nextStep()" id="nextBtn" class="w-full py-3 bg-brandBlue text-white rounded-xl text-sm font-semibold shadow">Continue</button>
+            <div id="modalFeedback" role="status" class="hidden text-xs font-semibold rounded-xl px-4 py-3 border"></div>
+            <div class="flex gap-3">
+                <button onclick="prevStep()" id="backBtn" class="px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold">Back</button>
+                <button onclick="nextStep()" id="nextBtn" class="flex-1 py-3 bg-brandBlue hover:bg-blue-800 disabled:bg-slate-300 disabled:cursor-not-allowed text-white rounded-xl text-sm font-semibold shadow">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activity Modal (matching game + fab simulation) -->
+    <div id="activityModal" role="dialog" aria-modal="true" aria-labelledby="activityTitle" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-5xl w-full max-h-[94vh] overflow-y-auto p-5 sm:p-8 space-y-5 shadow-2xl">
+            <div class="flex items-start justify-between gap-4 border-b pb-4">
+                <div>
+                    <h3 id="activityTitle" class="text-lg font-extrabold text-slate-900"></h3>
+                    <p id="activitySub" class="text-xs font-medium text-slate-500 mt-1"></p>
+                </div>
+                <button onclick="closeModal('activityModal')" aria-label="Close" class="text-slate-400 hover:text-slate-600 p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div id="activityBody"></div>
         </div>
     </div>
 
     <!-- Overall Completion Celebration Modal -->
-    <div id="celebrationModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div id="celebrationModal" role="dialog" aria-modal="true" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl max-w-lg w-full p-8 shadow-2xl border border-slate-100 text-center space-y-6">
             <div class="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-3xl mx-auto shadow-inner border border-emerald-100">
                 <i class="fa-solid fa-award"></i>
@@ -101,33 +140,72 @@
             <div>
                 <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Computer-Based Training Complete!</h2>
                 <p class="text-sm text-slate-600 mt-2 leading-relaxed">
-                    Congratulations! You have successfully mastered all knowledge-based foundations. Please return back to the main menu for continuous training and hands-on equipment scheduling.
+                    Congratulations! You have completed all ten knowledge modules and both hands-on activities. Please return to the main menu for continuous training and hands-on equipment scheduling.
                 </p>
             </div>
             <a href="/" class="block w-full py-3.5 rounded-xl bg-brandBlue hover:bg-blue-700 text-white font-semibold text-sm shadow-lg transition-colors">
                 <i class="fa-solid fa-arrow-left"></i> Return to Main Menu
             </a>
+            <button onclick="closeModal('celebrationModal')" class="text-xs font-semibold text-slate-500 hover:text-slate-700">Stay here and review modules</button>
         </div>
     </div>
 
+    <!-- Toast -->
+    <div id="toast" role="status" aria-live="polite" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] hidden px-5 py-3 rounded-2xl text-white text-sm font-semibold shadow-2xl max-w-[90vw]"></div>
+
     <script>
+        /* ============================== Helpers ============================== */
+        const $ = id => document.getElementById(id);
+        const shuffle = arr => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+        const TOTAL_ITEMS = 12;
+        const ACTIVITY_TRACKS = { match: '2D CBT - Activity: Electronics Match', fab: '2D CBT - Activity: Chip Fab Simulation' };
+
         let userId = '', userName = '';
         let completedModules = new Set();
+        let completedActivities = new Set();
+        let celebrated = false;
+        let toastTimer = null;
 
+        function toast(msg, ok = true) {
+            const t = $('toast');
+            t.textContent = msg;
+            t.className = `fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-5 py-3 rounded-2xl text-white text-sm font-semibold shadow-2xl max-w-[90vw] pop ${ok ? 'bg-emerald-600' : 'bg-red-600'}`;
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.classList.add('hidden'), 4000);
+        }
+        function closeModal(id) { $(id).classList.add('hidden'); }
+        function openModal(id) { $(id).classList.remove('hidden'); }
+        document.addEventListener('keydown', e => {
+            if (e.key !== 'Escape') return;
+            ['moduleModal', 'activityModal', 'celebrationModal'].forEach(closeModal);
+        });
+
+        /* ============================== API ============================== */
         async function handleDirectIntake(event) {
             event.preventDefault();
-            const studentIdInput = document.getElementById('intakeStudentId').value.trim();
-            const fullNameInput = document.getElementById('intakeFullName').value.trim();
-            const res = await fetch('/api/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ student_id: studentIdInput, full_name: fullNameInput })
-            });
-            if (res.ok) {
+            const studentIdInput = $('intakeStudentId').value.trim();
+            const fullNameInput = $('intakeFullName').value.trim();
+            const err = $('intakeError'), btn = $('intakeSubmit');
+            if (!studentIdInput || !fullNameInput) return;
+            err.classList.add('hidden');
+            btn.disabled = true;
+            try {
+                const res = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ student_id: studentIdInput, full_name: fullNameInput })
+                });
+                if (!res.ok) throw new Error(`Registration was rejected (error ${res.status}). Check your Student ID and try again.`);
                 userId = studentIdInput; userName = fullNameInput;
-                document.getElementById('userNameDisplay').textContent = userName;
-                document.getElementById('intakeAuthModal').classList.add('hidden');
-                loadExistingProgress();
+                try { sessionStorage.setItem('semiIntake', JSON.stringify({ id: userId, name: userName })); } catch (e) {}
+                $('userNameDisplay').textContent = userName;
+                closeModal('intakeAuthModal');
+                await loadExistingProgress();
+            } catch (e) {
+                err.textContent = e instanceof TypeError ? 'Could not reach the training server. Check your connection and try again.' : e.message;
+                err.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
             }
         }
 
@@ -137,121 +215,566 @@
                 if (res.ok) {
                     const logs = await res.json();
                     logs.forEach(log => {
-                        if (log.student_id === userId && (log.track || '').includes('2D CBT - Module')) {
-                            const match = log.track.match(/Module (\d+)/);
-                            if (match) completedModules.add(parseInt(match[1]));
-                        }
+                        if (log.student_id !== userId) return;
+                        const track = log.track || '';
+                        const match = track.match(/2D CBT - Module (\d+)/);
+                        if (match) completedModules.add(parseInt(match[1]));
+                        Object.entries(ACTIVITY_TRACKS).forEach(([key, t]) => { if (track === t) completedActivities.add(key); });
                     });
                 }
-                renderModulesGrid();
-            } catch (err) {
-                renderModulesGrid();
-            }
+            } catch (err) { /* progress simply starts empty */ }
+            renderAll();
         }
 
+        async function logCompletion(track, score) {
+            try {
+                const res = await fetch('/api/complete-training', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ student_id: userId, score: score, track: track })
+                });
+                return res.ok;
+            } catch (e) { return false; }
+        }
+
+        /* ============================== Module content ============================== */
         const modulesConfig = [
-            { id: 1, title: "Module 1: AI Literacy in Microelectronics", desc: "Foundational concepts of AI-driven semiconductor scheduling and autonomous fab workflows.", steps: [{ type: "content", text: "Autonomous agentic frameworks analyze lot flow and optimize tool utilization across semiconductor fabrication bays." }, { type: "quiz", question: "What is the primary role of AI agents in modern semiconductor manufacturing?", options: ["Automating tool routing and yield prediction", "Replacing all chemical cleaning processes", "Managing administrative payroll"], correct: 0 }] },
-            { id: 2, title: "Module 2: Cleanroom Protocols & Contamination Control", desc: "Understanding particle control, cleanroom classification, and gowning procedures.", steps: [{ type: "content", text: "Cleanrooms maintain extremely low concentrations of airborne particulates by controlling airflow and gowning discipline." }, { type: "quiz", question: "Why is particle control critical in a semiconductor cleanroom?", options: ["To keep the room temperature comfortable", "To prevent microscopic dust from bridging sub-micron circuit features", "To reduce electricity consumption"], correct: 1 }] },
-            { id: 3, title: "Module 3: Electrostatic Discharge (ESD) Safety", desc: "Mitigating electrostatic hazards to protect sensitive semiconductor devices.", steps: [{ type: "content", text: "Electrostatic discharge can instantly rupture gate oxides in microchips. Grounding straps and ESD flooring are mandatory." }, { type: "quiz", question: "What is the primary purpose of wearing an ESD wrist strap?", options: ["To prevent wrist strain during tool operation", "To safely drain static electricity from the technician to ground", "To track technician location in the bay"], correct: 1 }] },
-            { id: 4, title: "Module 4: Photolithography & Etching Fundamentals", desc: "Exploring exposure, photoresist application, and pattern transfer techniques.", steps: [{ type: "content", text: "Photolithography transfers circuit patterns from a photomask onto a silicon wafer using light-sensitive photoresist." }, { type: "quiz", question: "What substance is selectively removed during the wet or dry etching process?", options: ["The underlying substrate or unmasked material", "The vacuum pump oil", "The cleanroom ceiling tiles"], correct: 0 }] },
-            { id: 5, title: "Module 5: Chemical Handling & Safety Data Sheets", desc: "Safe handling of acids, solvents, and hazardous materials in microelectronics labs.", steps: [{ type: "content", text: "Strict adherence to Chemical Hygiene Plans and Safety Data Sheets (SDS) ensures accident prevention during wet etch operations." }, { type: "quiz", question: "Where should you immediately look if exposed to an unfamiliar chemical solvent?", options: ["The equipment user manual", "The chemical Safety Data Sheet (SDS) and emergency eyewash station", "Social media forums"], correct: 1 }] },
-            { id: 6, title: "Module 6: Vacuum Systems & Thin Film Deposition", desc: "Principles of physical and chemical vapor deposition (PVD/CVD) in vacuum chambers.", steps: [{ type: "content", text: "Thin films of conductors, insulators, and semiconductors are deposited inside specialized high-vacuum chambers." }, { type: "quiz", question: "Why are high-vacuum environments required for thin film PVD processes?", options: ["To prevent background gas molecules from contaminating the deposited film", "To make the equipment run faster", "To cool the facility"], correct: 0 }] },
-            { id: 7, title: "Module 7: Metrology & Defect Inspection", desc: "Advanced optical and electronic measurement tools for quality control and yield enhancement.", steps: [{ type: "content", text: "Metrology tools measure critical dimensions (CD) and inspect sub-surface defects across silicon wafers at atomic scales." }, { type: "quiz", question: "What does CD metrology measure on a semiconductor wafer?", options: ["The diameter of the silicon ingot", "The critical width and dimensions of fabricated circuit lines", "The weight of the wafer carrier"], correct: 1 }] },
-            { id: 8, title: "Module 8: Packaging & Integrated Circuit Testing", desc: "Dicing wafers, wire bonding, and electrical characterization of finished microchips.", steps: [{ type: "content", text: "Once fabrication is complete, wafers are diced into individual die and packaged for thermal and electrical reliability." }, { type: "quiz", question: "What is the primary goal of electrical sort and die testing?", options: ["To burnish the exterior packaging", "To verify functional performance and bin chips by speed and power", "To engrave student names on the chip"], correct: 1 }] },
-            { id: 9, title: "Module 9: Digital Multimeters & Electrical Testing", desc: "Using multimeters for voltage, current, and resistance verification during hardware diagnostics.", steps: [{ type: "content", text: "Digital multimeters allow technicians to verify circuit continuity, power rail stability, and component resistance." }, { type: "quiz", question: "When measuring electrical resistance on a circuit board, what must you always do first?", options: ["Disconnect power from the circuit to prevent meter damage", "Increase room humidity", "Wear polarized sunglasses"], correct: 0 }] },
-            { id: 10, title: "Module 10: Mixed Reality & Digital Twin Integration", desc: "Leveraging HoloLens 2, VR headsets, and digital twins for immersive technician training.", steps: [{ type: "content", text: "Mixed reality and digital twins create spatial, zero-risk simulation environments for complex equipment maintenance." }, { type: "quiz", question: "What is a major advantage of mixed reality cleanroom training?", options: ["It eliminates the need for any physical equipment forever", "It allows trainees to practice hazardous or complex procedures safely in a virtual space", "It lowers electricity costs in the building"], correct: 1 }] }
+            { id: 1, title: "Module 1: Using AI Responsibly at Work", desc: "What to do before, during, and after you use an AI tool on the job — and how to stay safe, honest, and accountable.", steps: [
+                { type: "content", title: "AI is an assistant, not an authority",
+                  text: "AI tools such as chat assistants, code helpers, and prediction models produce output that sounds confident. That output can still be wrong, out of date, or made up.",
+                  points: ["Use AI to draft, summarize, explain, and brainstorm.", "Do not treat an AI answer as a verified fact or an approved procedure.", "You — not the tool — are responsible for what you do with the answer."] },
+                { type: "content", title: "Before you use AI: permission and data",
+                  text: "Ask two questions before you type anything into an AI tool.",
+                  points: ["Am I allowed? Follow your instructor's or employer's AI policy, and use only approved tools.", "What am I sharing? Never paste process recipes, tool parameters, customer designs, export-controlled data, or personal information into a public AI tool.", "If you are unsure, ask your supervisor first."] },
+                { type: "quiz", question: "You want help troubleshooting an etch problem and are about to paste the full proprietary recipe into a public chatbot. What should you do?",
+                  options: ["Describe the problem in general terms, or use a tool your organization has approved for that data", "Paste it — the chatbot needs the full recipe to help", "Paste it, then delete the chat afterwards"], correct: 0,
+                  why: "Proprietary data that leaves the organization cannot be taken back. Deleting a chat does not undo the disclosure." },
+                { type: "content", title: "While you use AI: verify everything that matters",
+                  text: "AI can invent numbers, citations, and steps. Check its output against a trusted source before you act on it.",
+                  points: ["Safety information: check the Safety Data Sheet (SDS) and the SOP.", "Equipment settings: check the tool manual and the approved recipe.", "If AI output conflicts with a procedure, the procedure wins. Report the conflict."] },
+                { type: "quiz", question: "An AI assistant tells you two chemicals are safe to mix. The Safety Data Sheet says they are incompatible. What do you do?",
+                  options: ["Trust the AI — it has read more documents than you have", "Follow the SDS, do not mix them, and report the AI error", "Mix a small amount to see who is right"], correct: 1,
+                  why: "Verified safety documents always override AI output. Reporting the error protects the next person." },
+                { type: "quiz", question: "A technician applies an AI-suggested tool setpoint without checking it, and the lot is scrapped. Who is accountable?",
+                  options: ["The AI tool", "The company that built the AI", "The technician who applied it without verifying"], correct: 2,
+                  why: "A person stays accountable for every action taken. AI suggestions need human review before they touch product or equipment." },
+                { type: "content", title: "After you use AI: be honest about it",
+                  text: "Responsible use continues after the answer is on the screen.",
+                  points: ["Disclose AI use when your course or employer requires it.", "Do your own work on assessments and certifications — they measure what you can do.", "Review AI output for errors and unfair bias before you share it.", "Report AI mistakes or misuse so the process can be fixed."] },
+                { type: "quiz", question: "Which of these is a responsible use of AI?",
+                  options: ["Having AI write your shift report from memory and submitting it unread", "Using AI to answer a certification exam for you", "Using an approved AI tool to summarize your own notes, then checking the summary and noting that AI helped"], correct: 2,
+                  why: "It uses an approved tool, keeps you in control of the content, and is transparent about AI involvement." },
+                { type: "content", title: "Your five-point AI checklist",
+                  text: "Run through this list every time you use AI at work or in class.",
+                  points: ["Permitted — is this tool and this use allowed?", "Protected — am I keeping confidential and personal data out?", "Verified — did I check the output against a trusted source?", "Disclosed — have I been open about using AI?", "Accountable — am I ready to own the result?"] }
+            ] },
+            { id: 2, title: "Module 2: Cleanroom Protocols & Contamination Control", desc: "Understanding particle control, cleanroom classification, and gowning procedures.", steps: [{ type: "content", text: "Cleanrooms maintain extremely low concentrations of airborne particulates by controlling airflow and gowning discipline." }, { type: "quiz", question: "Why is particle control critical in a semiconductor cleanroom?", options: ["To keep the room temperature comfortable", "To prevent microscopic dust from bridging sub-micron circuit features", "To reduce electricity consumption"], correct: 1, why: "A single particle can be larger than the circuit features and short or block them." }] },
+            { id: 3, title: "Module 3: Electrostatic Discharge (ESD) Safety", desc: "Mitigating electrostatic hazards to protect sensitive semiconductor devices.", steps: [{ type: "content", text: "Electrostatic discharge can instantly rupture gate oxides in microchips. Grounding straps and ESD flooring are mandatory." }, { type: "quiz", question: "What is the primary purpose of wearing an ESD wrist strap?", options: ["To prevent wrist strain during tool operation", "To safely drain static electricity from the technician to ground", "To track technician location in the bay"], correct: 1, why: "The strap gives static charge a controlled path to ground instead of through the device." }] },
+            { id: 4, title: "Module 4: Photolithography & Etching Fundamentals", desc: "Exploring exposure, photoresist application, and pattern transfer techniques.", steps: [{ type: "content", text: "Photolithography transfers circuit patterns from a photomask onto a silicon wafer using light-sensitive photoresist." }, { type: "quiz", question: "What substance is selectively removed during the wet or dry etching process?", options: ["The underlying substrate or unmasked material", "The vacuum pump oil", "The cleanroom ceiling tiles"], correct: 0, why: "Etching removes material wherever the photoresist does not protect it." }] },
+            { id: 5, title: "Module 5: Chemical Handling & Safety Data Sheets", desc: "Safe handling of acids, solvents, and hazardous materials in microelectronics labs.", steps: [{ type: "content", text: "Strict adherence to Chemical Hygiene Plans and Safety Data Sheets (SDS) ensures accident prevention during wet etch operations." }, { type: "quiz", question: "Where should you immediately look if exposed to an unfamiliar chemical solvent?", options: ["The equipment user manual", "The chemical Safety Data Sheet (SDS) and emergency eyewash station", "Social media forums"], correct: 1, why: "The SDS lists first-aid measures, and the eyewash station provides immediate treatment." }] },
+            { id: 6, title: "Module 6: Vacuum Systems & Thin Film Deposition", desc: "Principles of physical and chemical vapor deposition (PVD/CVD) in vacuum chambers.", steps: [{ type: "content", text: "Thin films of conductors, insulators, and semiconductors are deposited inside specialized high-vacuum chambers." }, { type: "quiz", question: "Why are high-vacuum environments required for thin film PVD processes?", options: ["To prevent background gas molecules from contaminating the deposited film", "To make the equipment run faster", "To cool the facility"], correct: 0, why: "Stray gas molecules react with or scatter the depositing material and degrade the film." }] },
+            { id: 7, title: "Module 7: Metrology & Defect Inspection", desc: "Advanced optical and electronic measurement tools for quality control and yield enhancement.", steps: [{ type: "content", text: "Metrology tools measure critical dimensions (CD) and inspect sub-surface defects across silicon wafers at atomic scales." }, { type: "quiz", question: "What does CD metrology measure on a semiconductor wafer?", options: ["The diameter of the silicon ingot", "The critical width and dimensions of fabricated circuit lines", "The weight of the wafer carrier"], correct: 1, why: "CD stands for critical dimension — the smallest feature widths that control device behavior." }] },
+            { id: 8, title: "Module 8: Packaging & Integrated Circuit Testing", desc: "Dicing wafers, wire bonding, and electrical characterization of finished microchips.", steps: [{ type: "content", text: "Once fabrication is complete, wafers are diced into individual die and packaged for thermal and electrical reliability." }, { type: "quiz", question: "What is the primary goal of electrical sort and die testing?", options: ["To burnish the exterior packaging", "To verify functional performance and bin chips by speed and power", "To engrave student names on the chip"], correct: 1, why: "Testing finds the working dies and sorts them by how well they perform." }] },
+            { id: 9, title: "Module 9: Digital Multimeters & Electrical Testing", desc: "Using multimeters for voltage, current, and resistance verification during hardware diagnostics.", steps: [{ type: "content", text: "Digital multimeters allow technicians to verify circuit continuity, power rail stability, and component resistance." }, { type: "quiz", question: "When measuring electrical resistance on a circuit board, what must you always do first?", options: ["Disconnect power from the circuit to prevent meter damage", "Increase room humidity", "Wear polarized sunglasses"], correct: 0, why: "Resistance mode drives its own small current; external power gives false readings and can damage the meter." }] },
+            { id: 10, title: "Module 10: Mixed Reality & Digital Twin Integration", desc: "Leveraging HoloLens 2, VR headsets, and digital twins for immersive technician training.", steps: [{ type: "content", text: "Mixed reality and digital twins create spatial, zero-risk simulation environments for complex equipment maintenance." }, { type: "quiz", question: "What is a major advantage of mixed reality cleanroom training?", options: ["It eliminates the need for any physical equipment forever", "It allows trainees to practice hazardous or complex procedures safely in a virtual space", "It lowers electricity costs in the building"], correct: 1, why: "Trainees can make mistakes and repeat procedures with no risk to people, product, or tools." }] }
         ];
 
-        function renderModulesGrid() {
-            const grid = document.getElementById('modulesGrid');
+        /* ============================== Dashboard rendering ============================== */
+        const activitiesConfig = [
+            { key: 'match', icon: 'fa-puzzle-piece', title: 'Electronics Match', desc: 'Match each electronic component picture to its name. Learn what every part does as you pair them.', launch: () => startMatchGame() },
+            { key: 'fab', icon: 'fa-industry', title: 'Chip Fab Simulation', desc: 'Take one wafer through the whole process — from circuit design to a packaged, tested chip. Wrong calls cost yield.', launch: () => startFabSim() }
+        ];
+
+        function requireUser() {
+            if (userId) return true;
+            openModal('intakeAuthModal');
+            return false;
+        }
+
+        function cardHTML({ tag, isDone, title, desc, onclick, icon }) {
+            return `
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-[10px] font-bold uppercase px-2.5 py-1 ${isDone ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-50 text-brandBlue'} rounded-full">${tag}</span>
+                        ${isDone ? '<span class="text-xs font-bold text-emerald-600 flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> Completed</span>' : '<span class="text-xs font-medium text-slate-400">Pending</span>'}
+                    </div>
+                    <h4 class="text-base font-extrabold text-slate-900 mb-2">${icon ? `<i class="fa-solid ${icon} text-brandOrange mr-1.5"></i>` : ''}${title}</h4>
+                    <p class="text-xs text-slate-600 mb-6 leading-relaxed">${desc}</p>
+                </div>
+                <button onclick="${onclick}" class="w-full py-2.5 rounded-xl ${isDone ? 'bg-slate-800 hover:bg-slate-900' : 'bg-brandBlue hover:bg-blue-800'} text-white font-bold text-xs transition-colors shadow flex items-center justify-center gap-2">
+                    <i class="fa-solid ${isDone ? 'fa-rotate-right' : 'fa-play'}"></i> ${isDone ? 'Review' : 'Launch'}
+                </button>`;
+        }
+
+        function renderAll() {
+            const cardClass = isDone => `bg-white rounded-3xl border ${isDone ? 'border-emerald-200 bg-emerald-50/20' : 'border-slate-200'} p-6 flex flex-col justify-between shadow-sm`;
+
+            const grid = $('modulesGrid');
             grid.innerHTML = '';
             modulesConfig.forEach(mod => {
                 const isDone = completedModules.has(mod.id);
                 const card = document.createElement('div');
-                card.className = `bg-white rounded-3xl border ${isDone ? 'border-emerald-200 bg-emerald-50/20' : 'border-slate-200'} p-6 flex flex-col justify-between shadow-sm`;
-                card.innerHTML = `
-                    <div>
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-[10px] font-bold uppercase px-2.5 py-1 ${isDone ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-50 text-brandBlue'} rounded-full">Module ${mod.id} of 10</span>
-                            ${isDone ? '<span class="text-xs font-bold text-emerald-600 flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> Completed</span>' : '<span class="text-xs font-medium text-slate-400">Pending</span>'}
-                        </div>
-                        <h4 class="text-base font-extrabold text-slate-900 mb-2">${mod.title}</h4>
-                        <p class="text-xs text-slate-600 mb-6 leading-relaxed">${mod.desc}</p>
-                    </div>
-                    <button onclick="openModule(${mod.id})" class="w-full py-2.5 rounded-xl ${isDone ? 'bg-slate-800 hover:bg-slate-900' : 'bg-brandBlue hover:bg-blue-800'} text-white font-bold text-xs transition-colors shadow flex items-center justify-center gap-2">
-                        <i class="fa-solid ${isDone ? 'fa-rotate-right' : 'fa-play'}"></i> ${isDone ? 'Review Module' : 'Launch Module'}
-                    </button>
-                `;
+                card.className = cardClass(isDone);
+                card.innerHTML = cardHTML({ tag: `Module ${mod.id} of 10`, isDone, title: mod.title, desc: mod.desc, onclick: `openModule(${mod.id})` });
                 grid.appendChild(card);
             });
-            document.getElementById('completionBadge').textContent = `Completed: ${completedModules.size} / 10`;
-            if (completedModules.size >= 10) {
-                document.getElementById('celebrationModal').classList.remove('hidden');
+
+            const aGrid = $('activitiesGrid');
+            aGrid.innerHTML = '';
+            activitiesConfig.forEach(act => {
+                const isDone = completedActivities.has(act.key);
+                const card = document.createElement('div');
+                card.className = cardClass(isDone);
+                card.innerHTML = cardHTML({ tag: 'Interactive', isDone, title: act.title, desc: act.desc, icon: act.icon, onclick: `launchActivity('${act.key}')` });
+                aGrid.appendChild(card);
+            });
+
+            const done = completedModules.size + completedActivities.size;
+            $('completionBadge').textContent = `Completed: ${done} / ${TOTAL_ITEMS}`;
+            $('progressBar').style.width = `${(done / TOTAL_ITEMS) * 100}%`;
+            $('progressTrack').setAttribute('aria-valuenow', done);
+            if (done >= TOTAL_ITEMS && !celebrated) {
+                celebrated = true;
+                openModal('celebrationModal');
             }
         }
 
-        let currentActiveModule = null, currentStepIndex = 0;
-
-        function openModule(modId) {
-            if (!userId) { alert('Please register your Student ID first.'); return; }
-            currentActiveModule = modulesConfig.find(m => m.id === modId);
-            currentStepIndex = 0;
-            renderModalStep();
-            document.getElementById('moduleModal').classList.remove('hidden');
+        function launchActivity(key) {
+            if (!requireUser()) return;
+            activitiesConfig.find(a => a.key === key).launch();
         }
 
-        function closeModal() {
-            document.getElementById('moduleModal').classList.add('hidden');
+        /* ============================== Knowledge modules ============================== */
+        let mod = null; // { cfg, index, steps: [{ order, solved, missed, tried:Set }] }
+
+        function openModule(modId) {
+            if (!requireUser()) return;
+            const cfg = modulesConfig.find(m => m.id === modId);
+            mod = { cfg, index: 0, saving: false, steps: cfg.steps.map(s => s.options ? { order: shuffle(s.options.map((_, i) => i)), solved: false, missed: false, tried: new Set() } : null) };
+            renderModalStep();
+            openModal('moduleModal');
         }
 
         function renderModalStep() {
-            const step = currentActiveModule.steps[currentStepIndex];
-            document.getElementById('modalTitle').textContent = currentActiveModule.title;
-            let html = `<p class="text-sm text-slate-700 leading-relaxed font-medium">${step.text || step.question}</p>`;
+            const step = mod.cfg.steps[mod.index], st = mod.steps[mod.index], total = mod.cfg.steps.length;
+            $('modalTitle').textContent = mod.cfg.title;
+            $('modalStepLabel').textContent = `Step ${mod.index + 1} of ${total} · ${step.options ? 'Knowledge check' : 'Lesson'}`;
+            $('modalProgress').style.width = `${((mod.index + 1) / total) * 100}%`;
+
+            let html = '';
             if (step.options) {
-                html += `<div class="space-y-2.5 mt-4">`;
-                step.options.forEach((opt, idx) => {
-                    html += `
-                        <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-blue-50/50 cursor-pointer text-xs font-semibold text-slate-700 transition-colors">
-                            <input type="radio" name="quizOpt" value="${idx}" class="text-brandBlue"> ${opt}
-                        </label>`;
+                html += `<p class="text-sm text-slate-800 leading-relaxed font-semibold">${step.question}</p><div class="space-y-2.5">`;
+                st.order.forEach(idx => {
+                    const isCorrect = st.solved && idx === step.correct, isWrong = st.tried.has(idx);
+                    const cls = isCorrect ? 'border-emerald-400 bg-emerald-50 text-emerald-900'
+                              : isWrong ? 'border-red-200 bg-red-50 text-red-400 line-through'
+                              : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-blue-50/60 hover:border-blue-200';
+                    html += `<button type="button" onclick="answerQuiz(${idx})" ${st.solved || isWrong ? 'disabled' : ''} class="w-full text-left flex items-center gap-3 p-3 rounded-xl border ${cls} text-xs font-semibold transition-colors">
+                        <i class="fa-solid ${isCorrect ? 'fa-circle-check' : isWrong ? 'fa-circle-xmark' : 'fa-circle text-slate-300'}"></i><span>${step.options[idx]}</span></button>`;
                 });
                 html += `</div>`;
+            } else {
+                if (step.title) html += `<h4 class="text-base font-extrabold text-slate-900">${step.title}</h4>`;
+                html += `<p class="text-sm text-slate-700 leading-relaxed font-medium">${step.text}</p>`;
+                if (step.points) html += `<ul class="space-y-2">${step.points.map(p => `<li class="flex gap-2.5 text-sm text-slate-700 leading-relaxed"><i class="fa-solid fa-check text-brandBlue mt-1 text-xs"></i><span>${p}</span></li>`).join('')}</ul>`;
             }
-            document.getElementById('modalBodyContent').innerHTML = html;
-            document.getElementById('nextBtn').textContent = currentStepIndex < currentActiveModule.steps.length - 1 ? 'Next Step' : 'Complete & Log Module';
+            $('modalBodyContent').innerHTML = html;
+
+            const fb = $('modalFeedback');
+            if (step.options && st.solved) {
+                fb.className = 'text-xs font-semibold rounded-xl px-4 py-3 border border-emerald-200 bg-emerald-50 text-emerald-800';
+                fb.textContent = `Correct. ${step.why || ''}`;
+            } else if (step.options && st.tried.size) {
+                fb.className = 'text-xs font-semibold rounded-xl px-4 py-3 border border-red-200 bg-red-50 text-red-700';
+                fb.textContent = 'Not quite. Think it through and choose again.';
+            } else fb.className = 'hidden';
+
+            $('backBtn').classList.toggle('hidden', mod.index === 0);
+            const next = $('nextBtn');
+            next.disabled = !!(step.options && !st.solved) || mod.saving;
+            next.textContent = mod.saving ? 'Saving…' : mod.index < total - 1 ? 'Next Step' : 'Complete & Log Module';
         }
+
+        function answerQuiz(idx) {
+            const step = mod.cfg.steps[mod.index], st = mod.steps[mod.index];
+            if (st.solved) return;
+            if (idx === step.correct) st.solved = true;
+            else { st.tried.add(idx); st.missed = true; }
+            renderModalStep();
+        }
+
+        function prevStep() { if (mod.index > 0) { mod.index--; renderModalStep(); } }
 
         async function nextStep() {
-            const step = currentActiveModule.steps[currentStepIndex];
-            if (step.options) {
-                const selected = document.querySelector('input[name="quizOpt"]:checked');
-                if (!selected) { alert('Please select an answer to proceed.'); return; }
-                if (parseInt(selected.value) !== step.correct) { alert('Incorrect answer. Review the concept and try again.'); return; }
-            }
+            if (mod.index < mod.cfg.steps.length - 1) { mod.index++; renderModalStep(); return; }
+            const quizzes = mod.steps.filter(Boolean);
+            const score = quizzes.length ? Math.round(100 * quizzes.filter(q => !q.missed).length / quizzes.length) : 100;
+            mod.saving = true; renderModalStep();
+            const ok = await logCompletion(`2D CBT - Module ${mod.cfg.id}`, score);
+            mod.saving = false;
+            if (!ok) { renderModalStep(); toast('Could not save your result. Check your connection and press Complete again.', false); return; }
+            completedModules.add(mod.cfg.id);
+            closeModal('moduleModal');
+            toast(`Module ${mod.cfg.id} complete — first-try score ${score}%. Logged to your record.`);
+            renderAll();
+        }
 
-            if (currentStepIndex < currentActiveModule.steps.length - 1) {
-                currentStepIndex++;
-                renderModalStep();
+        /* ============================== Electronics matching game ============================== */
+        const svgWrap = inner => `<svg viewBox="0 0 80 60" class="w-full h-16" aria-hidden="true">${inner}</svg>`;
+        const COMPONENTS = [
+            { id: 'resistor', name: 'Resistor', fact: 'Limits how much current flows. The colored bands show its resistance value.',
+              svg: `<line x1="4" y1="30" x2="76" y2="30" stroke="#64748b" stroke-width="2.5"/><rect x="20" y="20" width="40" height="20" rx="8" fill="#e7c48f" stroke="#a16207" stroke-width="1.5"/><rect x="27" y="20" width="4" height="20" fill="#92400e"/><rect x="35" y="20" width="4" height="20" fill="#111827"/><rect x="43" y="20" width="4" height="20" fill="#dc2626"/><rect x="52" y="20" width="3" height="20" fill="#ca8a04"/>` },
+            { id: 'capacitor', name: 'Capacitor', fact: 'Stores electric charge and releases it. It smooths out voltage on power lines.',
+              svg: `<line x1="33" y1="40" x2="33" y2="58" stroke="#64748b" stroke-width="2.5"/><line x1="47" y1="40" x2="47" y2="54" stroke="#64748b" stroke-width="2.5"/><rect x="25" y="4" width="30" height="38" rx="4" fill="#1d4ed8"/><rect x="45" y="4" width="8" height="38" fill="#cbd5e1"/><line x1="47" y1="23" x2="51" y2="23" stroke="#1e293b" stroke-width="1.5"/><ellipse cx="40" cy="6" rx="15" ry="3" fill="#94a3b8"/>` },
+            { id: 'led', name: 'LED', fact: 'Light-emitting diode. It gives off light when current flows through it in the right direction.',
+              svg: `<line x1="35" y1="36" x2="35" y2="58" stroke="#64748b" stroke-width="2.5"/><line x1="45" y1="36" x2="45" y2="52" stroke="#64748b" stroke-width="2.5"/><path d="M27 34 V20 a13 13 0 0 1 26 0 V34 Z" fill="#ef4444"/><rect x="24" y="33" width="32" height="5" rx="1.5" fill="#b91c1c"/><path d="M33 22 a7 7 0 0 1 6 -8" stroke="#fecaca" stroke-width="2.5" fill="none" stroke-linecap="round"/>` },
+            { id: 'diode', name: 'Diode', fact: 'A one-way valve for electricity. Current passes in one direction only.',
+              svg: `<line x1="4" y1="30" x2="76" y2="30" stroke="#64748b" stroke-width="2.5"/><rect x="24" y="21" width="32" height="18" rx="3" fill="#1f2937"/><rect x="46" y="21" width="5" height="18" fill="#e2e8f0"/>` },
+            { id: 'transistor', name: 'Transistor', fact: 'A tiny electronic switch and amplifier. A chip holds billions of them.',
+              svg: `<line x1="31" y1="34" x2="31" y2="58" stroke="#64748b" stroke-width="2.5"/><line x1="40" y1="34" x2="40" y2="58" stroke="#64748b" stroke-width="2.5"/><line x1="49" y1="34" x2="49" y2="58" stroke="#64748b" stroke-width="2.5"/><path d="M24 36 V16 a16 12 0 0 1 32 0 V36 Z" fill="#1f2937"/><rect x="24" y="16" width="32" height="20" fill="#111827"/><text x="40" y="29" text-anchor="middle" font-size="6" fill="#94a3b8" font-family="monospace">2N2222</text>` },
+            { id: 'ic', name: 'Integrated Circuit (IC)', fact: 'A complete circuit built on one piece of silicon and sealed in a package with pins.',
+              svg: `${[14, 24, 34, 44, 54, 64].map(x => `<rect x="${x - 2}" y="8" width="4" height="10" fill="#94a3b8"/><rect x="${x - 2}" y="42" width="4" height="10" fill="#94a3b8"/>`).join('')}<rect x="8" y="16" width="64" height="28" rx="2" fill="#1f2937"/><circle cx="8" cy="30" r="4" fill="#f8fafc"/><circle cx="16" cy="38" r="1.5" fill="#64748b"/>` },
+            { id: 'wafer', name: 'Silicon Wafer', fact: 'A thin disc of pure silicon. Hundreds of chips are built on it at once.',
+              svg: `<defs><clipPath id="wc"><path d="M40 3 a27 27 0 1 1 -0.1 0 Z"/></clipPath></defs><circle cx="40" cy="30" r="27" fill="#cbd5e1" stroke="#64748b" stroke-width="1.5"/><g clip-path="url(#wc)" stroke="#6366f1" stroke-width="1">${[19, 26, 33, 40, 47, 54, 61].map(x => `<line x1="${x}" y1="0" x2="${x}" y2="60"/>`).join('')}${[9, 16, 23, 30, 37, 44, 51].map(y => `<line x1="10" y1="${y}" x2="70" y2="${y}"/>`).join('')}</g><rect x="30" y="54.5" width="20" height="4" fill="#f8fafc"/>` },
+            { id: 'multimeter', name: 'Multimeter', fact: 'A test tool that measures voltage, current, and resistance.',
+              svg: `<rect x="24" y="2" width="32" height="50" rx="4" fill="#facc15" stroke="#a16207" stroke-width="1.5"/><rect x="28" y="6" width="24" height="12" rx="1.5" fill="#d9f99d" stroke="#365314"/><text x="50" y="15.5" text-anchor="end" font-size="8" font-family="monospace" fill="#1a2e05">5.02</text><circle cx="40" cy="32" r="8" fill="#1f2937"/><line x1="40" y1="32" x2="44" y2="26" stroke="#f8fafc" stroke-width="2"/><circle cx="33" cy="46" r="2" fill="#111827"/><circle cx="47" cy="46" r="2" fill="#dc2626"/><path d="M33 48 Q20 62 10 46" stroke="#111827" stroke-width="1.8" fill="none"/><path d="M47 48 Q60 62 70 46" stroke="#dc2626" stroke-width="1.8" fill="none"/>` },
+            { id: 'battery', name: 'Battery', fact: 'A source of stored energy. It supplies DC voltage to a circuit.',
+              svg: `<rect x="10" y="18" width="56" height="24" rx="3" fill="#1f2937"/><rect x="10" y="18" width="20" height="24" rx="3" fill="#b45309"/><rect x="66" y="25" width="5" height="10" rx="1" fill="#94a3b8"/><text x="20" y="34" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">−</text><text x="54" y="34.500" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">+</text>` },
+            { id: 'inductor', name: 'Inductor', fact: 'A coil of wire that stores energy in a magnetic field. It resists changes in current.',
+              svg: `<line x1="4" y1="38" x2="16" y2="38" stroke="#64748b" stroke-width="2.5"/><line x1="64" y1="38" x2="76" y2="38" stroke="#64748b" stroke-width="2.5"/><rect x="16" y="26" width="48" height="12" rx="2" fill="#475569"/>${[18, 26, 34, 42, 50, 58].map(x => `<ellipse cx="${x + 2}" cy="32" rx="4" ry="11" fill="none" stroke="#c2410c" stroke-width="3"/>`).join('')}` },
+            { id: 'breadboard', name: 'Breadboard', fact: 'A reusable board for building test circuits by plugging parts in — no solder needed.',
+              svg: `<rect x="6" y="8" width="68" height="44" rx="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/><line x1="10" y1="14" x2="70" y2="14" stroke="#dc2626" stroke-width="1"/><line x1="10" y1="46" x2="70" y2="46" stroke="#2563eb" stroke-width="1"/><rect x="6" y="28.500" width="68" height="3" fill="#cbd5e1"/>${[19, 23, 27, 33, 37, 41].map(y => [12, 18, 24, 30, 36, 42, 48, 54, 60, 66].map(x => `<circle cx="${x + 1}" cy="${y}" r="1.1" fill="#334155"/>`).join('')).join('')}` },
+            { id: 'pcb', name: 'Printed Circuit Board (PCB)', fact: 'A board with copper traces that holds components and connects them together.',
+              svg: `<rect x="6" y="8" width="68" height="44" rx="3" fill="#15803d"/><path d="M14 16 H34 V30 H50 M14 44 H26 V36 H44 V44 H66 M66 16 H54 V24" stroke="#fde68a" stroke-width="1.8" fill="none"/><rect x="46" y="24" width="16" height="12" fill="#1f2937"/>${[[14, 16], [14, 44], [66, 16], [66, 44], [34, 16]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.5" fill="#fde68a"/><circle cx="${x}" cy="${y}" r="1" fill="#15803d"/>`).join('')}` }
+        ];
+        const PAIRS_PER_ROUND = 8;
+        let game = null;
+
+        function startMatchGame() {
+            const picks = shuffle(COMPONENTS).slice(0, PAIRS_PER_ROUND);
+            game = {
+                tiles: shuffle(picks.flatMap(c => [{ id: c.id, kind: 'pic' }, { id: c.id, kind: 'word' }])),
+                selected: null, wrong: [], matched: new Set(), mistakes: 0, lastFact: null, done: false, saved: null, lock: false
+            };
+            $('activityTitle').textContent = 'Electronics Match';
+            $('activitySub').textContent = 'Select a picture, then select the name that goes with it.';
+            renderGame();
+            openModal('activityModal');
+        }
+
+        function renderGame() {
+            const comp = id => COMPONENTS.find(c => c.id === id);
+            const score = Math.max(0, 100 - game.mistakes * 5);
+            let html = `
+                <div class="flex flex-wrap items-center gap-3 mb-4 text-xs font-bold">
+                    <span class="px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700">Matched: ${game.matched.size} / ${PAIRS_PER_ROUND}</span>
+                    <span class="px-3 py-1.5 rounded-full bg-slate-100 text-slate-700">Misses: ${game.mistakes}</span>
+                    <span class="px-3 py-1.5 rounded-full bg-blue-50 text-brandBlue">Score: ${score}%</span>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">`;
+            game.tiles.forEach((t, i) => {
+                const c = comp(t.id), matched = game.matched.has(t.id), sel = game.selected === i, wrong = game.wrong.includes(i);
+                const cls = matched ? 'border-emerald-300 bg-emerald-50 opacity-70'
+                          : wrong ? 'border-red-400 bg-red-50 shake'
+                          : sel ? 'border-brandBlue bg-blue-50 ring-2 ring-brandBlue/30'
+                          : 'border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50/40';
+                const label = t.kind === 'pic' ? 'Picture of a component' : c.name;
+                html += `<button type="button" onclick="pickTile(${i})" ${matched ? 'disabled' : ''} aria-label="${label}${matched ? ' (matched)' : ''}" aria-pressed="${sel}" class="relative h-28 rounded-2xl border-2 ${cls} p-2 flex items-center justify-center transition-colors">
+                    ${t.kind === 'pic' ? svgWrap(c.svg) : `<span class="text-sm font-extrabold text-slate-800 text-center leading-snug">${c.name}</span>`}
+                    ${matched ? '<i class="fa-solid fa-circle-check text-emerald-500 absolute top-2 right-2 text-sm"></i>' : ''}
+                </button>`;
+            });
+            html += `</div>`;
+            if (game.lastFact) html += `<div class="mt-4 text-xs rounded-xl px-4 py-3 border border-emerald-200 bg-emerald-50 text-emerald-900 pop"><span class="font-extrabold">${game.lastFact.name}:</span> <span class="font-medium">${game.lastFact.fact}</span></div>`;
+            if (game.done) {
+                html += `<div class="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-5 text-center space-y-3">
+                    <p class="text-base font-extrabold text-slate-900">All pairs matched — score ${score}%</p>
+                    <p class="text-xs font-medium ${game.saved === false ? 'text-red-700' : 'text-slate-600'}">${game.saved === null ? 'Saving your result…' : game.saved ? 'Result logged to your training record.' : 'Could not save your result. Check your connection.'}</p>
+                    <div class="flex flex-wrap justify-center gap-3">
+                        ${game.saved === false ? '<button onclick="saveGame()" class="px-5 py-2.5 rounded-xl bg-brandOrange text-white text-xs font-bold">Retry Save</button>' : ''}
+                        <button onclick="startMatchGame()" class="px-5 py-2.5 rounded-xl bg-brandBlue hover:bg-blue-800 text-white text-xs font-bold"><i class="fa-solid fa-shuffle"></i> Play Again With New Parts</button>
+                        <button onclick="closeModal('activityModal')" class="px-5 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold">Close</button>
+                    </div></div>`;
+            }
+            $('activityBody').innerHTML = html;
+        }
+
+        function pickTile(i) {
+            if (game.lock || game.done) return;
+            const t = game.tiles[i];
+            if (game.matched.has(t.id)) return;
+            if (game.selected === null || game.selected === i) { game.selected = game.selected === i ? null : i; renderGame(); return; }
+            const first = game.tiles[game.selected];
+            if (first.kind === t.kind) { game.selected = i; renderGame(); return; } // need one picture + one name
+            if (first.id === t.id) {
+                game.matched.add(t.id);
+                game.lastFact = COMPONENTS.find(c => c.id === t.id);
+                game.selected = null;
+                if (game.matched.size === PAIRS_PER_ROUND) { game.done = true; saveGame(); }
+                renderGame();
             } else {
-                await fetch('/api/complete-training', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ student_id: userId, score: 100.0, track: `2D CBT - Module ${currentActiveModule.id}` })
-                });
-                completedModules.add(currentActiveModule.id);
-                closeModal();
-                renderModulesGrid();
-                if (completedModules.size >= 10) {
-                    document.getElementById('celebrationModal').classList.remove('hidden');
-                } else {
-                    alert(`Module ${currentActiveModule.id} completed successfully and logged to admin database!`);
-                }
+                game.mistakes++;
+                game.wrong = [game.selected, i];
+                game.selected = null; game.lock = true;
+                renderGame();
+                const g = game;
+                setTimeout(() => { g.wrong = []; g.lock = false; if (game === g) renderGame(); }, 650);
             }
         }
 
+        async function saveGame() {
+            const g = game;
+            g.saved = null; if (game === g) renderGame();
+            g.saved = await logCompletion(ACTIVITY_TRACKS.match, Math.max(0, 100 - g.mistakes * 5));
+            if (g.saved) { completedActivities.add('match'); renderAll(); }
+            if (game === g && !$('activityModal').classList.contains('hidden')) renderGame();
+        }
+
+        /* ============================== Chip fabrication simulation ============================== */
+        const FAB_STAGES = [
+            { name: 'Design & Masks', tool: 'Design software → mask shop', after: 'mask',
+              q: 'The circuit layout is finished in design software. What has to be made before the fab can print it onto wafers?',
+              opts: [
+                { t: 'A set of photomasks — one pattern for each layer of the chip', ok: true, fb: 'Each layer of the chip gets its own photomask. The masks carry the patterns the fab will print onto the wafer.' },
+                { t: 'A plastic package for the finished chip', fb: 'Packaging comes at the very end. Without masks there is no pattern to print.' },
+                { t: 'A set of test probes', fb: 'Probing happens after fabrication. The fab first needs patterns to print.' } ] },
+            { name: 'Wafer Clean', tool: 'Wet bench', before: 'dirty', after: 'bare',
+              q: 'A bare silicon wafer arrives from the supplier, and you are fully gowned. What do you do first?',
+              opts: [
+                { t: 'Clean the wafer in the wet bench to remove particles and residues', ok: true, fb: 'A chemical clean removes particles, organics, and metals, so every later layer starts on a clean surface.' },
+                { t: 'Skip cleaning — the wafer is brand new', fb: 'New wafers still carry particles and thin films. One particle can kill a die.' },
+                { t: 'Wipe it with a dry cloth', fb: 'Wiping scratches the surface and adds particles.' } ] },
+            { name: 'Oxidation', tool: 'Oxidation furnace', after: 'oxide',
+              q: 'You need an insulating layer of silicon dioxide on the wafer. How do you grow it?',
+              opts: [
+                { t: 'Heat the wafer in a furnace with oxygen at around 1000 °C', ok: true, fb: 'At high temperature, oxygen reacts with the silicon surface and grows a uniform layer of silicon dioxide.' },
+                { t: 'Leave the wafer in room air overnight', fb: 'Room air forms only a native oxide a few nanometers thick — far too thin and uncontrolled.' },
+                { t: 'Rinse it in deionized water', fb: 'A water rinse cleans the wafer but does not grow a usable oxide.' } ] },
+            { name: 'Photoresist Coat', tool: 'Spin coater + hot plate', after: 'resist',
+              q: 'Next you need a light-sensitive layer to hold the pattern. How do you apply it?',
+              opts: [
+                { t: 'Spin-coat photoresist, then soft-bake it', ok: true, fb: 'Spinning spreads the resist into an even film. The soft bake drives off solvent so the film is stable.' },
+                { t: 'Pour photoresist on and let it air-dry', fb: 'Poured resist dries unevenly. Uneven thickness means uneven exposure and bad patterns.' },
+                { t: 'Skip the resist and expose the oxide directly', fb: 'Oxide is not light-sensitive. Without resist there is nothing to hold the pattern.' } ] },
+            { name: 'UV Exposure', tool: 'Mask aligner (yellow-light bay)', after: 'expose',
+              q: 'The wafer is coated with photoresist. How do you transfer the mask pattern into it?',
+              opts: [
+                { t: 'Align the photomask over the wafer and expose it with UV light', ok: true, fb: 'UV light passes through the clear areas of the mask and chemically changes the resist underneath.' },
+                { t: 'Expose the wafer with UV light and no mask', fb: 'Without a mask the whole resist layer is exposed and no pattern forms.' },
+                { t: 'Carry the wafer out under white room light', fb: 'White light exposes the resist everywhere. That is why lithography bays use yellow light.' } ] },
+            { name: 'Develop', tool: 'Developer station', after: 'develop',
+              q: 'The positive photoresist has been exposed. What reveals the pattern?',
+              opts: [
+                { t: 'Developer solution dissolves the exposed resist', ok: true, fb: 'With positive resist, the exposed areas wash away in developer and leave an opening over the oxide.' },
+                { t: 'Go straight to the acid etch', fb: 'The resist still covers the whole wafer, so the etch has nothing to cut through.' },
+                { t: 'Bake at high temperature until the resist burns off', fb: 'That destroys all the resist — and the pattern with it.' } ] },
+            { name: 'Etch & Strip', tool: 'Etcher + resist stripper', after: 'etch',
+              q: 'The resist now has an opening over the oxide. What comes next?',
+              opts: [
+                { t: 'Etch the uncovered oxide, then strip the remaining resist', ok: true, fb: 'The resist protects the oxide beneath it. The etch removes oxide only in the opening, then the resist is stripped.' },
+                { t: 'Strip the resist first, then etch', fb: 'With the resist gone, the etch removes oxide everywhere and the pattern is lost.' },
+                { t: 'Deposit metal over the resist', fb: 'It is too early for metal. The window down to the silicon is not open yet.' } ] },
+            { name: 'Doping', tool: 'Ion implanter + anneal furnace', after: 'dope',
+              q: 'Bare silicon is exposed in the window. How do you change its electrical behavior to form a device?',
+              opts: [
+                { t: 'Implant dopant ions, then anneal the wafer', ok: true, fb: 'Implanted dopant atoms change how the silicon conducts. The anneal repairs crystal damage and activates the dopants.' },
+                { t: 'Implant dopant ions and skip the anneal', fb: 'Without the anneal the dopants are not electrically active and the crystal stays damaged.' },
+                { t: 'Polish the exposed silicon', fb: 'Polishing does not change how silicon conducts.' } ] },
+            { name: 'Metal Deposition', tool: 'PVD sputter chamber', after: 'metal',
+              q: 'The doped region needs an electrical connection. How do you make it?',
+              opts: [
+                { t: 'Deposit a metal film in a vacuum chamber and pattern it into contacts', ok: true, fb: 'A metal film is deposited under vacuum, then patterned with another lithography and etch cycle to form contacts and wires.' },
+                { t: 'Solder a wire onto it by hand', fb: 'Chip features are thousands of times smaller than any hand-soldered wire.' },
+                { t: 'Deposit the metal in open air', fb: 'Air molecules contaminate the film. That is why deposition runs under vacuum.' } ] },
+            { name: 'Metrology & Inspection', tool: 'CD-SEM + defect inspection', after: 'inspect',
+              q: 'The layer is finished. What do you do before the wafer moves on?',
+              opts: [
+                { t: 'Measure critical dimensions and inspect for defects', ok: true, fb: 'Measuring now catches problems while they can still be fixed, before more work is stacked on a bad layer.' },
+                { t: 'Move on — inspection slows production', fb: 'A defect found late costs the whole wafer and every step done after it.' },
+                { t: 'Check it by eye under room light', fb: 'Features are far too small to see. Inspection needs metrology tools.' } ] },
+            { name: 'Wafer Test & Dicing', tool: 'Wafer prober + dicing saw', after: 'probe',
+              q: 'All layers are complete. How do you find the working dies and separate them?',
+              opts: [
+                { t: 'Probe-test every die on the wafer, then dice the wafer', ok: true, fb: 'Probing marks good and bad dies while they are still on the wafer. The saw then cuts the dies apart.' },
+                { t: 'Dice first, package every die, and test later', fb: 'Packaging bad dies wastes time and money. Test first.' },
+                { t: 'Test one die and assume the rest match', fb: 'Yield varies across a wafer, so every die needs testing.' } ] },
+            { name: 'Packaging & Final Test', tool: 'Die attach, wire bonder, tester', after: 'package',
+              q: 'You have a tray of known-good dies. What is the last step?',
+              opts: [
+                { t: 'Attach and wire-bond each die, seal the package, then run a final test', ok: true, fb: 'The package protects the die and connects it to the outside world. Final test confirms that the finished chip works.' },
+                { t: 'Seal the package and skip the final test', fb: 'Packaging can introduce failures, such as a broken bond wire. Always run the final test.' },
+                { t: 'Ship the bare dies in an envelope', fb: 'A bare die is fragile and has no way to connect to a circuit board.' } ] }
+        ];
+        const YIELD_PENALTY = 8;
+        let sim = null;
+
+        function startFabSim() {
+            sim = { i: 0, yield: 100, mistakes: 0, solved: false, tried: new Set(), fb: null, order: shuffle([0, 1, 2]), finished: false, saved: null };
+            $('activityTitle').textContent = 'Chip Fab Simulation';
+            $('activitySub').textContent = 'Take one wafer from design to a packaged chip. Every wrong call costs yield.';
+            renderSim();
+            openModal('activityModal');
+        }
+
+        function waferSVG(view) {
+            const legend = [];
+            let g = '';
+            const SI = '#94a3b8', OX = '#60a5fa', PR = '#f87171', DOPE = '#34d399', METAL = '#f59e0b';
+            const has = (...v) => v.includes(view);
+            const cross = has('dirty', 'bare', 'oxide', 'resist', 'expose', 'develop', 'etch', 'dope', 'metal', 'inspect');
+
+            if (view === 'layout' || view === 'mask') {
+                const isMask = view === 'mask';
+                g += `<rect x="110" y="20" width="180" height="180" rx="6" fill="${isMask ? '#1e293b' : '#eff6ff'}" stroke="${isMask ? '#0f172a' : '#93c5fd'}" stroke-width="2"/>`;
+                const c = isMask ? '#e2e8f0' : '#2563eb';
+                g += `<g fill="none" stroke="${c}" stroke-width="${isMask ? 7 : 3}"><path d="M135 50 H220 V95 H265"/><path d="M135 90 H185 V140 H265"/><path d="M135 170 H230 V125"/></g>`;
+                g += `<g fill="${c}"><rect x="128" y="42" width="16" height="16"/><rect x="128" y="82" width="16" height="16"/><rect x="128" y="162" width="16" height="16"/><rect x="257" y="87" width="16" height="16"/><rect x="257" y="132" width="16" height="16"/></g>`;
+                legend.push([isMask ? '#1e293b' : '#2563eb', isMask ? 'Photomask (one per layer)' : 'Circuit layout']);
+            }
+            if (cross) {
+                g += `<rect x="40" y="140" width="320" height="60" fill="${SI}"/><text x="48" y="192" class="lbl">Silicon wafer</text>`;
+                legend.push([SI, 'Silicon']);
+                if (view === 'dirty') {
+                    g += [[70, 134], [120, 137], [185, 133], [250, 136], [300, 134], [335, 137]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3.5" fill="#78350f"/>`).join('');
+                    legend.push(['#78350f', 'Particles']);
+                }
+                if (has('oxide', 'resist', 'expose', 'develop')) g += `<rect x="40" y="120" width="320" height="20" fill="${OX}"/>`;
+                if (has('etch', 'dope', 'metal', 'inspect')) g += `<rect x="40" y="120" width="120" height="20" fill="${OX}"/><rect x="240" y="120" width="120" height="20" fill="${OX}"/>`;
+                if (has('oxide', 'resist', 'expose', 'develop', 'etch', 'dope', 'metal', 'inspect')) legend.push([OX, 'Silicon dioxide']);
+                if (has('resist', 'expose')) g += `<rect x="40" y="100" width="320" height="20" fill="${PR}"/>`;
+                if (view === 'expose') g += `<rect x="160" y="100" width="80" height="20" fill="#fecaca" stroke="#b91c1c" stroke-dasharray="3 2"/>`;
+                if (view === 'develop') g += `<rect x="40" y="100" width="120" height="20" fill="${PR}"/><rect x="240" y="100" width="120" height="20" fill="${PR}"/>`;
+                if (has('resist', 'expose', 'develop')) legend.push([PR, 'Photoresist']);
+                if (view === 'expose') {
+                    g += `<rect x="40" y="62" width="120" height="10" fill="#1e293b"/><rect x="240" y="62" width="120" height="10" fill="#1e293b"/><rect x="40" y="58" width="320" height="4" fill="#cbd5e1" opacity=".7"/>`;
+                    g += [175, 200, 225].map(x => `<line x1="${x}" y1="14" x2="${x}" y2="94" stroke="#7c3aed" stroke-width="2.5"/><path d="M${x - 5} 86 L${x} 96 L${x + 5} 86" fill="none" stroke="#7c3aed" stroke-width="2.5"/>`).join('');
+                    g += `<text x="250" y="30" class="lbl" style="fill:#7c3aed">UV light</text><text x="48" y="52" class="lbl">Photomask</text>`;
+                    legend.push(['#1e293b', 'Mask'], ['#7c3aed', 'UV light']);
+                }
+                if (has('dope', 'metal', 'inspect')) { g += `<path d="M160 140 H240 V152 a12 12 0 0 1 -12 12 H172 a12 12 0 0 1 -12 -12 Z" fill="${DOPE}"/>`; legend.push([DOPE, 'Doped region']); }
+                if (has('metal', 'inspect')) { g += `<path d="M160 140 V120 H146 V106 H254 V120 H240 V140 Z" fill="${METAL}"/>`; legend.push([METAL, 'Metal contact']); }
+                if (view === 'inspect') {
+                    g += `<circle cx="200" cy="118" r="44" fill="none" stroke="#0f172a" stroke-width="4"/><line x1="232" y1="150" x2="262" y2="182" stroke="#0f172a" stroke-width="7" stroke-linecap="round"/>`;
+                    g += `<line x1="146" y1="92" x2="254" y2="92" stroke="#0f172a" stroke-width="1.5"/><line x1="146" y1="87" x2="146" y2="97" stroke="#0f172a" stroke-width="1.5"/><line x1="254" y1="87" x2="254" y2="97" stroke="#0f172a" stroke-width="1.5"/><text x="200" y="86" text-anchor="middle" class="lbl">CD in spec ✓</text>`;
+                }
+            }
+            if (view === 'probe') {
+                g += `<defs><clipPath id="pw"><circle cx="200" cy="110" r="92"/></clipPath></defs><circle cx="200" cy="110" r="95" fill="#cbd5e1" stroke="#64748b" stroke-width="2"/><g clip-path="url(#pw)">`;
+                const bad = new Set(['0-3', '2-1', '5-5', '6-2', '3-7', '7-4']);
+                for (let r = 0; r < 8; r++) for (let c = 0; c < 8; c++) g += `<rect x="${104 + c * 24}" y="${14 + r * 24}" width="22" height="22" fill="${bad.has(r + '-' + c) ? '#ef4444' : '#22c55e'}"/>`;
+                g += `</g>`;
+                legend.push(['#22c55e', 'Good die'], ['#ef4444', 'Failed die']);
+            }
+            if (view === 'package') {
+                g += [130, 160, 190, 220, 250, 270].map((x, k) => `<rect x="${126 + k * 28}" y="50" width="10" height="24" fill="#94a3b8"/><rect x="${126 + k * 28}" y="146" width="10" height="24" fill="#94a3b8"/>`).join('');
+                g += `<rect x="110" y="70" width="180" height="80" rx="5" fill="#1f2937"/><circle cx="110" cy="110" r="10" fill="#fff"/><text x="205" y="107" text-anchor="middle" font-size="13" font-weight="700" fill="#e2e8f0" font-family="monospace">SEMI-001</text><text x="205" y="126" text-anchor="middle" font-size="10" fill="#4ade80" font-family="monospace">FINAL TEST: PASS</text>`;
+                legend.push(['#1f2937', 'Packaged chip']);
+            }
+            return `<svg viewBox="0 0 400 220" class="w-full h-auto pop" role="img" aria-label="Wafer view: ${view}">${g}</svg>
+                <div class="flex flex-wrap gap-x-4 gap-y-1.5 mt-2">${legend.map(([c, l]) => `<span class="flex items-center gap-1.5 text-[11px] font-semibold text-slate-600"><span class="w-3 h-3 rounded-sm inline-block" style="background:${c}"></span>${l}</span>`).join('')}</div>`;
+        }
+
+        function yieldColor(y) { return y >= 85 ? 'bg-emerald-500' : y >= 60 ? 'bg-amber-500' : 'bg-red-500'; }
+
+        function renderSim() {
+            const n = FAB_STAGES.length;
+            if (sim.finished) {
+                const grade = sim.yield >= 85 ? 'Excellent run — a production-ready process.' : sim.yield >= 60 ? 'The chip works, but the wrong calls cost yield. Run it again to improve.' : 'Too many process errors. Review the steps and run it again.';
+                $('activityBody').innerHTML = `
+                    <div class="grid md:grid-cols-2 gap-6 items-center">
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">${waferSVG('package')}</div>
+                        <div class="space-y-4">
+                            <p class="text-xs font-bold text-brandOrange uppercase tracking-wider">Run complete</p>
+                            <p class="text-3xl font-extrabold text-slate-900">Final yield: ${sim.yield}%</p>
+                            <p class="text-sm text-slate-700 font-medium">${grade}</p>
+                            <p class="text-xs text-slate-600">You completed all ${n} process steps with ${sim.mistakes} wrong ${sim.mistakes === 1 ? 'call' : 'calls'}.</p>
+                            <p class="text-xs font-semibold ${sim.saved === false ? 'text-red-700' : 'text-slate-600'}">${sim.saved === null ? 'Saving your result…' : sim.saved ? 'Result logged to your training record.' : 'Could not save your result. Check your connection.'}</p>
+                            <div class="flex flex-wrap gap-3">
+                                ${sim.saved === false ? '<button onclick="saveSim()" class="px-5 py-2.5 rounded-xl bg-brandOrange text-white text-xs font-bold">Retry Save</button>' : ''}
+                                <button onclick="startFabSim()" class="px-5 py-2.5 rounded-xl bg-brandBlue hover:bg-blue-800 text-white text-xs font-bold"><i class="fa-solid fa-rotate-right"></i> Run Again</button>
+                                <button onclick="closeModal('activityModal')" class="px-5 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                    <ol class="mt-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">${FAB_STAGES.map((s, k) => `<li class="text-[11px] font-semibold text-slate-700 bg-emerald-50 border border-emerald-100 rounded-lg px-2.5 py-1.5"><span class="text-emerald-600">${k + 1}.</span> ${s.name}</li>`).join('')}</ol>`;
+                return;
+            }
+            const s = FAB_STAGES[sim.i];
+            const prevView = sim.i === 0 ? 'layout' : FAB_STAGES[sim.i - 1].after;
+            const view = sim.solved ? s.after : (s.before || prevView);
+
+            const stepper = FAB_STAGES.map((st, k) => {
+                const done = k < sim.i || (k === sim.i && sim.solved), cur = k === sim.i;
+                return `<li title="${st.name}" class="flex-1 h-2 rounded-full ${done ? 'bg-emerald-500' : cur ? 'bg-brandBlue' : 'bg-slate-200'}"></li>`;
+            }).join('');
+
+            const opts = sim.order.map(idx => {
+                const o = s.opts[idx], right = sim.solved && o.ok, wrong = sim.tried.has(idx);
+                const cls = right ? 'border-emerald-400 bg-emerald-50 text-emerald-900'
+                          : wrong ? 'border-red-200 bg-red-50 text-red-400 line-through'
+                          : sim.solved ? 'border-slate-200 bg-slate-50 text-slate-400'
+                          : 'border-slate-200 bg-white text-slate-800 hover:border-blue-300 hover:bg-blue-50/50';
+                return `<button type="button" onclick="simChoose(${idx})" ${sim.solved || wrong ? 'disabled' : ''} class="w-full text-left flex items-start gap-3 p-3 rounded-xl border-2 ${cls} text-xs font-semibold transition-colors">
+                    <i class="fa-solid ${right ? 'fa-circle-check' : wrong ? 'fa-circle-xmark' : 'fa-circle-chevron-right text-slate-300'} mt-0.5"></i><span>${o.t}</span></button>`;
+            }).join('');
+
+            const fb = sim.fb ? `<div role="status" class="text-xs font-semibold rounded-xl px-4 py-3 border pop ${sim.fb.ok ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-red-200 bg-red-50 text-red-700'}">${sim.fb.ok ? '' : `<span class="font-extrabold">Yield −${YIELD_PENALTY}%.</span> `}${sim.fb.text}</div>` : '';
+
+            $('activityBody').innerHTML = `
+                <ol class="flex gap-1 mb-5" aria-label="Process progress">${stepper}</ol>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">${waferSVG(view)}</div>
+                        <div>
+                            <div class="flex justify-between text-xs font-bold text-slate-700 mb-1.5"><span>Wafer yield</span><span>${sim.yield}%</span></div>
+                            <div class="h-2.5 rounded-full bg-slate-100 overflow-hidden"><div class="h-full rounded-full transition-all duration-500 ${yieldColor(sim.yield)}" style="width:${sim.yield}%"></div></div>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <p class="text-xs font-bold text-brandOrange uppercase tracking-wider">Step ${sim.i + 1} of ${n}</p>
+                            <h4 class="text-lg font-extrabold text-slate-900">${s.name}</h4>
+                            <p class="text-[11px] font-semibold text-slate-500 mt-0.5"><i class="fa-solid fa-screwdriver-wrench mr-1"></i>${s.tool}</p>
+                        </div>
+                        <p class="text-sm text-slate-800 font-semibold leading-relaxed">${s.q}</p>
+                        <div class="space-y-2.5">${opts}</div>
+                        ${fb}
+                        ${sim.solved ? `<button onclick="simNext()" class="w-full py-3 bg-brandBlue hover:bg-blue-800 text-white rounded-xl text-sm font-semibold shadow">${sim.i < n - 1 ? `Next: ${FAB_STAGES[sim.i + 1].name} <i class="fa-solid fa-arrow-right ml-1"></i>` : 'Finish Run'}</button>` : ''}
+                    </div>
+                </div>`;
+        }
+
+        function simChoose(idx) {
+            if (sim.solved || sim.tried.has(idx)) return;
+            const o = FAB_STAGES[sim.i].opts[idx];
+            if (o.ok) sim.solved = true;
+            else { sim.tried.add(idx); sim.mistakes++; sim.yield = Math.max(0, sim.yield - YIELD_PENALTY); }
+            sim.fb = { ok: !!o.ok, text: o.fb };
+            renderSim();
+        }
+
+        function simNext() {
+            if (sim.i < FAB_STAGES.length - 1) {
+                sim.i++; sim.solved = false; sim.tried = new Set(); sim.fb = null; sim.order = shuffle([0, 1, 2]);
+                renderSim();
+            } else { sim.finished = true; saveSim(); }
+        }
+
+        async function saveSim() {
+            const s = sim;
+            s.saved = null; if (sim === s) renderSim();
+            s.saved = await logCompletion(ACTIVITY_TRACKS.fab, s.yield);
+            if (s.saved) { completedActivities.add('fab'); renderAll(); }
+            if (sim === s && !$('activityModal').classList.contains('hidden')) renderSim();
+        }
+
+        /* ============================== Init ============================== */
         window.addEventListener('DOMContentLoaded', () => {
-            renderModulesGrid();
+            renderAll();
+            try {
+                const saved = JSON.parse(sessionStorage.getItem('semiIntake') || 'null');
+                if (saved) { $('intakeStudentId').value = saved.id; $('intakeFullName').value = saved.name; }
+            } catch (e) {}
         });
     </script>
 </body>
