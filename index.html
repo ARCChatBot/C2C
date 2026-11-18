@@ -6,10 +6,25 @@
     <title>Classroom to Cleanroom (C2C) - Operation SEMI Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
+        /* Operation SEMI / MI-CHIPS presentation color system (C01–C12).
+           Direction: deep slate + white surfaces, Trojan Blue text, orange as a small accent. */
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: { vsuBlue: '#0047AB', vsuOrange: '#FF6700', vsuDark: '#1E293B', vsuLight: '#F8FAFC' },
+                    colors: {
+                        ink:       '#0B0F19', // C01 Deep Academic Slate — dark surfaces, primary text on white
+                        paper:     '#FFFFFF', // C02 Presentation White — headlines on dark, white panels
+                        trojan:    '#00358E', // C03 Trojan Blue — wordmark, headings, links, primary buttons
+                        precision: '#FF6700', // C04 Precision Orange — small marks, indexes, dots only
+                        night:     '#111928', // C05 Night Slate — dark secondary surfaces (footer)
+                        silver:    '#A6AFC1', // C06 Body Silver — supporting body copy on dark
+                        label:     '#53617A', // C07 Label Slate — labels and secondary text on white
+                        soft:      '#FAFBFD', // C08 Soft White — alternate light surfaces
+                        divider:   '#E0E5EC', // C09 Divider Gray — borders and separators, never text
+                        ice:       '#73C5FB', // C10 Technology Ice Blue — small indicators on dark
+                        advisor:   '#A4B4D0', // C11 Advisor Blue Gray — eyebrow text on dark
+                        frost:     '#E3EDFC'  // C12 Caption Frost — bright captions on dark
+                    },
                     fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
             }
@@ -17,31 +32,46 @@
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .field { width: 100%; padding: .625rem 1rem; border-radius: .75rem; border: 1px solid #E0E5EC; background: #FAFBFD; font-size: .875rem; color: #0B0F19; }
+        .field:focus { outline: none; box-shadow: 0 0 0 2px #00358E; border-color: transparent; }
+        .field-label { display: block; font-size: .75rem; font-weight: 600; color: #53617A; margin-bottom: .25rem; }
+    </style>
 </head>
-<body class="h-full bg-vsuLight text-vsuDark font-sans antialiased flex flex-col">
+<body class="h-full bg-soft text-ink font-sans antialiased flex flex-col">
 
-    <header class="bg-vsuBlue border-b-4 border-vsuOrange sticky top-0 z-40 shadow-md text-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-24 flex items-center justify-between">
+    <header class="bg-ink border-b-4 border-precision sticky top-0 z-40 shadow-md text-paper">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-24 py-4 flex flex-wrap items-center justify-between gap-4">
             <div class="flex items-center space-x-4">
-                <div class="w-14 h-14 rounded-2xl bg-white text-vsuBlue flex items-center justify-center text-3xl font-extrabold shadow-inner border-2 border-vsuOrange">
+                <div class="w-14 h-14 shrink-0 rounded-2xl bg-paper text-trojan flex items-center justify-center text-3xl font-extrabold">
                     <i class="fa-solid fa-graduation-cap"></i>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-extrabold tracking-tight flex items-center gap-2">
-                        Classroom to Cleanroom <span class="text-[10px] uppercase px-2.5 py-1 bg-vsuOrange text-white rounded-full font-bold shadow-sm">C2C Pathway</span>
+                    <h1 class="text-2xl font-extrabold tracking-tight flex flex-wrap items-center gap-2">
+                        Classroom to Cleanroom <span class="text-[10px] uppercase px-2.5 py-1 bg-precision text-ink rounded-full font-bold">C2C Pathway</span>
                     </h1>
-                    <p class="text-xs text-blue-100 font-medium">Training system developed by <strong class="text-white underline">Operation SEMI (VSU)</strong></p>
+                    <p class="text-xs text-advisor font-medium">Training system developed by <strong class="text-paper underline">Operation SEMI (VSU)</strong></p>
                 </div>
             </div>
-            <div class="flex items-center space-x-3">
-                <button onclick="openStudentSignupModal()" class="px-4 py-2 bg-vsuOrange hover:bg-orange-600 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-2 shadow">
-                    <i class="fa-solid fa-user-plus"></i> Student Sign-Up
+            <div class="flex flex-wrap items-center gap-3">
+                <!-- Signed-out state -->
+                <button id="signInBtn" onclick="openModal('signInModal')" class="px-4 py-2 bg-paper hover:bg-frost text-ink rounded-xl text-xs font-bold transition-colors flex items-center gap-2 shadow">
+                    <i class="fa-solid fa-right-to-bracket text-trojan"></i> Student Sign-In
                 </button>
-                <a href="/cbt" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
-                    <i class="fa-solid fa-desktop"></i> CBT Portal
+                <!-- Signed-in state -->
+                <div id="signedInChip" class="hidden items-center gap-2 pl-3 pr-1 py-1 rounded-xl border border-label">
+                    <i class="fa-solid fa-circle-user text-ice"></i>
+                    <span class="text-xs leading-tight"><span id="chipName" class="font-bold text-paper block"></span><span id="chipId" class="text-advisor font-mono"></span></span>
+                    <button onclick="signOut()" class="ml-1 px-2.5 py-1.5 rounded-lg hover:bg-night text-[11px] font-semibold text-frost">Sign out</button>
+                </div>
+                <button onclick="openSignup()" class="px-4 py-2 border border-label hover:bg-night text-paper rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-user-plus text-ice"></i> Student Sign-Up
+                </button>
+                <a href="cbt" class="px-4 py-2 border border-label hover:bg-night text-paper rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-desktop text-ice"></i> CBT Portal
                 </a>
-                <a href="/admin" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
-                    <i class="fa-solid fa-gauge-high"></i> Admin Portal
+                <a href="admin" class="px-4 py-2 border border-label hover:bg-night text-paper rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-gauge-high text-ice"></i> Admin Portal
                 </a>
             </div>
         </div>
@@ -49,160 +79,189 @@
 
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-8 pb-24">
         <!-- Grant Section -->
-        <section class="bg-white rounded-3xl p-8 border-2 border-vsuBlue/20 shadow-xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-vsuOrange/10 rounded-bl-full pointer-events-none"></div>
+        <section class="bg-paper rounded-3xl p-8 border border-divider shadow-sm relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="absolute left-0 top-8 bottom-8 w-1.5 bg-precision rounded-r-full pointer-events-none"></div>
             <div class="space-y-4 max-w-2xl">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-vsuBlue flex items-center justify-center text-lg font-bold border border-blue-200">
+                    <div class="w-10 h-10 rounded-xl bg-soft text-trojan flex items-center justify-center text-lg font-bold border border-divider">
                         <i class="fa-solid fa-book-bookmark"></i>
                     </div>
                     <div>
-                        <span class="text-xs font-bold text-vsuOrange uppercase tracking-wider">National Science Foundation Grant</span>
-                        <h2 class="text-xl font-extrabold text-vsuDark">About the Grant &bull; Award Abstract # 2606117</h2>
+                        <span class="text-xs font-bold text-trojan uppercase tracking-wider">National Science Foundation Grant</span>
+                        <h2 class="text-xl font-extrabold text-ink">About the Grant &bull; Award Abstract # 2606117</h2>
                     </div>
                 </div>
-                <div class="bg-vsuLight p-5 rounded-2xl border border-slate-200">
-                    <p class="text-slate-700 text-sm leading-relaxed font-medium">
-                        <strong>Targeted Infusion Project:</strong> Enhancing Undergraduate Education and Research in AI-Driven Microelectronics at Virginia State University through the <strong>Classroom to Cleanroom (C2C) Pathway</strong>.
+                <div class="bg-soft p-5 rounded-2xl border border-divider">
+                    <p class="text-label text-sm leading-relaxed font-medium">
+                        <strong class="text-ink">Targeted Infusion Project:</strong> Enhancing Undergraduate Education and Research in AI-Driven Microelectronics at Virginia State University through the <strong class="text-trojan">Classroom to Cleanroom (C2C) Pathway</strong>.
                     </p>
                 </div>
             </div>
-            <div class="w-full md:w-auto shrink-0 bg-gradient-to-br from-blue-50 to-orange-50 p-6 rounded-2xl border border-blue-100 text-center space-y-3">
-                <h3 class="text-sm font-extrabold text-vsuDark">Interested in Participating?</h3>
-                <p class="text-xs text-slate-600 max-w-xs">Join the C2C training program to express interest so our team can reach out to you.</p>
-                <button onclick="openStudentSignupModal()" class="w-full py-3 px-6 bg-vsuOrange hover:bg-orange-600 text-white font-extrabold text-xs rounded-xl shadow-md transition-colors flex items-center justify-center gap-2">
+            <div class="w-full md:w-auto shrink-0 bg-soft p-6 rounded-2xl border border-divider text-center space-y-3">
+                <h3 class="text-sm font-extrabold text-ink">Interested in Participating?</h3>
+                <p class="text-xs text-label max-w-xs">Join the C2C training program to express interest so our team can reach out to you.</p>
+                <button onclick="openSignup()" class="w-full py-3 px-6 bg-trojan hover:bg-ink text-paper font-extrabold text-xs rounded-xl shadow-md transition-colors flex items-center justify-center gap-2">
                     <i class="fa-solid fa-user-plus"></i> Sign-Up for Training
                 </button>
             </div>
         </section>
 
         <!-- Architecture Layers -->
-        <div class="space-y-4">
-            <h3 class="text-xl font-extrabold text-vsuDark flex items-center gap-2">
-                <i class="fa-solid fa-layer-group text-vsuOrange"></i> C2C Training Management System Architecture
-            </h3>
-        </div>
+        <h3 class="text-xl font-extrabold text-ink flex items-center gap-2">
+            <i class="fa-solid fa-layer-group text-precision"></i> C2C Training Management System Architecture
+        </h3>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div class="bg-white rounded-3xl p-6 border-t-4 border-vsuBlue border-x border-b border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+            <div class="bg-paper rounded-3xl p-6 border-t-4 border-t-trojan border-x border-b border-divider shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
                 <div>
-                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-vsuBlue flex items-center justify-center text-xl font-bold mb-4 border border-blue-100"><i class="fa-solid fa-desktop"></i></div>
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-vsuBlue bg-blue-50 px-2.5 py-1 rounded-full">Layer 01</span>
-                    <h4 class="text-lg font-bold text-vsuDark mt-3 mb-2">Computer-Based Training Node</h4>
-                    <p class="text-xs text-slate-600 leading-relaxed mb-4">Interactive digital modules delivering foundational knowledge and AI literacy.</p>
+                    <div class="w-12 h-12 rounded-2xl bg-soft text-trojan flex items-center justify-center text-xl font-bold mb-4 border border-divider"><i class="fa-solid fa-desktop"></i></div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-trojan bg-soft border border-divider px-2.5 py-1 rounded-full">Layer 01</span>
+                    <h4 class="text-lg font-bold text-ink mt-3 mb-2">Computer-Based Training Node</h4>
+                    <p class="text-xs text-label leading-relaxed mb-4">Hands-on simulations and an electronics matching game covering cleanroom, safety, fabrication, and responsible AI use.</p>
                 </div>
-                <a href="/cbt" class="w-full py-2.5 bg-vsuBlue hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-play"></i> Launch CBT Portal</a>
+                <div data-layer="cbt" data-label="Launch CBT Portal" data-icon="fa-play" data-style="trojan"></div>
             </div>
 
-            <div class="bg-white rounded-3xl p-6 border-t-4 border-vsuOrange border-x border-b border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+            <div class="bg-paper rounded-3xl p-6 border-t-4 border-t-precision border-x border-b border-divider shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
                 <div>
-                    <div class="w-12 h-12 rounded-2xl bg-orange-50 text-vsuOrange flex items-center justify-center text-xl font-bold mb-4 border border-orange-100"><i class="fa-solid fa-cubes"></i></div>
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-vsuOrange bg-orange-50 px-2.5 py-1 rounded-full">Layer 02</span>
-                    <h4 class="text-lg font-bold text-vsuDark mt-3 mb-2">3D Simulation Training Node</h4>
-                    <p class="text-xs text-slate-600 leading-relaxed mb-4">Immersive 3D environments simulating semiconductor fabrication processes.</p>
+                    <div class="w-12 h-12 rounded-2xl bg-soft text-precision flex items-center justify-center text-xl font-bold mb-4 border border-divider"><i class="fa-solid fa-cubes"></i></div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-ink bg-soft border border-divider px-2.5 py-1 rounded-full"><span class="inline-block w-1.5 h-1.5 rounded-full bg-precision mr-1 align-middle"></span>Layer 02</span>
+                    <h4 class="text-lg font-bold text-ink mt-3 mb-2">3D Simulation Training Node</h4>
+                    <p class="text-xs text-label leading-relaxed mb-4">Immersive 3D environments simulating semiconductor fabrication processes.</p>
                 </div>
-                <button onclick="alert('Launching 3D Microelectronics Simulation Sandbox...')" class="w-full py-2.5 bg-vsuOrange hover:bg-orange-600 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-cube"></i> Open 3D Simulator</button>
+                <div data-layer="sim3d" data-label="Open 3D Simulator" data-icon="fa-cube" data-style="ink"></div>
             </div>
 
-            <div class="bg-white rounded-3xl p-6 border-t-4 border-vsuBlue border-x border-b border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+            <div class="bg-paper rounded-3xl p-6 border-t-4 border-t-trojan border-x border-b border-divider shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
                 <div>
-                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-vsuBlue flex items-center justify-center text-xl font-bold mb-4 border border-blue-100"><i class="fa-solid fa-vr-cardboard"></i></div>
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-vsuBlue bg-blue-50 px-2.5 py-1 rounded-full">Layer 03</span>
-                    <h4 class="text-lg font-bold text-vsuDark mt-3 mb-2">VR Cleanroom Training Node</h4>
-                    <p class="text-xs text-slate-600 leading-relaxed mb-4">Virtual Reality integration guiding students through cleanroom protocols.</p>
+                    <div class="w-12 h-12 rounded-2xl bg-soft text-trojan flex items-center justify-center text-xl font-bold mb-4 border border-divider"><i class="fa-solid fa-vr-cardboard"></i></div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-trojan bg-soft border border-divider px-2.5 py-1 rounded-full">Layer 03</span>
+                    <h4 class="text-lg font-bold text-ink mt-3 mb-2">VR Cleanroom Training Node</h4>
+                    <p class="text-xs text-label leading-relaxed mb-4">Virtual Reality integration guiding students through cleanroom protocols.</p>
                 </div>
-                <button onclick="alert('Initializing VR Cleanroom Headset Bridge & Stream...')" class="w-full py-2.5 bg-vsuBlue hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-headset"></i> Launch VR Portal</button>
+                <div data-layer="vr" data-label="Launch VR Portal" data-icon="fa-headset" data-style="trojan"></div>
             </div>
 
-            <!-- Layer 4: SOP & Documentation Repository -->
-            <div class="bg-white rounded-3xl p-6 border-t-4 border-vsuOrange border-x border-b border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+            <!-- Layer 4: AR data visualization -->
+            <div class="bg-paper rounded-3xl p-6 border-t-4 border-t-precision border-x border-b border-divider shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
                 <div>
-                    <div class="w-12 h-12 rounded-2xl bg-orange-50 text-vsuOrange flex items-center justify-center text-xl font-bold mb-4 border border-orange-100"><i class="fa-solid fa-folder-open"></i></div>
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-vsuOrange bg-orange-50 px-2.5 py-1 rounded-full">Layer 04</span>
-                    <h4 class="text-lg font-bold text-vsuDark mt-3 mb-2">SOP & Documentation Repository</h4>
-                    <p class="text-xs text-slate-600 leading-relaxed mb-4">Centralized repository for Standard Operating Procedures and safety guidelines with viewable PDF viewer.</p>
+                    <div class="w-12 h-12 rounded-2xl bg-soft text-precision flex items-center justify-center text-xl font-bold mb-4 border border-divider"><i class="fa-solid fa-chart-column"></i></div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-ink bg-soft border border-divider px-2.5 py-1 rounded-full"><span class="inline-block w-1.5 h-1.5 rounded-full bg-precision mr-1 align-middle"></span>Layer 04</span>
+                    <h4 class="text-lg font-bold text-ink mt-3 mb-2">AR Data Visualization Node</h4>
+                    <p class="text-xs text-label leading-relaxed mb-3">Web-based augmented reality for training reports and immersive data experiences. Explore results as 3D charts placed in your space, right from the browser.</p>
+                    <ul class="text-[11px] text-label space-y-1 mb-4">
+                        <li><i class="fa-solid fa-check text-trojan mr-1.5"></i>Interactive 3D report dashboards</li>
+                        <li><i class="fa-solid fa-check text-trojan mr-1.5"></i>Place data in your room on a phone, tablet, or headset</li>
+                        <li><i class="fa-solid fa-check text-trojan mr-1.5"></i>No app install — runs in a web browser</li>
+                    </ul>
                 </div>
-                <button onclick="openSopModal()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-file-pdf"></i> View SOP &amp; Documents PDF</button>
+                <div data-layer="ar" data-label="Launch AR Data Experience" data-icon="fa-mobile-screen" data-style="ink"></div>
             </div>
 
-            <div class="bg-white rounded-3xl p-6 border-t-4 border-vsuBlue border-x border-b border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between lg:col-span-2">
+            <!-- Layer 5: SOP & Documentation (requested through Outlook) -->
+            <div class="bg-paper rounded-3xl p-6 border-t-4 border-t-trojan border-x border-b border-divider shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
                 <div>
-                    <div class="w-12 h-12 rounded-2xl bg-blue-50 text-vsuBlue flex items-center justify-center text-xl font-bold mb-4 border border-blue-100"><i class="fa-solid fa-screwdriver-wrench"></i></div>
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-vsuBlue bg-blue-50 px-2.5 py-1 rounded-full">Layer 05</span>
-                    <h4 class="text-lg font-bold text-vsuDark mt-3 mb-3">3D Printer &amp; Equipment Training &amp; Scheduling</h4>
-                    <div class="space-y-2 text-xs text-slate-700 bg-vsuLight p-4 rounded-2xl border border-slate-200 mb-4">
-                        <div class="flex items-start gap-2"><span class="w-4 h-4 rounded-full bg-vsuBlue text-white font-bold flex items-center justify-center shrink-0 text-[9px]">1</span><span><strong>Training Times:</strong> Tuesdays &amp; Thursdays from 3:30 PM – 4:50 PM EST.</span></div>
-                        <div class="flex items-start gap-2"><span class="w-4 h-4 rounded-full bg-vsuBlue text-white font-bold flex items-center justify-center shrink-0 text-[9px]">2</span><span><strong>Equipment:</strong> Digital Multimeter, HoloLens 2, VR Oculus 2, Enderbot 3D Printer, NVIDIA Jetson Nano.</span></div>
-                        <div class="flex items-start gap-2"><span class="w-4 h-4 rounded-full bg-vsuBlue text-white font-bold flex items-center justify-center shrink-0 text-[9px]">3</span><span><strong>Trainer Sign-Off:</strong> Assigned student mentor must sign off on the session during hands-on training.</span></div>
+                    <div class="w-12 h-12 rounded-2xl bg-soft text-trojan flex items-center justify-center text-xl font-bold mb-4 border border-divider"><i class="fa-solid fa-folder-open"></i></div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-trojan bg-soft border border-divider px-2.5 py-1 rounded-full">Layer 05</span>
+                    <h4 class="text-lg font-bold text-ink mt-3 mb-2">SOP &amp; Documentation Requests</h4>
+                    <p class="text-xs text-label leading-relaxed mb-3">Standard Operating Procedures and safety documents are shared by email. Request the ones you need through Outlook.</p>
+                    <ol class="text-[11px] text-label space-y-1.5 mb-4">
+                        <li class="flex gap-2"><span class="w-4 h-4 rounded-full bg-precision text-ink font-bold flex items-center justify-center shrink-0 text-[9px]">1</span><span>Choose the documents you need.</span></li>
+                        <li class="flex gap-2"><span class="w-4 h-4 rounded-full bg-precision text-ink font-bold flex items-center justify-center shrink-0 text-[9px]">2</span><span>Outlook opens with your request already written.</span></li>
+                        <li class="flex gap-2"><span class="w-4 h-4 rounded-full bg-precision text-ink font-bold flex items-center justify-center shrink-0 text-[9px]">3</span><span>Send it from your VSU email account.</span></li>
+                    </ol>
+                </div>
+                <button onclick="openSop()" class="w-full py-2.5 bg-trojan hover:bg-ink text-paper font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-envelope"></i> Request SOP Documents</button>
+            </div>
+
+            <!-- Layer 6: Equipment training scheduling (requested through Outlook) -->
+            <div class="bg-paper rounded-3xl p-6 border-t-4 border-t-precision border-x border-b border-divider shadow-sm hover:shadow-md transition-all flex flex-col justify-between md:col-span-2 lg:col-span-1">
+                <div>
+                    <div class="w-12 h-12 rounded-2xl bg-soft text-precision flex items-center justify-center text-xl font-bold mb-4 border border-divider"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-ink bg-soft border border-divider px-2.5 py-1 rounded-full"><span class="inline-block w-1.5 h-1.5 rounded-full bg-precision mr-1 align-middle"></span>Layer 06</span>
+                    <h4 class="text-lg font-bold text-ink mt-3 mb-3">3D Printer &amp; Equipment Training &amp; Scheduling</h4>
+                    <div class="space-y-2 text-xs text-label bg-soft p-4 rounded-2xl border border-divider mb-4">
+                        <div class="flex items-start gap-2"><span class="w-4 h-4 rounded-full bg-precision text-ink font-bold flex items-center justify-center shrink-0 text-[9px]">1</span><span><strong class="text-ink">Training Times:</strong> Tuesdays &amp; Thursdays from 3:30 PM – 4:50 PM EST.</span></div>
+                        <div class="flex items-start gap-2"><span class="w-4 h-4 rounded-full bg-precision text-ink font-bold flex items-center justify-center shrink-0 text-[9px]">2</span><span><strong class="text-ink">Equipment:</strong> Digital Multimeter, HoloLens 2, VR Oculus 2, Enderbot 3D Printer, NVIDIA Jetson Nano.</span></div>
+                        <div class="flex items-start gap-2"><span class="w-4 h-4 rounded-full bg-precision text-ink font-bold flex items-center justify-center shrink-0 text-[9px]">3</span><span><strong class="text-ink">Trainer Sign-Off:</strong> Assigned student mentor must sign off on the session during hands-on training.</span></div>
                     </div>
                 </div>
-                <button onclick="openEquipmentModal()" class="w-full py-2.5 bg-vsuBlue hover:bg-blue-800 text-white font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-calendar-check"></i> Schedule 3D Printer &amp; Equipment Training</button>
+                <button onclick="openEquipment()" class="w-full py-2.5 bg-ink hover:bg-night text-paper font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-2"><i class="fa-solid fa-calendar-check"></i> Request a Session in Outlook</button>
             </div>
         </div>
 
         <!-- Advisors & Teams Section -->
-        <section class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
-            <div class="flex items-center gap-3 pb-4 border-b border-slate-100">
-                <div class="w-10 h-10 rounded-xl bg-orange-50 text-vsuOrange flex items-center justify-center text-lg font-bold border border-orange-200"><i class="fa-solid fa-users-gear"></i></div>
+        <section class="bg-paper rounded-3xl p-8 border border-divider shadow-sm space-y-6">
+            <div class="flex items-center gap-3 pb-4 border-b border-divider">
+                <div class="w-10 h-10 rounded-xl bg-soft text-precision flex items-center justify-center text-lg font-bold border border-divider"><i class="fa-solid fa-users-gear"></i></div>
                 <div>
-                    <span class="text-xs font-bold text-vsuOrange uppercase tracking-wider">Leadership & Cohorts</span>
-                    <h3 class="text-xl font-extrabold text-vsuDark">Faculty Advisors &amp; Senior Project Teams</h3>
+                    <span class="text-xs font-bold text-trojan uppercase tracking-wider">Leadership & Cohorts</span>
+                    <h3 class="text-xl font-extrabold text-ink">Faculty Advisors &amp; Senior Project Teams</h3>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-vsuLight p-5 rounded-2xl border border-slate-200 flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-blue-100 text-vsuBlue flex items-center justify-center text-lg font-bold"><i class="fa-solid fa-chalkboard-user"></i></div>
+                <div class="bg-soft p-5 rounded-2xl border border-divider flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-paper border border-divider text-trojan flex items-center justify-center text-lg font-bold"><i class="fa-solid fa-chalkboard-user"></i></div>
                     <div>
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Faculty Advisor / PI</span>
-                        <h4 class="text-base font-extrabold text-vsuDark">Dr. Peng Cheng</h4>
+                        <span class="text-[10px] font-bold text-label uppercase tracking-wider block">Faculty Advisor / PI</span>
+                        <h4 class="text-base font-extrabold text-ink">Dr. Peng Cheng</h4>
                     </div>
                 </div>
-                <div class="bg-vsuLight p-5 rounded-2xl border border-slate-200 flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-blue-100 text-vsuBlue flex items-center justify-center text-lg font-bold"><i class="fa-solid fa-chalkboard-user"></i></div>
+                <div class="bg-soft p-5 rounded-2xl border border-divider flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-paper border border-divider text-trojan flex items-center justify-center text-lg font-bold"><i class="fa-solid fa-chalkboard-user"></i></div>
                     <div>
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Faculty Advisor / Co-PI</span>
-                        <h4 class="text-base font-extrabold text-vsuDark">Dr. Tao Sun</h4>
+                        <span class="text-[10px] font-bold text-label uppercase tracking-wider block">Faculty Advisor / Co-PI</span>
+                        <h4 class="text-base font-extrabold text-ink">Dr. Tao Sun</h4>
                     </div>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
                 <!-- Operation SEMI (VSU) -->
-                <div class="bg-vsuLight rounded-2xl p-6 border-t-4 border-vsuOrange border-x border-b border-slate-200 shadow-sm flex flex-col justify-between">
+                <div class="bg-soft rounded-2xl p-6 border-t-4 border-t-precision border-x border-b border-divider shadow-sm flex flex-col justify-between">
                     <div>
-                        <div class="flex items-center justify-between mb-3"><h4 class="text-base font-extrabold text-vsuDark">Operation SEMI (VSU)</h4><span class="text-[10px] bg-orange-100 text-vsuOrange font-bold px-2 py-0.5 rounded-full">Lead Team</span></div>
-                        <ul class="space-y-2 text-xs text-slate-700 mt-3">
-                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-bold text-vsuBlue">Nicolas Pollard <span class="text-[10px] text-vsuOrange font-bold block">Team Lead</span></li>
-                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-medium">Tory'elle Coleman <span class="text-[10px] text-slate-500 font-bold block">Recorder</span></li>
-                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-medium">Larry Caldwell <span class="text-[10px] text-slate-500 font-bold block">Editor</span></li>
-                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-medium">Sabien Hill <span class="text-[10px] text-slate-500 font-bold block">Contributor</span></li>
+                        <div class="mb-3 space-y-2">
+                            <h4 class="text-base font-extrabold text-ink">Operation SEMI (VSU)</h4>
+                            <span class="inline-block text-[10px] leading-snug bg-precision text-ink font-bold px-2.5 py-1 rounded-lg">AI Digi-Physical Training Systems Engineering Team</span>
+                        </div>
+                        <ul class="space-y-2 text-xs text-ink mt-3">
+                            <li class="p-2 rounded-lg bg-paper border border-divider border-l-4 border-l-precision font-bold text-trojan">Nicolas Pollard <span class="text-[10px] text-label font-bold block">Team Lead</span></li>
+                            <li class="p-2 rounded-lg bg-paper border border-divider font-medium">Tory'elle Coleman <span class="text-[10px] text-label font-bold block">Recorder</span></li>
+                            <li class="p-2 rounded-lg bg-paper border border-divider font-medium">Larry Caldwell <span class="text-[10px] text-label font-bold block">Editor</span></li>
+                            <li class="p-2 rounded-lg bg-paper border border-divider font-medium">Sabien Hill <span class="text-[10px] text-label font-bold block">Contributor</span></li>
                         </ul>
                     </div>
                 </div>
 
                 <!-- Virginia Tech Team -->
-                <div class="bg-vsuLight rounded-2xl p-6 border-t-4 border-vsuBlue border-x border-b border-slate-200 shadow-sm flex flex-col justify-between">
+                <div class="bg-soft rounded-2xl p-6 border-t-4 border-t-trojan border-x border-b border-divider shadow-sm flex flex-col justify-between">
                     <div>
-                        <div class="flex items-center justify-between mb-3"><h4 class="text-base font-extrabold text-vsuDark">Virginia Tech Team</h4><span class="text-[10px] bg-blue-100 text-vsuBlue font-bold px-2 py-0.5 rounded-full">Collaborator</span></div>
-                        <ul class="space-y-2 text-xs text-slate-700 mt-3">
-                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-bold text-vsuBlue">Kayin Buckley <span class="text-[10px] text-vsuBlue font-bold block">Team Lead</span></li>
-                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-medium">Darwin Otchere <span class="text-[10px] text-slate-500 font-bold block">Comms Liaison</span></li>
-                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-medium">Fiorenza Viacava <span class="text-[10px] text-slate-500 font-bold block">Secondary Team Lead</span></li>
-                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-medium">Jacob Enslen <span class="text-[10px] text-slate-500 font-bold block">Document Manager</span></li>
+                        <div class="mb-3 space-y-2">
+                            <h4 class="text-base font-extrabold text-ink">Virginia Tech Team</h4>
+                            <span class="inline-block text-[10px] leading-snug bg-trojan text-paper font-bold px-2.5 py-1 rounded-lg">Virtual Reality Cleanroom Design Team</span>
+                        </div>
+                        <ul class="space-y-2 text-xs text-ink mt-3">
+                            <li class="p-2 rounded-lg bg-paper border border-divider border-l-4 border-l-trojan font-bold text-trojan">Kayin Buckley <span class="text-[10px] text-label font-bold block">Team Lead</span></li>
+                            <li class="p-2 rounded-lg bg-paper border border-divider font-medium">Darwin Otchere <span class="text-[10px] text-label font-bold block">Comms Liaison</span></li>
+                            <li class="p-2 rounded-lg bg-paper border border-divider font-medium">Fiorenza Viacava <span class="text-[10px] text-label font-bold block">Secondary Team Lead</span></li>
+                            <li class="p-2 rounded-lg bg-paper border border-divider font-medium">Jacob Enslen <span class="text-[10px] text-label font-bold block">Document Manager</span></li>
                         </ul>
                     </div>
                 </div>
 
                 <!-- Virginia State Team -->
-                <div class="bg-vsuLight rounded-2xl p-6 border-t-4 border-vsuOrange border-x border-b border-slate-200 shadow-sm flex flex-col justify-between">
+                <div class="bg-soft rounded-2xl p-6 border-t-4 border-t-precision border-x border-b border-divider shadow-sm flex flex-col justify-between">
                     <div>
-                        <div class="flex items-center justify-between mb-3"><h4 class="text-base font-extrabold text-vsuDark">Virginia State Team</h4><span class="text-[10px] bg-orange-100 text-vsuOrange font-bold px-2 py-0.5 rounded-full">Collaborator</span></div>
-                        <ul class="space-y-2 text-xs text-slate-700 mt-3">
-                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-bold text-vsuOrange">Keasara Palmera Etienne <span class="text-[10px] text-vsuOrange font-bold block">Team Lead</span></li>
-                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-medium">Jalen Wooden <span class="text-[10px] text-slate-500 font-bold block">Recorder</span></li>
-                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-medium">Jeff Becton <span class="text-[10px] text-slate-500 font-bold block">Contributor</span></li>
-                            <li class="p-2 rounded-lg bg-white border border-slate-100 font-medium">Trey Shelton <span class="text-[10px] text-slate-500 font-bold block">Contributor</span></li>
+                        <div class="mb-3 space-y-2">
+                            <h4 class="text-base font-extrabold text-ink">Virginia State Team</h4>
+                            <span class="inline-block text-[10px] leading-snug bg-precision text-ink font-bold px-2.5 py-1 rounded-lg">Virtual Reality Cleanroom Training Platform Team</span>
+                        </div>
+                        <ul class="space-y-2 text-xs text-ink mt-3">
+                            <li class="p-2 rounded-lg bg-paper border border-divider border-l-4 border-l-precision font-bold text-trojan">Keasara Palmera Etienne <span class="text-[10px] text-label font-bold block">Team Lead</span></li>
+                            <li class="p-2 rounded-lg bg-paper border border-divider font-medium">Jalen Wooden <span class="text-[10px] text-label font-bold block">Recorder</span></li>
+                            <li class="p-2 rounded-lg bg-paper border border-divider font-medium">Jeff Becton <span class="text-[10px] text-label font-bold block">Contributor</span></li>
+                            <li class="p-2 rounded-lg bg-paper border border-divider font-medium">Trey Shelton <span class="text-[10px] text-label font-bold block">Contributor</span></li>
                         </ul>
                     </div>
                 </div>
@@ -210,85 +269,182 @@
         </section>
     </main>
 
-    <!-- SOP PDF Viewer Modal -->
-    <div id="sopModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-3xl max-w-4xl w-full h-[85vh] p-6 shadow-2xl border border-slate-100 flex flex-col space-y-4">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+    <!-- Student Sign-In Modal -->
+    <div id="signInModal" role="dialog" aria-modal="true" aria-labelledby="signInTitle" class="fixed inset-0 bg-ink/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-paper rounded-3xl max-w-md w-full p-8 shadow-2xl border border-divider space-y-6">
+            <div class="flex items-center justify-between pb-4 border-b border-divider">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-vsuBlue flex items-center justify-center text-lg font-bold border border-blue-200"><i class="fa-solid fa-file-pdf"></i></div>
+                    <div class="w-10 h-10 rounded-xl bg-soft text-trojan flex items-center justify-center text-lg font-bold border border-divider"><i class="fa-solid fa-right-to-bracket"></i></div>
                     <div>
-                        <h3 class="text-lg font-extrabold text-vsuDark">Standard Operating Procedures (SOP) &amp; Documentation</h3>
-                        <p class="text-xs text-slate-500">Classroom to Cleanroom (C2C) Safety &amp; Protocol Manual</p>
+                        <h3 id="signInTitle" class="text-lg font-extrabold text-ink">Student Sign-In</h3>
+                        <p class="text-xs text-label">Use your V# and your first and last name.</p>
                     </div>
                 </div>
-                <button onclick="closeSopModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="closeModal('signInModal')" aria-label="Close" class="text-label hover:text-ink"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <div class="flex-1 w-full bg-slate-100 rounded-2xl overflow-hidden border border-slate-200">
-                <iframe src="https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" class="w-full h-full" frameborder="0"></iframe>
-            </div>
-            <div class="flex justify-end pt-2">
-                <button onclick="closeSopModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow">Close Viewer</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Student Sign-Up Modal -->
-    <div id="studentSignupModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100 space-y-6">
-            <div class="flex items-center justify-between pb-4 border-b border-slate-100">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-orange-50 text-vsuOrange flex items-center justify-center text-lg font-bold border border-orange-200"><i class="fa-solid fa-user-plus"></i></div>
-                    <h3 class="text-lg font-extrabold text-vsuDark">Student Training Sign-Up</h3>
-                </div>
-                <button onclick="closeStudentSignupModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            <form onsubmit="submitStudentSignup(event)" class="space-y-4">
+            <form onsubmit="submitSignIn(event)" class="space-y-4" novalidate>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
-                    <input type="text" id="signupFullName" placeholder="e.g. Nicolas Pollard" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50">
+                    <label for="siVnum" class="field-label">V# (Student ID)</label>
+                    <input type="text" id="siVnum" class="field font-mono uppercase" placeholder="V00123456" autocomplete="off" required>
                 </div>
-                <button type="submit" class="w-full py-3 rounded-xl bg-vsuOrange hover:bg-orange-600 text-white font-bold text-sm shadow-md transition-colors"><i class="fa-solid fa-check"></i> Submit Interest &amp; Join</button>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="siFirst" class="field-label">First Name</label>
+                        <input type="text" id="siFirst" class="field" autocomplete="given-name" required>
+                    </div>
+                    <div>
+                        <label for="siLast" class="field-label">Last Name</label>
+                        <input type="text" id="siLast" class="field" autocomplete="family-name" required>
+                    </div>
+                </div>
+                <p id="siError" role="alert" class="hidden text-xs font-semibold text-red-700 bg-red-50 border border-red-200 rounded-xl px-3 py-2"></p>
+                <button type="submit" class="w-full py-3 rounded-xl bg-trojan hover:bg-ink text-paper font-bold text-sm shadow-md transition-colors"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
+                <p class="text-[11px] text-label text-center">New to C2C? <button type="button" onclick="closeModal('signInModal'); openSignup();" class="font-bold text-trojan underline">Sign up for training</button></p>
             </form>
         </div>
     </div>
 
-    <!-- Equipment Modal -->
-    <div id="equipmentModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-3xl max-w-lg w-full p-8 shadow-2xl border border-slate-100 space-y-6">
-            <div class="flex items-center justify-between pb-4 border-b border-slate-100">
-                <h3 class="text-lg font-extrabold text-vsuDark">3D Printer &amp; Equipment Booking</h3>
-                <button onclick="closeEquipmentModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+    <!-- Student Sign-Up Modal (recorded in Airtable through the server) -->
+    <div id="studentSignupModal" role="dialog" aria-modal="true" aria-labelledby="signupTitle" class="fixed inset-0 bg-ink/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-paper rounded-3xl max-w-lg w-full max-h-[92vh] overflow-y-auto p-8 shadow-2xl border border-divider space-y-6">
+            <div class="flex items-center justify-between pb-4 border-b border-divider">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-soft text-precision flex items-center justify-center text-lg font-bold border border-divider"><i class="fa-solid fa-user-plus"></i></div>
+                    <h3 id="signupTitle" class="text-lg font-extrabold text-ink">Student Training Sign-Up</h3>
+                </div>
+                <button onclick="closeModal('studentSignupModal')" aria-label="Close" class="text-label hover:text-ink"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <form onsubmit="submitEquipmentBooking(event)" class="space-y-4">
+            <form id="signupForm" onsubmit="submitStudentSignup(event)" class="space-y-4" novalidate>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
-                    <input type="text" id="eqFullName" placeholder="e.g. Nicolas Pollard" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50">
+                    <label for="suVnum" class="field-label">V# (Student ID)</label>
+                    <input type="text" id="suVnum" class="field font-mono uppercase" placeholder="V00123456" autocomplete="off" required>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="suFirst" class="field-label">First Name</label>
+                        <input type="text" id="suFirst" class="field" autocomplete="given-name" required>
+                    </div>
+                    <div>
+                        <label for="suLast" class="field-label">Last Name</label>
+                        <input type="text" id="suLast" class="field" autocomplete="family-name" required>
+                    </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Training Date</label>
-                    <input type="date" id="eqDate" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50">
+                    <label for="suEmail" class="field-label">VSU Email</label>
+                    <input type="email" id="suEmail" class="field" autocomplete="email" placeholder="you@students.vsu.edu" required>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Select Training Time Slot</label>
-                    <select id="eqTimeSlot" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50">
-                        <option value="">-- Choose Slot --</option>
+                    <label for="suClass" class="field-label">Classification</label>
+                    <select id="suClass" class="field" required>
+                        <option value="">-- Select --</option>
+                        <option>Freshman</option><option>Sophomore</option><option>Junior</option><option>Senior</option><option>Graduate</option>
+                    </select>
+                </div>
+                <fieldset>
+                    <legend class="field-label">Training Interests (choose any)</legend>
+                    <div class="grid grid-cols-2 gap-2 text-xs text-ink" id="suInterests">
+                        <label class="flex items-center gap-2 p-2 rounded-lg border border-divider bg-soft"><input type="checkbox" value="Computer-Based Training"> Computer-Based Training</label>
+                        <label class="flex items-center gap-2 p-2 rounded-lg border border-divider bg-soft"><input type="checkbox" value="3D Simulation"> 3D Simulation</label>
+                        <label class="flex items-center gap-2 p-2 rounded-lg border border-divider bg-soft"><input type="checkbox" value="VR Cleanroom"> VR Cleanroom</label>
+                        <label class="flex items-center gap-2 p-2 rounded-lg border border-divider bg-soft"><input type="checkbox" value="AR Data Visualization"> AR Data Visualization</label>
+                        <label class="flex items-center gap-2 p-2 rounded-lg border border-divider bg-soft col-span-2"><input type="checkbox" value="3D Printer & Equipment"> 3D Printer &amp; Equipment</label>
+                    </div>
+                </fieldset>
+                <p id="suStatus" role="status" class="hidden text-xs font-semibold rounded-xl px-3 py-2 border"></p>
+                <button type="submit" id="suSubmit" class="w-full py-3 rounded-xl bg-trojan hover:bg-ink disabled:opacity-60 text-paper font-bold text-sm shadow-md transition-colors"><i class="fa-solid fa-check"></i> <span>Submit Interest &amp; Join</span></button>
+            </form>
+        </div>
+    </div>
+
+    <!-- SOP Request Modal (Outlook) -->
+    <div id="sopModal" role="dialog" aria-modal="true" aria-labelledby="sopTitle" class="fixed inset-0 bg-ink/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-paper rounded-3xl max-w-lg w-full max-h-[92vh] overflow-y-auto p-8 shadow-2xl border border-divider space-y-5">
+            <div class="flex items-center justify-between pb-4 border-b border-divider">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-soft text-trojan flex items-center justify-center text-lg font-bold border border-divider"><i class="fa-solid fa-envelope-open-text"></i></div>
+                    <div>
+                        <h3 id="sopTitle" class="text-lg font-extrabold text-ink">Request SOP Documents</h3>
+                        <p class="text-xs text-label">Classroom to Cleanroom (C2C) Safety &amp; Protocol Manual</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('sopModal')" aria-label="Close" class="text-label hover:text-ink"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="bg-soft border border-divider rounded-2xl p-4 text-xs text-label space-y-1.5">
+                <p class="font-bold text-ink">How to request documents</p>
+                <p>1. Check the documents you need below.</p>
+                <p>2. Press <strong class="text-ink">Open in Outlook</strong>. A new email opens with your request filled in.</p>
+                <p>3. Make sure you are signed in to Outlook with your <strong class="text-ink">VSU email</strong>, then press Send.</p>
+                <p>4. The C2C team replies with the documents. Read each SOP fully before any hands-on session.</p>
+            </div>
+            <form onsubmit="sendSopRequest(event)" class="space-y-4" novalidate>
+                <fieldset>
+                    <legend class="field-label">Documents needed</legend>
+                    <div class="space-y-2 text-xs text-ink" id="sopDocs">
+                        <label class="flex items-center gap-2 p-2 rounded-lg border border-divider bg-soft"><input type="checkbox" value="Cleanroom Gowning & Entry SOP"> Cleanroom Gowning &amp; Entry SOP</label>
+                        <label class="flex items-center gap-2 p-2 rounded-lg border border-divider bg-soft"><input type="checkbox" value="ESD Safety SOP"> ESD Safety SOP</label>
+                        <label class="flex items-center gap-2 p-2 rounded-lg border border-divider bg-soft"><input type="checkbox" value="Chemical Handling & Safety Data Sheets"> Chemical Handling &amp; Safety Data Sheets</label>
+                        <label class="flex items-center gap-2 p-2 rounded-lg border border-divider bg-soft"><input type="checkbox" value="Enderbot 3D Printer SOP"> Enderbot 3D Printer SOP</label>
+                        <label class="flex items-center gap-2 p-2 rounded-lg border border-divider bg-soft"><input type="checkbox" value="HoloLens 2 & VR Oculus 2 Equipment SOP"> HoloLens 2 &amp; VR Oculus 2 Equipment SOP</label>
+                        <label class="flex items-center gap-2 p-2 rounded-lg border border-divider bg-soft"><input type="checkbox" value="Digital Multimeter SOP"> Digital Multimeter SOP</label>
+                        <label class="flex items-center gap-2 p-2 rounded-lg border border-divider bg-soft"><input type="checkbox" value="NVIDIA Jetson Nano SOP"> NVIDIA Jetson Nano SOP</label>
+                    </div>
+                </fieldset>
+                <div>
+                    <label for="sopNote" class="field-label">Anything else? (optional)</label>
+                    <textarea id="sopNote" rows="2" class="field" placeholder="e.g. I have a 3D printer session next Tuesday"></textarea>
+                </div>
+                <p id="sopError" role="alert" class="hidden text-xs font-semibold text-red-700 bg-red-50 border border-red-200 rounded-xl px-3 py-2"></p>
+                <button type="submit" class="w-full py-3 rounded-xl bg-trojan hover:bg-ink text-paper font-bold text-sm shadow-md transition-colors"><i class="fa-solid fa-envelope"></i> Open in Outlook</button>
+                <p class="text-[11px] text-label text-center">Use the Outlook desktop or phone app instead? <a href="#" id="sopMailto" onclick="return sendSopRequest(event, true)" class="font-bold text-trojan underline">Open in my email app</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Equipment Scheduling Modal (Outlook) -->
+    <div id="equipmentModal" role="dialog" aria-modal="true" aria-labelledby="eqTitle" class="fixed inset-0 bg-ink/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-paper rounded-3xl max-w-lg w-full max-h-[92vh] overflow-y-auto p-8 shadow-2xl border border-divider space-y-5">
+            <div class="flex items-center justify-between pb-4 border-b border-divider">
+                <div>
+                    <h3 id="eqTitle" class="text-lg font-extrabold text-ink">3D Printer &amp; Equipment Training Request</h3>
+                    <p class="text-xs text-label">Fill this in and Outlook opens with your request ready to send.</p>
+                </div>
+                <button onclick="closeModal('equipmentModal')" aria-label="Close" class="text-label hover:text-ink"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form onsubmit="sendEquipmentRequest(event)" class="space-y-4" novalidate>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="eqFullName" class="field-label">Full Name</label>
+                        <input type="text" id="eqFullName" class="field" autocomplete="name" required>
+                    </div>
+                    <div>
+                        <label for="eqVnum" class="field-label">V#</label>
+                        <input type="text" id="eqVnum" class="field font-mono uppercase" placeholder="V00123456" autocomplete="off" required>
+                    </div>
+                </div>
+                <div>
+                    <label for="eqDate" class="field-label">Training Date (Tuesday or Thursday)</label>
+                    <input type="date" id="eqDate" class="field" required>
+                </div>
+                <div>
+                    <label for="eqTimeSlot" class="field-label">Training Time Slot</label>
+                    <select id="eqTimeSlot" class="field" required>
                         <option value="3:30 PM - 4:50 PM EST">3:30 PM - 4:50 PM EST</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Target Equipment</label>
-                    <select id="eqTarget" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50">
+                    <label for="eqTarget" class="field-label">Target Equipment</label>
+                    <select id="eqTarget" class="field" required>
                         <option value="">-- Select Equipment --</option>
                         <option value="Enderbot 3D Printer">Enderbot 3D Printer (3D Printer Training)</option>
                         <option value="Digital Multimeter">Digital Multimeter</option>
-                        <option value="HoloLens 2 equipment">HoloLens 2 equipment</option>
+                        <option value="HoloLens 2">HoloLens 2</option>
                         <option value="VR Oculus 2">VR Oculus 2</option>
-                        <option value="Nvidia Jetson Nano">Nvidia Jetson Nano</option>
+                        <option value="NVIDIA Jetson Nano">NVIDIA Jetson Nano</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">Assigned Student Mentor (Trainer)</label>
-                    <select id="eqMentor" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50">
+                    <label for="eqMentor" class="field-label">Preferred Student Mentor (Trainer)</label>
+                    <select id="eqMentor" class="field" required>
                         <option value="">-- Select Mentor --</option>
                         <option value="Nicolas Pollard">Nicolas Pollard (Operation SEMI Lead)</option>
                         <option value="Tory'elle Coleman">Tory'elle Coleman</option>
@@ -296,79 +452,236 @@
                         <option value="Sabien Hill">Sabien Hill</option>
                     </select>
                 </div>
-                <button type="submit" class="w-full py-3 rounded-xl bg-vsuBlue hover:bg-blue-800 text-white font-bold text-sm shadow-md">Confirm &amp; Schedule Booking</button>
+                <p id="eqError" role="alert" class="hidden text-xs font-semibold text-red-700 bg-red-50 border border-red-200 rounded-xl px-3 py-2"></p>
+                <button type="submit" class="w-full py-3 rounded-xl bg-trojan hover:bg-ink text-paper font-bold text-sm shadow-md transition-colors"><i class="fa-solid fa-envelope"></i> Open in Outlook</button>
+                <p class="text-[11px] text-label text-center">Your session is confirmed only when the team replies. <a href="#" onclick="return sendEquipmentRequest(event, true)" class="font-bold text-trojan underline">Open in my email app instead</a></p>
             </form>
         </div>
     </div>
 
-    <footer class="bg-vsuBlue text-white border-t-2 border-vsuOrange py-6 text-center text-xs">
-        <p>Virginia State University &bull; Classroom to Cleanroom (C2C) &bull; Developed by Operation SEMI (VSU) &bull; NSF Award #2606117</p>
+    <!-- Toast -->
+    <div id="toast" role="status" aria-live="polite" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-5 py-3 rounded-2xl text-paper text-sm font-semibold shadow-2xl max-w-[90vw]"></div>
+
+    <footer class="bg-night text-silver border-t-2 border-precision py-6 px-4 text-center text-xs">
+        <p>Virginia State University &bull; Classroom to Cleanroom (C2C) &bull; Developed by <span class="text-frost font-semibold">Operation SEMI (VSU)</span> &bull; NSF Award #2606117</p>
     </footer>
 
     <script>
-        function openStudentSignupModal() { document.getElementById('studentSignupModal').classList.remove('hidden'); }
-        function closeStudentSignupModal() { document.getElementById('studentSignupModal').classList.add('hidden'); }
+        /* =====================================================================
+           SETTINGS — edit these values.
+           ===================================================================== */
 
-        function openEquipmentModal() { document.getElementById('equipmentModal').classList.remove('hidden'); }
-        function closeEquipmentModal() { document.getElementById('equipmentModal').classList.add('hidden'); }
+        // Training layer links. Paste each URL between the quotes.
+        // A layer left empty shows a "Link coming soon" button.
+        const LAYER_LINKS = {
+            cbt:   'cbt',  // Layer 01 — Computer-Based Training
+            sim3d: '',     // Layer 02 — 3D Simulation
+            vr:    '',     // Layer 03 — VR Cleanroom
+            ar:    ''      // Layer 04 — AR Data Visualization
+        };
 
-        function openSopModal() { document.getElementById('sopModal').classList.remove('hidden'); }
-        function closeSopModal() { document.getElementById('sopModal').classList.add('hidden'); }
+        // Outlook addresses that receive requests. Leave empty and the email opens
+        // with a blank "To" line for the student to fill in.
+        const SOP_REQUEST_EMAIL = '';   // Layer 05 — SOP document requests
+        const SCHEDULING_EMAIL  = '';   // Layer 06 — equipment training requests
 
+        // Server route that saves sign-ups to Airtable (see airtable_signup.py).
+        // The Airtable token lives on the server, never in this page.
+        const SIGNUP_ENDPOINT = 'api/register-interest';
+
+        /* ===================================================================== */
+
+        const $ = id => document.getElementById(id);
+        const V_PATTERN = /^V\d{8}$/;
+        const normV = v => v.trim().toUpperCase();
+        let toastTimer = null;
+
+        function toast(msg, ok = true) {
+            const t = $('toast');
+            t.textContent = msg;
+            t.className = `fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-5 py-3 rounded-2xl text-paper text-sm font-semibold shadow-2xl max-w-[90vw] ${ok ? 'bg-trojan' : 'bg-red-700'}`;
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.classList.add('hidden'), 4500);
+        }
+        function showError(id, msg) { const e = $(id); e.textContent = msg; e.classList.toggle('hidden', !msg); }
+        function openModal(id) { $(id).classList.remove('hidden'); const f = $(id).querySelector('input:not([type=checkbox]), select, textarea'); if (f) setTimeout(() => f.focus(), 50); }
+        function closeModal(id) { $(id).classList.add('hidden'); }
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') ['signInModal', 'studentSignupModal', 'sopModal', 'equipmentModal'].forEach(closeModal);
+        });
+
+        /* ---------- Layer buttons ---------- */
+        function renderLayerButtons() {
+            document.querySelectorAll('[data-layer]').forEach(slot => {
+                const url = (LAYER_LINKS[slot.dataset.layer] || '').trim();
+                const color = slot.dataset.style === 'ink' ? 'bg-ink hover:bg-night' : 'bg-trojan hover:bg-ink';
+                const base = 'w-full py-2.5 text-paper font-bold text-xs rounded-xl shadow transition-colors flex items-center justify-center gap-2';
+                if (!url) {
+                    slot.innerHTML = `<button type="button" disabled class="w-full py-2.5 bg-soft border border-divider text-label font-bold text-xs rounded-xl flex items-center justify-center gap-2 cursor-not-allowed"><i class="fa-solid fa-clock"></i> Link coming soon</button>`;
+                    return;
+                }
+                const external = /^https?:\/\//i.test(url) && !url.startsWith(location.origin);
+                const a = document.createElement('a');
+                a.href = url;
+                a.className = `${base} ${color}`;
+                if (external) { a.target = '_blank'; a.rel = 'noopener'; }
+                a.innerHTML = `<i class="fa-solid ${slot.dataset.icon}"></i> `;
+                a.append(slot.dataset.label);
+                if (external) a.insertAdjacentHTML('beforeend', ' <i class="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-80"></i>');
+                slot.replaceChildren(a);
+            });
+        }
+
+        /* ---------- Student sign-in (V# + first and last name) ---------- */
+        let student = null;
+        function loadStudent() {
+            try { student = JSON.parse(localStorage.getItem('c2cStudent') || 'null'); } catch (e) { student = null; }
+            if (student && !V_PATTERN.test(student.v || '')) student = null;
+        }
+        function saveStudent() {
+            try {
+                if (student) localStorage.setItem('c2cStudent', JSON.stringify(student));
+                else localStorage.removeItem('c2cStudent');
+            } catch (e) {}
+            // Pre-fills the CBT portal's sign-in box when the student opens it from this tab.
+            try {
+                if (student) sessionStorage.setItem('semiIntake', JSON.stringify({ id: student.v, name: `${student.first} ${student.last}` }));
+                else sessionStorage.removeItem('semiIntake');
+            } catch (e) {}
+        }
+        function renderStudent() {
+            const signedIn = !!student;
+            $('signInBtn').classList.toggle('hidden', signedIn);
+            $('signedInChip').classList.toggle('hidden', !signedIn);
+            $('signedInChip').classList.toggle('flex', signedIn);
+            if (signedIn) { $('chipName').textContent = `${student.first} ${student.last}`; $('chipId').textContent = student.v; }
+        }
+        function submitSignIn(event) {
+            event.preventDefault();
+            const v = normV($('siVnum').value), first = $('siFirst').value.trim(), last = $('siLast').value.trim();
+            if (!V_PATTERN.test(v)) return showError('siError', 'Enter your V# as the letter V followed by 8 digits, for example V00123456.');
+            if (!first || !last) return showError('siError', 'Enter both your first and last name.');
+            showError('siError', '');
+            student = { v, first, last };
+            saveStudent(); renderStudent(); closeModal('signInModal');
+            toast(`Signed in as ${first} ${last}.`);
+        }
+        function signOut() {
+            student = null; saveStudent(); renderStudent();
+            ['siVnum', 'siFirst', 'siLast'].forEach(id => $(id).value = '');
+            toast('Signed out.');
+        }
+        function prefill(map) {
+            if (!student) return;
+            Object.entries(map).forEach(([id, val]) => { if (!$(id).value) $(id).value = val; });
+        }
+
+        /* ---------- Student sign-up -> server -> Airtable ---------- */
+        function openSignup() {
+            showStatus('');
+            prefill({ suVnum: student?.v, suFirst: student?.first, suLast: student?.last });
+            openModal('studentSignupModal');
+        }
+        function showStatus(msg, ok) {
+            const s = $('suStatus');
+            s.textContent = msg;
+            s.className = msg ? `text-xs font-semibold rounded-xl px-3 py-2 border ${ok ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-red-200 bg-red-50 text-red-700'}` : 'hidden';
+        }
         async function submitStudentSignup(event) {
             event.preventDefault();
-            const fullName = document.getElementById('signupFullName').value.trim();
+            const data = {
+                v_number: normV($('suVnum').value),
+                first_name: $('suFirst').value.trim(),
+                last_name: $('suLast').value.trim(),
+                email: $('suEmail').value.trim(),
+                classification: $('suClass').value,
+                interests: [...document.querySelectorAll('#suInterests input:checked')].map(c => c.value)
+            };
+            if (!V_PATTERN.test(data.v_number)) return showStatus('Enter your V# as the letter V followed by 8 digits, for example V00123456.', false);
+            if (!data.first_name || !data.last_name) return showStatus('Enter both your first and last name.', false);
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) return showStatus('Enter a valid email address.', false);
+            if (!data.classification) return showStatus('Choose your classification.', false);
 
+            const btn = $('suSubmit');
+            btn.disabled = true; btn.querySelector('span').textContent = 'Submitting…';
             try {
-                const response = await fetch('/api/register-interest', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ full_name: fullName })
-                });
-
-                if (response.ok) {
-                    alert('Thank you for signing up! Your registration has been logged.');
-                    closeStudentSignupModal();
-                    document.getElementById('signupFullName').value = '';
-                } else {
-                    alert('Failed to register student.');
+                const res = await fetch(SIGNUP_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+                if (!res.ok) {
+                    let detail = '';
+                    try { detail = (await res.json()).error || ''; } catch (e) {}
+                    throw new Error(res.status === 404 ? 'The sign-up service is not set up on the server yet. Please tell the C2C team.' : (detail || `The server could not save your sign-up (error ${res.status}). Please try again.`));
                 }
+                // A successful sign-up also signs the student in.
+                student = { v: data.v_number, first: data.first_name, last: data.last_name };
+                saveStudent(); renderStudent();
+                $('signupForm').reset();
+                closeModal('studentSignupModal');
+                toast('Thank you for signing up! The C2C team will reach out to you.');
             } catch (err) {
-                console.error("Signup error:", err);
-                alert('Could not connect to backend.');
+                showStatus(err instanceof TypeError ? 'Could not reach the server. Check your connection and try again.' : err.message, false);
+            } finally {
+                btn.disabled = false; btn.querySelector('span').textContent = 'Submit Interest & Join';
             }
         }
 
-        async function submitEquipmentBooking(event) {
+        /* ---------- Outlook helpers ---------- */
+        function openEmail(to, subject, body, useApp) {
+            const q = s => encodeURIComponent(s);
+            const url = useApp
+                ? `mailto:${to}?subject=${q(subject)}&body=${q(body)}`
+                : `https://outlook.office.com/mail/deeplink/compose?to=${q(to)}&subject=${q(subject)}&body=${q(body)}`;
+            if (useApp) location.href = url;
+            else window.open(url, '_blank', 'noopener');
+        }
+
+        /* ---------- SOP request (Outlook) ---------- */
+        function openSop() { showError('sopError', ''); openModal('sopModal'); }
+        function sendSopRequest(event, useApp = false) {
             event.preventDefault();
-            const fullName = document.getElementById('eqFullName').value.trim();
-            const date = document.getElementById('eqDate').value;
-            const timeSlot = document.getElementById('eqTimeSlot').value;
-            const equipment = document.getElementById('eqTarget').value;
-            const mentor = document.getElementById('eqMentor').value;
-
-            try {
-                const response = await fetch('/api/complete-training', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        full_name: fullName, 
-                        score: 100.0, 
-                        track: `Physical Equipment: ${equipment} on ${date} (${timeSlot}) w/ Trainer: ${mentor}` 
-                    })
-                });
-
-                if (response.ok) {
-                    alert('Equipment training session scheduled! Trainer sign-off required during hands-on execution.');
-                    closeEquipmentModal();
-                } else {
-                    alert('Failed to log equipment session.');
-                }
-            } catch (err) {
-                console.error("Equipment booking error:", err);
-                alert('Could not connect to backend.');
-            }
+            const docs = [...document.querySelectorAll('#sopDocs input:checked')].map(c => c.value);
+            if (!docs.length) { showError('sopError', 'Check at least one document.'); return false; }
+            showError('sopError', '');
+            const who = student ? `${student.first} ${student.last} (${student.v})` : '[Your full name and V#]';
+            const note = $('sopNote').value.trim();
+            const body = `Hello C2C Team,\n\nPlease send me the following SOP documents:\n\n${docs.map(d => `- ${d}`).join('\n')}\n${note ? `\nNote: ${note}\n` : ''}\nName and V#: ${who}\n\nThank you.`;
+            openEmail(SOP_REQUEST_EMAIL, `SOP Document Request - ${student ? `${student.first} ${student.last}` : 'C2C Student'}`, body, useApp);
+            closeModal('sopModal');
+            toast('Outlook opened with your request. Press Send to finish.');
+            return false;
         }
+
+        /* ---------- Equipment scheduling (Outlook) ---------- */
+        function openEquipment() {
+            showError('eqError', '');
+            prefill({ eqFullName: student ? `${student.first} ${student.last}` : '', eqVnum: student?.v });
+            $('eqDate').min = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+            openModal('equipmentModal');
+        }
+        function sendEquipmentRequest(event, useApp = false) {
+            event.preventDefault();
+            const name = $('eqFullName').value.trim(), v = normV($('eqVnum').value), date = $('eqDate').value;
+            const slot = $('eqTimeSlot').value, equipment = $('eqTarget').value, mentor = $('eqMentor').value;
+            if (!name) { showError('eqError', 'Enter your full name.'); return false; }
+            if (!V_PATTERN.test(v)) { showError('eqError', 'Enter your V# as the letter V followed by 8 digits, for example V00123456.'); return false; }
+            if (!date) { showError('eqError', 'Choose a training date.'); return false; }
+            const day = new Date(`${date}T12:00:00`);
+            if (![2, 4].includes(day.getDay())) { showError('eqError', 'Training runs on Tuesdays and Thursdays only. Choose a Tuesday or Thursday.'); return false; }
+            if (date < $('eqDate').min) { showError('eqError', 'Choose a date that has not passed.'); return false; }
+            if (!equipment) { showError('eqError', 'Choose the equipment.'); return false; }
+            if (!mentor) { showError('eqError', 'Choose a student mentor.'); return false; }
+            showError('eqError', '');
+            const pretty = day.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+            const body = `Hello C2C Team,\n\nI would like to schedule a hands-on equipment training session.\n\nName: ${name}\nV#: ${v}\nEquipment: ${equipment}\nDate: ${pretty}\nTime: ${slot}\nPreferred mentor: ${mentor}\n\nI understand my mentor must sign off on the session during hands-on training.\n\nThank you.`;
+            openEmail(SCHEDULING_EMAIL, `Equipment Training Request - ${equipment} - ${pretty}`, body, useApp);
+            closeModal('equipmentModal');
+            toast('Outlook opened with your request. Press Send to finish.');
+            return false;
+        }
+
+        /* ---------- Init ---------- */
+        renderLayerButtons();
+        loadStudent();
+        renderStudent();
     </script>
 </body>
 </html>
