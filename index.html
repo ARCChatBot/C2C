@@ -30,6 +30,7 @@
             }
         }
     </script>
+    <script src="c2c-connect.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -487,7 +488,8 @@
 
         // Server route that saves sign-ups to Airtable (see airtable_signup.py).
         // The Airtable token lives on the server, never in this page.
-        const SIGNUP_ENDPOINT = 'api/register-interest';
+        // The server address itself is set once for every site in c2c-connect.js.
+        const SIGNUP_ENDPOINT = window.C2C ? C2C.apiUrl('api/register-interest') : 'api/register-interest';
 
         /* ===================================================================== */
 

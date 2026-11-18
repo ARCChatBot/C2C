@@ -14,10 +14,12 @@ import hmac
 import io
 import os
 import re
+import time
+from datetime import datetime, timedelta, timezone
 
 from fastapi import FastAPI, Header, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
+from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, StreamingResponse
 from pydantic import BaseModel
 
 import airtable_store
@@ -133,6 +135,11 @@ def read_admin():
     return page("admin.html")
 
 
+@app.get("/c2c-connect.js", include_in_schema=False)
+def read_connector():
+    return FileResponse(os.path.join(BASE_DIR, "c2c-connect.js"), media_type="application/javascript")
+
+
 @app.get("/healthz")
 def health():
     return {"ok": True, "database_connected": airtable_store.configured()}
@@ -206,6 +213,80 @@ def training_logs(student_id: str = Query(default=""), x_admin_key: str = Header
         return [{k: row[k] for k in ("student_id", "track", "score", "timestamp")} for row in map(result_row, rows)]
     require_admin(x_admin_key)
     return [result_row(r) for r in store(airtable_store.list_records, RESULTS_TABLE)]
+
+
+# ----------------------------------------------------------------------------- AR reports
+# Summary data for the AR data visualization site, in its CSV format. No names or V#s.
+
+_report_cache = {"at": 0.0, "results": []}
+
+
+def recent_results():
+    """All training results, cached for a minute so a busy AR page doesn't hit Airtable limits."""
+    if time.time() - _report_cache["at"] > 60:
+        _report_cache["results"] = [result_row(r) for r in store(airtable_store.list_records, RESULTS_TABLE)]
+        _report_cache["at"] = time.time()
+    return _report_cache["results"]
+
+
+SYSTEMS = ["CBT", "3D Simulation", "VR Cleanroom", "AR Data Visualization", "Physical Equipment"]
+
+
+def activity_csv(results):
+    today = datetime.now(timezone.utc).date()
+    counts = {s: [0] * 30 for s in SYSTEMS}
+    for r in results:
+        try:
+            day = datetime.fromisoformat(r["timestamp"].replace("Z", "+00:00")).date()
+        except ValueError:
+            continue
+        ago = (today - day).days
+        if 0 <= ago < 30 and r["system"] in counts:
+            counts[r["system"]][29 - ago] += 1
+    used = [s for s in SYSTEMS if any(counts[s])] or ["CBT"]
+    lines = [
+        "# type: series   # title: C2C Training Completions (last 30 days)   # category: quality",
+        "# x: Day (0 = today)   # y: Completions",
+        "# description: Training sessions completed per day in each C2C system. Live from the C2C Airtable base.",
+        "# source: C2C training server",
+        "Day," + ",".join(used),
+    ]
+    for i in range(30):
+        lines.append(f"{i - 29}," + ",".join(str(counts[s][i]) for s in used))
+    return "\n".join(lines) + "\n"
+
+
+def scores_csv(results):
+    scores = [r["score"] for r in reversed(results) if isinstance(r["score"], (int, float))][-200:]
+    lines = [
+        "# type: spc   # title: C2C Training Scores   # category: quality",
+        "# quantity: Score   # unit: %   # target: 100   # lsl: 70   # usl: 100",
+        "# description: Scores of the most recent training sessions across all C2C systems, oldest to newest. 70% is the passing line.",
+        "# source: C2C training server",
+        "score",
+    ] + [str(round(s, 1)) for s in scores]
+    return "\n".join(lines) + "\n"
+
+
+@app.get("/api/reports/index.json")
+def reports_index():
+    require_storage()
+    results = recent_results()
+    names = ["c2c_training_activity.csv"]
+    if sum(isinstance(r["score"], (int, float)) for r in results) >= 8:
+        names.append("c2c_training_scores.csv")  # the control chart needs at least 8 scores
+    return names
+
+
+@app.get("/api/reports/{name}")
+def report(name: str):
+    require_storage()
+    results = recent_results()
+    if name == "c2c_training_activity.csv":
+        return PlainTextResponse(activity_csv(results), media_type="text/csv")
+    if name == "c2c_training_scores.csv":
+        return PlainTextResponse(scores_csv(results), media_type="text/csv")
+    raise HTTPException(status_code=404, detail="No such report.")
 
 
 # ----------------------------------------------------------------------------- admin routes

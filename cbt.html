@@ -15,6 +15,7 @@
             }
         }
     </script>
+    <script src="c2c-connect.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -138,6 +139,7 @@
         const ACTIVITY_TRACKS = { match: '2D CBT - Activity: Electronics Match' };
 
         let userId = '', userName = '';
+        const api = (path) => (window.C2C ? C2C.apiUrl(path) : path);
         let offline = false; // true when the training server is not connected (e.g. on GitHub Pages)
 
         // V# rule: V00 followed by 6 digits. Accepts lowercase, spaces, dashes, and the letter O typed for zero.
@@ -153,6 +155,7 @@
             return offline ? 'Completed. Results are kept on this page only until the training server is connected.' : 'Result logged to your training record.';
         }
         function enterPortal() {
+            if (window.C2C) C2C.rememberStudent(userId, userName);
             try { sessionStorage.setItem('semiIntake', JSON.stringify({ id: userId, name: userName })); } catch (e) {}
             $('userNameDisplay').textContent = userName;
             $('offlineBanner').classList.toggle('hidden', !offline);
@@ -192,7 +195,7 @@
             err.classList.add('hidden');
             btn.disabled = true;
             try {
-                const res = await fetch('api/register', {
+                const res = await fetch(api('api/register'), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ student_id: studentIdInput, full_name: fullNameInput })
@@ -217,7 +220,7 @@
 
         async function loadExistingProgress() {
             try {
-                const res = await fetch(`api/training-logs?student_id=${encodeURIComponent(userId)}`);
+                const res = await fetch(api(`api/training-logs?student_id=${encodeURIComponent(userId)}`));
                 if (res.ok) {
                     const logs = await res.json();
                     logs.forEach(log => {
@@ -234,7 +237,7 @@
         async function logCompletion(track, score) {
             if (offline) return true;
             try {
-                const res = await fetch('api/complete-training', {
+                const res = await fetch(api('api/complete-training'), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ student_id: userId, full_name: userName, score: score, track: track, system: 'CBT' })
@@ -949,7 +952,8 @@ function waferSVG(view) {
         window.addEventListener('DOMContentLoaded', () => {
             renderAll();
             try {
-                const saved = JSON.parse(sessionStorage.getItem('semiIntake') || 'null');
+                const shared = window.C2C && C2C.student();
+                const saved = shared ? { id: shared.v, name: C2C.fullName(shared) } : JSON.parse(sessionStorage.getItem('semiIntake') || 'null');
                 if (saved) { $('intakeStudentId').value = saved.id; $('intakeFullName').value = saved.name; }
             } catch (e) {}
         });
