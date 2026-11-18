@@ -1,0 +1,21 @@
+# Render Blueprint for the C2C training server.
+# Render dashboard -> New -> Blueprint -> pick this repo. Render asks for the secret values below.
+services:
+  - type: web
+    name: c2c-training
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn mainsys:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /healthz
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      - key: AIRTABLE_TOKEN
+        sync: false
+      - key: AIRTABLE_BASE_ID
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: ALLOWED_ORIGINS
+        value: https://arcchatbot.github.io

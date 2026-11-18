@@ -1,149 +1,277 @@
-import os
-import sqlite3
+"""
+Operation SEMI / C2C training server.
+
+Serves the dashboard (/), the CBT portal (/cbt) and the admin portal (/admin),
+and stores every sign-up, sign-in and training result in Airtable.
+
+Run locally:   uvicorn mainsys:app --reload
+On Render:     uvicorn mainsys:app --host 0.0.0.0 --port $PORT   (see render.yaml)
+Setup:         README.md
+"""
+
 import csv
+import hmac
 import io
-from fastapi import FastAPI, HTTPException
+import os
+import re
+
+from fastapi import FastAPI, Header, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from pydantic import BaseModel
 
+import airtable_store
+from airtable_signup import SIGNUPS_TABLE, V_PATTERN, normalize_v, save_signup
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_NAME = os.path.join(BASE_DIR, "operation_semi.db")
 
-app = FastAPI(title="Operation SEMI Training System API", version="1.0")
+SIGNINS_TABLE = os.environ.get("AIRTABLE_SIGNINS_TABLE", "Sign-Ins")
+RESULTS_TABLE = os.environ.get("AIRTABLE_RESULTS_TABLE", "Training Results")
 
+app = FastAPI(title="Operation SEMI Training System API", version="2.0")
+
+# Sites on other addresses (GitHub Pages, the VR, 3D and AR apps) that may call this API.
+# Comma-separated list in ALLOWED_ORIGINS; pages served by this server itself need no entry.
+ALLOWED_ORIGINS = [o.strip() for o in os.environ.get("ALLOWED_ORIGINS", "https://arcchatbot.github.io").split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=False,
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type", "X-Admin-Key"],
 )
 
-def init_db():
-    conn = sqlite3.connect(DB_NAME)
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS students (
-            full_name TEXT PRIMARY KEY,
-            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS training_logs (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            full_name TEXT,
-            score REAL,
-            track TEXT,
-            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    conn.commit()
-    conn.close()
 
-init_db()
+# ----------------------------------------------------------------------------- helpers
 
-class StudentInterest(BaseModel):
+def clean(value, limit=200):
+    return str(value or "").strip()[:limit]
+
+
+def require_v(raw):
+    v = normalize_v(raw)
+    if not V_PATTERN.match(v):
+        raise HTTPException(status_code=400, detail="Enter your Student ID as V00 followed by 6 numbers.")
+    return v
+
+
+def require_storage():
+    if not airtable_store.configured():
+        print("mainsys: AIRTABLE_TOKEN or AIRTABLE_BASE_ID is not set")
+        raise HTTPException(status_code=503, detail="The training database is not connected yet. Please tell the C2C team.")
+
+
+def require_admin(key):
+    expected = os.environ.get("ADMIN_PASSWORD", "")
+    if not expected:
+        raise HTTPException(status_code=503, detail="ADMIN_PASSWORD is not set on the server.")
+    if not key or not hmac.compare_digest(key.encode(), expected.encode()):
+        raise HTTPException(status_code=401, detail="Wrong admin password.")
+
+
+def store(action, *args):
+    """Run an Airtable call; turn failures into a clean 502 for the browser."""
+    try:
+        return action(*args)
+    except airtable_store.AirtableError as e:
+        print(f"mainsys: {e}")  # full detail stays in the server log
+        raise HTTPException(status_code=502, detail="The training database could not be reached. Please try again.")
+
+
+def system_for(track, given=""):
+    """Which training system a result came from, for the admin dashboard."""
+    if given:
+        return clean(given, 60)
+    t = track.lower()
+    if t.startswith("2d cbt") or "cbt" in t:
+        return "CBT"
+    if "vr" in t:
+        return "VR Cleanroom"
+    if "ar " in t or "augmented" in t:
+        return "AR Data Visualization"
+    if "3d" in t:
+        return "3D Simulation"
+    if any(k in t for k in ("equipment", "printer", "multimeter", "hololens", "jetson", "oculus")):
+        return "Physical Equipment"
+    return "Other"
+
+
+def result_row(r):
+    f = r.get("fields", {})
+    return {
+        "id": r.get("id"),
+        "student_id": f.get("V Number", ""),
+        "full_name": f.get("Full Name", ""),
+        "system": f.get("System", ""),
+        "track": f.get("Activity", ""),
+        "score": f.get("Score"),
+        "timestamp": r.get("createdTime", ""),
+    }
+
+
+# ----------------------------------------------------------------------------- pages
+
+def page(name):
+    return FileResponse(os.path.join(BASE_DIR, name))
+
+
+@app.get("/", include_in_schema=False)
+@app.get("/index.html", include_in_schema=False)
+def read_index():
+    return page("index.html")
+
+
+@app.get("/cbt", include_in_schema=False)
+@app.get("/cbt.html", include_in_schema=False)
+def read_cbt():
+    return page("cbt.html")
+
+
+@app.get("/admin", include_in_schema=False)
+@app.get("/admin.html", include_in_schema=False)
+def read_admin():
+    return page("admin.html")
+
+
+@app.get("/healthz")
+def health():
+    return {"ok": True, "database_connected": airtable_store.configured()}
+
+
+# ----------------------------------------------------------------------------- student routes
+
+class SignIn(BaseModel):
+    student_id: str
     full_name: str
+    system: str = "CBT"
+
 
 class TrainingCompletion(BaseModel):
-    full_name: str
+    student_id: str
     score: float
     track: str
+    full_name: str = ""
+    system: str = ""
 
-@app.get("/")
-async def read_index():
-    return FileResponse(os.path.join(BASE_DIR, "index.html"))
-
-@app.get("/cbt")
-async def read_cbt():
-    return FileResponse(os.path.join(BASE_DIR, "cbt.html"))
-
-@app.get("/admin")
-async def read_admin():
-    return FileResponse(os.path.join(BASE_DIR, "admin.html"))
-
-@app.get("/api/students")
-async def get_students():
-    try:
-        conn = sqlite3.connect(DB_NAME)
-        cursor = conn.cursor()
-        cursor.execute("SELECT full_name, timestamp FROM students ORDER BY timestamp DESC")
-        rows = cursor.fetchall()
-        conn.close()
-        # Explicit dictionary construction to prevent serialization issues
-        students = [{"full_name": r[0], "timestamp": r[1]} for r in rows]
-        return students
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/api/training-logs")
-async def get_training_logs():
-    try:
-        conn = sqlite3.connect(DB_NAME)
-        cursor = conn.cursor()
-        cursor.execute("SELECT id, full_name, score, track, timestamp FROM training_logs ORDER BY timestamp DESC")
-        rows = cursor.fetchall()
-        conn.close()
-        logs = [{"id": r[0], "full_name": r[1], "score": r[2], "track": r[3], "timestamp": r[4]} for r in rows]
-        return logs
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/register-interest")
-async def register_interest(student: StudentInterest):
-    try:
-        conn = sqlite3.connect(DB_NAME)
-        cursor = conn.cursor()
-        cursor.execute(
-            "INSERT OR IGNORE INTO students (full_name) VALUES (?)", 
-            (student.full_name.strip(),)
-        )
-        conn.commit()
-        conn.close()
-        return {"status": "success", "message": "Student registered successfully"}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+def register_interest(payload: dict):
+    """Dashboard sign-up form -> 'C2C Sign-Ups' table."""
+    ok, status, message = save_signup(payload)
+    return JSONResponse({"ok": True} if ok else {"error": message}, status_code=status)
+
+
+@app.post("/api/register")
+def register(data: SignIn):
+    """CBT (and other systems') sign-in -> 'Sign-Ins' table."""
+    v = require_v(data.student_id)
+    name = clean(data.full_name, 120)
+    if not name:
+        raise HTTPException(status_code=400, detail="Enter your full name.")
+    require_storage()
+    store(airtable_store.create_record, SIGNINS_TABLE, {
+        "V Number": v, "Full Name": name, "System": clean(data.system, 60) or "CBT",
+    })
+    return {"ok": True, "student_id": v}
+
 
 @app.post("/api/complete-training")
-async def complete_training(data: TrainingCompletion):
-    try:
-        conn = sqlite3.connect(DB_NAME)
-        cursor = conn.cursor()
-        cursor.execute(
-            "INSERT OR IGNORE INTO students (full_name) VALUES (?)", 
-            (data.full_name.strip(),)
-        )
-        cursor.execute(
-            "INSERT INTO training_logs (full_name, score, track) VALUES (?, ?, ?)", 
-            (data.full_name.strip(), data.score, data.track)
-        )
-        conn.commit()
-        conn.close()
-        return {"status": "success", "message": "Training progress logged"}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+def complete_training(data: TrainingCompletion):
+    """A finished simulation, game or session from any system -> 'Training Results' table."""
+    v = require_v(data.student_id)
+    track = clean(data.track)
+    if not track:
+        raise HTTPException(status_code=400, detail="Missing training activity name.")
+    if not 0 <= data.score <= 100:
+        raise HTTPException(status_code=400, detail="Score must be between 0 and 100.")
+    require_storage()
+    store(airtable_store.create_record, RESULTS_TABLE, {
+        "V Number": v,
+        "Full Name": clean(data.full_name, 120),
+        "System": system_for(track, data.system),
+        "Activity": track,
+        "Score": round(data.score, 1),
+    })
+    return {"ok": True}
+
+
+@app.get("/api/training-logs")
+def training_logs(student_id: str = Query(default=""), x_admin_key: str = Header(default="")):
+    """With ?student_id=V00…: that student's own results (used by CBT to restore progress).
+    Without it: every result, for the admin portal only."""
+    require_storage()
+    if student_id:
+        v = require_v(student_id)
+        rows = store(airtable_store.list_records, RESULTS_TABLE, f"{{V Number}}='{v}'")
+        return [{k: row[k] for k in ("student_id", "track", "score", "timestamp")} for row in map(result_row, rows)]
+    require_admin(x_admin_key)
+    return [result_row(r) for r in store(airtable_store.list_records, RESULTS_TABLE)]
+
+
+# ----------------------------------------------------------------------------- admin routes
+
+def all_students():
+    """One row per student, combining sign-ups and sign-ins (newest activity first)."""
+    people = {}
+    for r in store(airtable_store.list_records, SIGNUPS_TABLE):
+        f = r.get("fields", {})
+        v = f.get("V Number")
+        if v and v not in people:
+            people[v] = {
+                "student_id": v,
+                "full_name": f"{f.get('First Name', '')} {f.get('Last Name', '')}".strip(),
+                "email": f.get("Email", ""),
+                "classification": f.get("Classification", ""),
+                "interests": ", ".join(f.get("Interests", []) or []),
+                "signed_up": r.get("createdTime", ""),
+                "last_sign_in": "",
+            }
+    for r in store(airtable_store.list_records, SIGNINS_TABLE):
+        f = r.get("fields", {})
+        v = f.get("V Number")
+        if not v:
+            continue
+        p = people.setdefault(v, {
+            "student_id": v, "full_name": f.get("Full Name", ""), "email": "", "classification": "",
+            "interests": "", "signed_up": "", "last_sign_in": "",
+        })
+        if not p["last_sign_in"]:
+            p["last_sign_in"] = r.get("createdTime", "")  # records arrive newest first
+    return sorted(people.values(), key=lambda p: max(p["signed_up"], p["last_sign_in"]), reverse=True)
+
+
+@app.get("/api/students")
+def get_students(x_admin_key: str = Header(default="")):
+    require_admin(x_admin_key)
+    require_storage()
+    return all_students()
+
 
 @app.get("/api/export-csv")
-async def export_csv():
-    conn = sqlite3.connect(DB_NAME)
-    cursor = conn.cursor()
-    cursor.execute("SELECT full_name, timestamp FROM students ORDER BY timestamp DESC")
-    rows = cursor.fetchall()
-    conn.close()
+def export_csv(x_admin_key: str = Header(default="")):
+    require_admin(x_admin_key)
+    require_storage()
+    students = all_students()
+    results = [result_row(r) for r in store(airtable_store.list_records, RESULTS_TABLE)]
 
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow(["Full Name", "Registration Timestamp"])
-    for row in rows:
-        writer.writerow(row)
-    
-    output.seek(0)
+    writer.writerow(["Students"])
+    writer.writerow(["V Number", "Full Name", "Email", "Classification", "Interests", "Signed Up", "Last Sign-In"])
+    for p in students:
+        writer.writerow([p["student_id"], p["full_name"], p["email"], p["classification"], p["interests"], p["signed_up"], p["last_sign_in"]])
+    writer.writerow([])
+    writer.writerow(["Training Results"])
+    writer.writerow(["V Number", "Full Name", "System", "Activity", "Score", "Completed"])
+    for r in results:
+        writer.writerow([r["student_id"], r["full_name"], r["system"], r["track"], r["score"], r["timestamp"]])
+
     return StreamingResponse(
         iter([output.getvalue()]),
         media_type="text/csv",
-        headers={"Content-Disposition": "attachment; filename=registered_students.csv"}
+        headers={"Content-Disposition": "attachment; filename=c2c_training_records.csv"},
     )
+
 
 if __name__ == "__main__":
     import uvicorn

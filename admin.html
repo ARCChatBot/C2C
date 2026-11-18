@@ -34,10 +34,13 @@
                 </div>
             </div>
             <div class="flex items-center space-x-3">
-                <a href="/api/export-csv" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-2 shadow">
+                <button onclick="exportCsv()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-2 shadow">
                     <i class="fa-solid fa-file-csv text-sm"></i> Export Data to CSV
-                </a>
-                <a href="/" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
+                </button>
+                <button onclick="lockAdmin()" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
+                    <i class="fa-solid fa-lock"></i> Lock
+                </button>
+                <a href="./" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold transition-colors flex items-center gap-2">
                     <i class="fa-solid fa-house"></i> Main Portal
                 </a>
             </div>
@@ -52,7 +55,7 @@
                         <i class="fa-solid fa-gauge-high"></i>
                     </div>
                     <div>
-                        <span class="text-xs font-bold text-vsuOrange uppercase tracking-wider">Live Database Connection Active</span>
+                        <span id="connStatus" class="text-xs font-bold text-vsuOrange uppercase tracking-wider">Connecting to Airtable…</span>
                         <h2 class="text-2xl font-extrabold text-vsuDark">Workforce Development Metrics &amp; 4 Training Tracks</h2>
                     </div>
                 </div>
@@ -110,81 +113,130 @@
         </section>
     </main>
 
+    <!-- Admin password screen -->
+    <div id="adminLock" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <form onsubmit="unlockAdmin(event)" class="bg-white rounded-3xl max-w-sm w-full p-8 shadow-2xl space-y-4">
+            <div class="w-14 h-14 rounded-2xl bg-blue-50 text-vsuBlue flex items-center justify-center text-2xl mx-auto"><i class="fa-solid fa-lock"></i></div>
+            <h2 class="text-xl font-extrabold text-vsuDark text-center">Admin Access</h2>
+            <p class="text-xs text-slate-500 text-center">Student records are private. Enter the admin password to view them.</p>
+            <label for="adminKey" class="block text-xs font-semibold text-slate-700">Admin password</label>
+            <input id="adminKey" type="password" autocomplete="current-password" required class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-slate-50">
+            <p id="adminLockError" role="alert" class="hidden text-xs font-semibold text-red-700 bg-red-50 border border-red-200 rounded-xl px-3 py-2"></p>
+            <button type="submit" class="w-full py-3 rounded-xl bg-vsuBlue hover:bg-blue-800 text-white font-bold text-sm">Unlock</button>
+            <a href="./" class="block text-center text-xs font-semibold text-slate-500 hover:text-slate-700">Back to Main Portal</a>
+        </form>
+    </div>
+
     <footer class="bg-vsuBlue text-white border-t-2 border-vsuOrange py-6 text-center text-xs">
         <p>Virginia State University &bull; Classroom to Cleanroom (C2C) &bull; Admin Telemetry &bull; NSF Award #2606117</p>
     </footer>
 
     <script>
+        // The admin password is kept for this browser tab only and sent with each request.
+        function getKey() { try { return sessionStorage.getItem('c2cAdminKey') || ''; } catch (e) { return ''; } }
+        function setKey(k) { try { k ? sessionStorage.setItem('c2cAdminKey', k) : sessionStorage.removeItem('c2cAdminKey'); } catch (e) {} }
+
+        function showLock(message) {
+            document.getElementById('adminLock').classList.remove('hidden');
+            const err = document.getElementById('adminLockError');
+            err.textContent = message || '';
+            err.classList.toggle('hidden', !message);
+            setTimeout(() => document.getElementById('adminKey').focus(), 50);
+        }
+        function unlockAdmin(event) {
+            event.preventDefault();
+            setKey(document.getElementById('adminKey').value);
+            document.getElementById('adminLock').classList.add('hidden');
+            loadAdminMetrics();
+        }
+        function lockAdmin() { setKey(''); document.getElementById('adminKey').value = ''; showLock(); }
+
+        async function adminFetch(url) {
+            const res = await fetch(url, { headers: { 'X-Admin-Key': getKey() } });
+            if (res.status === 401) { setKey(''); showLock('Wrong admin password. Try again.'); throw new Error('locked'); }
+            if (!res.ok) {
+                let detail = '';
+                try { detail = (await res.json()).detail || ''; } catch (e) {}
+                throw new Error(detail || `Server error ${res.status}`);
+            }
+            return res;
+        }
+
         async function loadAdminMetrics() {
+            if (!getKey()) { showLock(); return; }
             const tbody = document.getElementById('adminLogsTableBody');
+            const status = document.getElementById('connStatus');
             tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400 italic">Syncing telemetry metrics...</td></tr>`;
             try {
-                const [studentsRes, logsRes] = await Promise.all([
-                    fetch('/api/students'),
-                    fetch('/api/training-logs').catch(() => null)
+                const [students, logs] = await Promise.all([
+                    adminFetch('api/students').then(r => r.json()),
+                    adminFetch('api/training-logs').then(r => r.json())
                 ]);
-                const students = studentsRes.ok ? await studentsRes.json() : [];
+                status.textContent = 'Live Airtable Connection Active';
                 document.getElementById('statTotalStudents').textContent = students.length;
 
-                let count2d = 0, count3d = 0, countVr = 0, countPhysical = 0;
-                let logs = [];
-                if (logsRes && logsRes.ok) {
-                    logs = await logsRes.json();
-                    logs.forEach(log => {
-                        const t = (log.track || '').toLowerCase();
-                        if (t.includes('2d') || t.includes('cbt') || t.includes('module')) count2d++;
-                        else if (t.includes('3d') || t.includes('simulation')) count3d++;
-                        else if (t.includes('vr') || t.includes('cleanroom')) countVr++;
-                        else if (t.includes('physical') || t.includes('equipment') || t.includes('multimeter') || t.includes('hololens') || t.includes('enderbot') || t.includes('jetson')) countPhysical++;
-                    });
-                }
-                document.getElementById('stat2dCompleted').textContent = count2d;
-                document.getElementById('stat3dCompleted').textContent = count3d;
-                document.getElementById('statVrCompleted').textContent = countVr;
-                document.getElementById('statPhysicalCompleted').textContent = countPhysical;
+                const count = sys => logs.filter(l => l.system === sys).length;
+                document.getElementById('stat2dCompleted').textContent = count('CBT');
+                document.getElementById('stat3dCompleted').textContent = count('3D Simulation');
+                document.getElementById('statVrCompleted').textContent = count('VR Cleanroom');
+                document.getElementById('statPhysicalCompleted').textContent = count('Physical Equipment');
 
                 if (logs.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400 italic">Registered students found (${students.length}), but no activity logs recorded yet.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400 italic">Registered students found (${students.length}), but no training results recorded yet.</td></tr>`;
                     return;
                 }
 
+                const badge = {
+                    'CBT': 'bg-blue-50 text-blue-800 border border-blue-200',
+                    '3D Simulation': 'bg-orange-50 text-orange-800 border border-orange-200',
+                    'VR Cleanroom': 'bg-indigo-50 text-indigo-800 border border-indigo-200',
+                    'AR Data Visualization': 'bg-sky-50 text-sky-800 border border-sky-200',
+                    'Physical Equipment': 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                };
                 tbody.innerHTML = '';
                 logs.forEach(log => {
                     const row = document.createElement('tr');
                     row.className = "hover:bg-slate-50 transition-colors";
-                    const tLower = (log.track || '').toLowerCase();
-                    
-                    let badgeClass = "bg-slate-100 text-slate-700";
-                    let recordType = "CBT Completion";
-
-                    if (tLower.includes('physical') || tLower.includes('equipment')) {
-                        badgeClass = "bg-emerald-50 text-emerald-800 border border-emerald-200";
-                        recordType = "Equipment Booking";
-                    } else if (tLower.includes('3d')) {
-                        badgeClass = "bg-orange-50 text-orange-800 border border-orange-200";
-                        recordType = "3D Simulation";
-                    } else if (tLower.includes('vr')) {
-                        badgeClass = "bg-indigo-50 text-indigo-800 border border-indigo-200";
-                        recordType = "VR Cleanroom";
-                    }
-
+                    const when = log.timestamp ? new Date(log.timestamp).toLocaleString() : 'N/A';
+                    const score = (log.score ?? '') === '' ? '' : ` · ${log.score}%`;
                     row.innerHTML = `
-                        <td class="py-3 px-4 font-semibold text-vsuBlue">${escapeHtml(log.student_id)}</td>
+                        <td class="py-3 px-4 font-semibold text-vsuBlue font-mono">${escapeHtml(log.student_id)}</td>
                         <td class="py-3 px-4 font-medium text-slate-900">${escapeHtml(log.full_name || 'Trainee')}</td>
-                        <td class="py-3 px-4"><span class="px-2.5 py-1 ${badgeClass} rounded-full text-xs font-bold">${escapeHtml(log.track)}</span></td>
-                        <td class="py-3 px-4 font-bold ${recordType === 'Equipment Booking' ? 'text-emerald-700' : 'text-blue-600'}">${recordType}</td>
-                        <td class="py-3 px-4 text-xs text-slate-500">${escapeHtml(log.timestamp || 'N/A')}</td>
+                        <td class="py-3 px-4"><span class="px-2.5 py-1 ${badge[log.system] || 'bg-slate-100 text-slate-700'} rounded-full text-xs font-bold">${escapeHtml(log.track)}${escapeHtml(score)}</span></td>
+                        <td class="py-3 px-4 font-bold text-blue-600">${escapeHtml(log.system || 'Other')}</td>
+                        <td class="py-3 px-4 text-xs text-slate-500">${escapeHtml(when)}</td>
                     `;
                     tbody.appendChild(row);
                 });
             } catch (error) {
-                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-rose-500 font-medium">Could not connect to backend telemetry database.</td></tr>`;
+                if (error.message === 'locked') return;
+                status.textContent = 'Not Connected';
+                tbody.innerHTML = '';
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="5" class="py-6 text-center text-rose-500 font-medium"></td>`;
+                row.firstElementChild.textContent = `Could not load records: ${error.message}`;
+                tbody.appendChild(row);
             }
         }
+
+        async function exportCsv() {
+            if (!getKey()) { showLock(); return; }
+            try {
+                const blob = await (await adminFetch('api/export-csv')).blob();
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'c2c_training_records.csv';
+                a.click();
+                setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+            } catch (e) {
+                if (e.message !== 'locked') alert(`Export failed: ${e.message}`);
+            }
+        }
+
         function escapeHtml(text) {
-            if (!text) return '';
+            if (text === null || text === undefined) return '';
             const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-            return text.toString().replace(/[&<>"']/g, function(m) { return map[m]; });
+            return text.toString().replace(/[&<>"']/g, m => map[m]);
         }
         window.addEventListener('DOMContentLoaded', loadAdminMetrics);
     </script>

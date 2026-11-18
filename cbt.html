@@ -217,7 +217,7 @@
 
         async function loadExistingProgress() {
             try {
-                const res = await fetch('api/training-logs');
+                const res = await fetch(`api/training-logs?student_id=${encodeURIComponent(userId)}`);
                 if (res.ok) {
                     const logs = await res.json();
                     logs.forEach(log => {
@@ -237,7 +237,7 @@
                 const res = await fetch('api/complete-training', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ student_id: userId, score: score, track: track })
+                    body: JSON.stringify({ student_id: userId, full_name: userName, score: score, track: track, system: 'CBT' })
                 });
                 return res.ok;
             } catch (e) { return false; }
