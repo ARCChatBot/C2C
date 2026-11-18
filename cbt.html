@@ -40,8 +40,8 @@
             </div>
             <form onsubmit="handleDirectIntake(event)" class="space-y-3 text-left">
                 <div>
-                    <label for="intakeStudentId" class="block text-xs font-semibold text-slate-700 mb-1">Student ID</label>
-                    <input type="text" id="intakeStudentId" placeholder="e.g. VSU-100294" required autocomplete="off" class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brandBlue/40">
+                    <label for="intakeStudentId" class="block text-xs font-semibold text-slate-700 mb-1">Student ID (V#)</label>
+                    <input type="text" id="intakeStudentId" placeholder="e.g. V00123456" required autocomplete="off" class="font-mono uppercase w-full px-4 py-3 rounded-xl border border-slate-200 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brandBlue/40">
                 </div>
                 <div>
                     <label for="intakeFullName" class="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
@@ -65,14 +65,18 @@
                 <h1 class="text-lg sm:text-xl font-bold text-slate-900 truncate">Operation SEMI <span class="hidden sm:inline text-xs uppercase px-2 py-0.5 bg-blue-50 text-brandBlue rounded-full font-semibold">2D CBT Portal</span></h1>
             </div>
             <div class="flex items-center gap-2 sm:gap-4 shrink-0">
-                <a href="/" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold">Main Portal</a>
-                <a href="/admin" class="px-3 py-1.5 bg-orange-100 hover:bg-orange-200 text-brandOrange rounded-xl text-xs font-bold">Admin View</a>
+                <a href="./" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold">Main Portal</a>
+                <a href="admin" class="px-3 py-1.5 bg-orange-100 hover:bg-orange-200 text-brandOrange rounded-xl text-xs font-bold">Admin View</a>
                 <span class="hidden md:inline text-xs font-semibold text-slate-700" id="userNameDisplay">Trainee Candidate</span>
             </div>
         </div>
     </header>
 
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-8">
+        <div id="offlineBanner" role="status" class="hidden rounded-2xl border border-amber-300 bg-amber-50 px-5 py-3 text-xs font-semibold text-amber-900 flex items-start gap-2">
+            <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
+            <span>Practice mode: the training server is not connected, so your results are not being saved to your record. You can still complete every simulation.</span>
+        </div>
         <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
             <div class="flex flex-wrap items-center justify-between gap-3">
                 <div>
@@ -117,7 +121,7 @@
                     Congratulations! You have completed every simulation and the matching game. Please return to the main menu for continuous training and hands-on equipment scheduling.
                 </p>
             </div>
-            <a href="/" class="block w-full py-3.5 rounded-xl bg-brandBlue hover:bg-blue-700 text-white font-semibold text-sm shadow-lg transition-colors">
+            <a href="./" class="block w-full py-3.5 rounded-xl bg-brandBlue hover:bg-blue-700 text-white font-semibold text-sm shadow-lg transition-colors">
                 <i class="fa-solid fa-arrow-left"></i> Return to Main Menu
             </a>
             <button onclick="closeModal('celebrationModal')" class="text-xs font-semibold text-slate-500 hover:text-slate-700">Stay here and run simulations again</button>
@@ -134,6 +138,26 @@
         const ACTIVITY_TRACKS = { match: '2D CBT - Activity: Electronics Match' };
 
         let userId = '', userName = '';
+        let offline = false; // true when the training server is not connected (e.g. on GitHub Pages)
+
+        // V# rule: V00 followed by 6 digits. Accepts lowercase, spaces, dashes, and the letter O typed for zero.
+        const V_PATTERN = /^V00\d{6}$/;
+        function normV(raw) {
+            let v = String(raw || '').toUpperCase().replace(/[\s-]/g, '');
+            if (/^V[O0]{2}/.test(v)) v = 'V00' + v.slice(3);
+            return v;
+        }
+        function savedText(saved) {
+            if (saved === null) return 'Saving your result…';
+            if (!saved) return 'Could not save your result. Check your connection.';
+            return offline ? 'Completed. Results are kept on this page only until the training server is connected.' : 'Result logged to your training record.';
+        }
+        function enterPortal() {
+            try { sessionStorage.setItem('semiIntake', JSON.stringify({ id: userId, name: userName })); } catch (e) {}
+            $('userNameDisplay').textContent = userName;
+            $('offlineBanner').classList.toggle('hidden', !offline);
+            closeModal('intakeAuthModal');
+        }
         let completedActivities = new Set();
         let celebrated = false;
         let toastTimer = null;
@@ -155,26 +179,36 @@
         /* ============================== API ============================== */
         async function handleDirectIntake(event) {
             event.preventDefault();
-            const studentIdInput = $('intakeStudentId').value.trim();
+            const studentIdInput = normV($('intakeStudentId').value);
             const fullNameInput = $('intakeFullName').value.trim();
             const err = $('intakeError'), btn = $('intakeSubmit');
             if (!studentIdInput || !fullNameInput) return;
+            if (!V_PATTERN.test(studentIdInput)) {
+                err.textContent = 'Enter your Student ID as V00 followed by 6 numbers, for example V00123456.';
+                err.classList.remove('hidden');
+                return;
+            }
+            $('intakeStudentId').value = studentIdInput;
             err.classList.add('hidden');
             btn.disabled = true;
             try {
-                const res = await fetch('/api/register', {
+                const res = await fetch('api/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ student_id: studentIdInput, full_name: fullNameInput })
                 });
-                if (!res.ok) throw new Error(`Registration was rejected (error ${res.status}). Check your Student ID and try again.`);
                 userId = studentIdInput; userName = fullNameInput;
-                try { sessionStorage.setItem('semiIntake', JSON.stringify({ id: userId, name: userName })); } catch (e) {}
-                $('userNameDisplay').textContent = userName;
-                closeModal('intakeAuthModal');
+                if ([404, 405, 501].includes(res.status)) {
+                    // No training server behind this page: let the student train, but say results are not saved.
+                    offline = true; enterPortal(); renderAll();
+                    return;
+                }
+                if (!res.ok) throw new Error(`The training server could not register you (error ${res.status}). Please try again, or tell your instructor.`);
+                offline = false; enterPortal();
                 await loadExistingProgress();
             } catch (e) {
-                err.textContent = e instanceof TypeError ? 'Could not reach the training server. Check your connection and try again.' : e.message;
+                if (e instanceof TypeError) { offline = true; userId = studentIdInput; userName = fullNameInput; enterPortal(); renderAll(); return; }
+                err.textContent = e.message;
                 err.classList.remove('hidden');
             } finally {
                 btn.disabled = false;
@@ -183,7 +217,7 @@
 
         async function loadExistingProgress() {
             try {
-                const res = await fetch('/api/training-logs');
+                const res = await fetch('api/training-logs');
                 if (res.ok) {
                     const logs = await res.json();
                     logs.forEach(log => {
@@ -198,8 +232,9 @@
         }
 
         async function logCompletion(track, score) {
+            if (offline) return true;
             try {
-                const res = await fetch('/api/complete-training', {
+                const res = await fetch('api/complete-training', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ student_id: userId, score: score, track: track })
@@ -330,7 +365,7 @@
             if (game.done) {
                 html += `<div class="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-5 text-center space-y-3">
                     <p class="text-base font-extrabold text-slate-900">All pairs matched — score ${score}%</p>
-                    <p class="text-xs font-medium ${game.saved === false ? 'text-red-700' : 'text-slate-600'}">${game.saved === null ? 'Saving your result…' : game.saved ? 'Result logged to your training record.' : 'Could not save your result. Check your connection.'}</p>
+                    <p class="text-xs font-medium ${game.saved === false ? 'text-red-700' : 'text-slate-600'}">${savedText(game.saved)}</p>
                     <div class="flex flex-wrap justify-center gap-3">
                         ${game.saved === false ? '<button onclick="saveGame()" class="px-5 py-2.5 rounded-xl bg-brandOrange text-white text-xs font-bold">Retry Save</button>' : ''}
                         <button onclick="startMatchGame()" class="px-5 py-2.5 rounded-xl bg-brandBlue hover:bg-blue-800 text-white text-xs font-bold"><i class="fa-solid fa-shuffle"></i> Play Again With New Parts</button>
@@ -834,7 +869,7 @@ function waferSVG(view) {
                             <p class="text-3xl font-extrabold text-slate-900">${cfg.meter}: ${sim.score}%</p>
                             <p class="text-sm text-slate-700 font-medium">${grade}</p>
                             <p class="text-xs text-slate-600">You completed all ${n} steps with ${sim.mistakes} wrong ${sim.mistakes === 1 ? 'call' : 'calls'}.</p>
-                            <p class="text-xs font-semibold ${sim.saved === false ? 'text-red-700' : 'text-slate-600'}">${sim.saved === null ? 'Saving your result…' : sim.saved ? 'Result logged to your training record.' : 'Could not save your result. Check your connection.'}</p>
+                            <p class="text-xs font-semibold ${sim.saved === false ? 'text-red-700' : 'text-slate-600'}">${savedText(sim.saved)}</p>
                             <div class="flex flex-wrap gap-3">
                                 ${sim.saved === false ? '<button onclick="saveSim()" class="px-5 py-2.5 rounded-xl bg-brandOrange text-white text-xs font-bold">Retry Save</button>' : ''}
                                 <button onclick="startSim('${cfg.key}')" class="px-5 py-2.5 rounded-xl bg-brandBlue hover:bg-blue-800 text-white text-xs font-bold"><i class="fa-solid fa-rotate-right"></i> Run Again</button>

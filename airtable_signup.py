@@ -64,7 +64,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-V_PATTERN = re.compile(r"^V\d{8}$")
+V_PATTERN = re.compile(r"^V00\d{6}$")
 EMAIL_PATTERN = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
 CLASSIFICATIONS = {"Freshman", "Sophomore", "Junior", "Senior", "Graduate"}
 INTERESTS = {
@@ -82,7 +82,9 @@ def save_signup(data):
 
     Returns (ok, http_status, message). The message is safe to show students.
     """
-    v_number = _clean(data.get("v_number"), 9).upper()
+    v_number = re.sub(r"[\s-]", "", _clean(data.get("v_number"), 20).upper())
+    if re.match(r"^V[O0]{2}", v_number):
+        v_number = "V00" + v_number[3:]
     first = _clean(data.get("first_name"))
     last = _clean(data.get("last_name"))
     email = _clean(data.get("email"), 254)
@@ -91,7 +93,7 @@ def save_signup(data):
     interests = [i for i in interests if isinstance(i, str) and i in INTERESTS] if isinstance(interests, list) else []
 
     if not V_PATTERN.match(v_number):
-        return False, 400, "Enter your V# as the letter V followed by 8 digits."
+        return False, 400, "Enter your V# as V00 followed by 6 numbers."
     if not first or not last:
         return False, 400, "Enter both your first and last name."
     if not EMAIL_PATTERN.match(email):

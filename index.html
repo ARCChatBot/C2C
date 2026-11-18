@@ -492,8 +492,13 @@
         /* ===================================================================== */
 
         const $ = id => document.getElementById(id);
-        const V_PATTERN = /^V\d{8}$/;
-        const normV = v => v.trim().toUpperCase();
+        // V# rule: V00 followed by 6 digits. Accepts lowercase, spaces, dashes, and the letter O typed for zero.
+        const V_PATTERN = /^V00\d{6}$/;
+        function normV(raw) {
+            let v = String(raw || '').toUpperCase().replace(/[\s-]/g, '');
+            if (/^V[O0]{2}/.test(v)) v = 'V00' + v.slice(3);
+            return v;
+        }
         let toastTimer = null;
 
         function toast(msg, ok = true) {
@@ -559,7 +564,7 @@
         function submitSignIn(event) {
             event.preventDefault();
             const v = normV($('siVnum').value), first = $('siFirst').value.trim(), last = $('siLast').value.trim();
-            if (!V_PATTERN.test(v)) return showError('siError', 'Enter your V# as the letter V followed by 8 digits, for example V00123456.');
+            if (!V_PATTERN.test(v)) return showError('siError', 'Enter your V# as V00 followed by 6 numbers, for example V00123456.');
             if (!first || !last) return showError('siError', 'Enter both your first and last name.');
             showError('siError', '');
             student = { v, first, last };
@@ -597,7 +602,7 @@
                 classification: $('suClass').value,
                 interests: [...document.querySelectorAll('#suInterests input:checked')].map(c => c.value)
             };
-            if (!V_PATTERN.test(data.v_number)) return showStatus('Enter your V# as the letter V followed by 8 digits, for example V00123456.', false);
+            if (!V_PATTERN.test(data.v_number)) return showStatus('Enter your V# as V00 followed by 6 numbers, for example V00123456.', false);
             if (!data.first_name || !data.last_name) return showStatus('Enter both your first and last name.', false);
             if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) return showStatus('Enter a valid email address.', false);
             if (!data.classification) return showStatus('Choose your classification.', false);
@@ -662,7 +667,7 @@
             const name = $('eqFullName').value.trim(), v = normV($('eqVnum').value), date = $('eqDate').value;
             const slot = $('eqTimeSlot').value, equipment = $('eqTarget').value, mentor = $('eqMentor').value;
             if (!name) { showError('eqError', 'Enter your full name.'); return false; }
-            if (!V_PATTERN.test(v)) { showError('eqError', 'Enter your V# as the letter V followed by 8 digits, for example V00123456.'); return false; }
+            if (!V_PATTERN.test(v)) { showError('eqError', 'Enter your V# as V00 followed by 6 numbers, for example V00123456.'); return false; }
             if (!date) { showError('eqError', 'Choose a training date.'); return false; }
             const day = new Date(`${date}T12:00:00`);
             if (![2, 4].includes(day.getDay())) { showError('eqError', 'Training runs on Tuesdays and Thursdays only. Choose a Tuesday or Thursday.'); return false; }
